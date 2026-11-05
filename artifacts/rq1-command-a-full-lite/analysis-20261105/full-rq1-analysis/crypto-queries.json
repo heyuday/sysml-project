@@ -1,0 +1,2593 @@
+{
+  "version": 2,
+  "database": "crypto",
+  "queries": {
+    "3c85c8eb7f0445e0b8c6320fc5dc989679b76e1d919e666fac150826a4b6cdf7": {
+      "sql": "SELECT\n    (\n        (CAST(quote_depth_snapshot->'quotes'->>'askquote' AS DECIMAL) - \n        CAST(quote_depth_snapshot->'quotes'->>'bidquote' AS DECIMAL)) /\n        CAST(quote_depth_snapshot->'quotes'->>'bidquote' AS DECIMAL)\n    ) * 100 AS price_gap_percentage,\n    (quote_depth_snapshot->'metadata'->>'exchnote') AS exchange_code,\n    (quote_depth_snapshot->'metadata'->>'timetrack') AS snapshot_timestamp\nFROM marketdata\nORDER BY (quote_depth_snapshot->'metadata'->>'timetrack')::timestamp DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4caf501d2a99644c251d49db4b8faaa735a4dfbb69624d83366101e14e9bd5df",
+      "ordered": true,
+      "columns": [
+        [
+          "price_gap_percentage",
+          1700,
+          -1
+        ],
+        [
+          "exchange_code",
+          25,
+          -1
+        ],
+        [
+          "snapshot_timestamp",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "37b241060cc661dedd28164d083ce3a7f9c411581d7eb011746e6635e5443e4f",
+      "values_digest": "cd9aeb909bbd61a915ccd5dbf9edc45f59d5150bf07b95407f6910ef9dbd1f1a",
+      "ordered_digest": "37b241060cc661dedd28164d083ce3a7f9c411581d7eb011746e6635e5443e4f"
+    },
+    "8e17276c161a99d50aed280732fc6269b18a43b20d6641096ff8e85cb2176d6f": {
+      "sql": "SELECT\n    (md.quote_depth_snapshot->>'exchnote') AS exchange_code,\n    (md.quote_depth_snapshot->'metadata'->>'timetrack')::timestamp AS snapshot_timestamp,\n    ((md.quote_depth_snapshot->'quotes'->>'askquote')::decimal - (md.quote_depth_snapshot->'quotes'->>'bidquote')::decimal) /\n    (md.quote_depth_snapshot->'quotes'->>'bidquote')::decimal * 100 AS price_gap_percentage\nFROM\n    marketdata md\nORDER BY\n    (md.quote_depth_snapshot->'metadata'->>'timetrack')::timestamp DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7d1a743b89e1f3b76abb02540a4e8b02933e6315e7207028d7978d576c59313e",
+      "ordered": true,
+      "columns": [
+        [
+          "exchange_code",
+          25,
+          -1
+        ],
+        [
+          "snapshot_timestamp",
+          1114,
+          -1
+        ],
+        [
+          "price_gap_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "e3b30d699d7e3720d9f873db9455725ef87612ba488012bc8897b43eb71991cd",
+      "values_digest": "eff3d8131310a5355015364f78fd84390167496bd708a2954b569f80656577f0",
+      "ordered_digest": "e3b30d699d7e3720d9f873db9455725ef87612ba488012bc8897b43eb71991cd"
+    },
+    "9a7492c653aaa106c5363b93492fc654a4b228b2f520561d2b2809e80a57796c": {
+      "sql": "SELECT\n    SUM(realline) AS total_realized_pnl,\n    AVG(realline) AS avg_realized_pnl,\n    (SUM(realline) / SUM(walletsum)) AS profit_ratio\nFROM\n    accountbalances;",
+      "decisions": {
+        "N0": {
+          "key": "f5b3fe5f97bab067da511df9621e81e6774dcff40f3dbab915873eaeedcc39e1",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "d5a3c878795ec937774843c49beb9dd8e374613f58643b1032ad9e45d7033440",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "56acae888aabaacfb474b3e5b9fdd39785722a1d0f96adf294c8b2e001d7ab98",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "e75d8f7da37e320f01f88eb32365f4d40b1eca2d2342bfc27edd565fb6954b9e",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "810e273355f53557c2c44437a9052fef159bfeb14fca1167765a698f43d517f3",
+      "ordered": false,
+      "columns": [
+        [
+          "total_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "avg_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "profit_ratio",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "69317887cd4a5ddb10b82e611251987ea818e088834bf2d6eb7af6f2f9853540",
+      "values_digest": "5c6cbf558272f8647f7a4584943507ac8fbaa61904260d53844240a7c326cc89",
+      "ordered_digest": "69317887cd4a5ddb10b82e611251987ea818e088834bf2d6eb7af6f2f9853540"
+    },
+    "3f46039376b5e8a8a5a13c144210b60f9ec6c35f37955deaf2e14a38f518a437": {
+      "sql": "SELECT\n    marketdatanode,\n    jsonb_build_object(\n        'spread_percentage',\n        ((quote_depth_snapshot->'quotes'->>'askquote')::numeric - (quote_depth_snapshot->'quotes'->>'bidquote')::numeric) / (quote_depth_snapshot->'quotes'->>'bidquote')::numeric,\n        'existing_data', quote_depth_snapshot\n    ) AS updated_quote_depth_snapshot\nFROM marketdata\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c6c7199148972a552c1512271bb8291fdae6730664cde972681bd83aa84904ce",
+      "ordered": false,
+      "columns": [
+        [
+          "marketdatanode",
+          20,
+          -1
+        ],
+        [
+          "updated_quote_depth_snapshot",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "5f3ea1ec256a4fdd54a102e6dba6eb5e8a12846b8d24029efec86a837acaee72",
+      "values_digest": "c25edf3789b4e320e549792c769c43562a92a57608e0a37389795abb7a25be5f",
+      "ordered_digest": "5f3ea1ec256a4fdd54a102e6dba6eb5e8a12846b8d24029efec86a837acaee72"
+    },
+    "0a2c9982929f177a40c0e2f0e254accf9957e1ce83786ad4f1beadc22555e81f": {
+      "sql": "SELECT\n    o.recordvault AS order_id,\n    o.dealcount AS total_order_quantity,\n    oe.remaincount AS remaining_quantity,\n    (o.dealcount - oe.remaincount) / o.dealcount AS order_fill_rate\nFROM\n    orders o\nJOIN\n    orderexecutions oe ON o.recordvault = oe.ordersmark;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9a9bb040b1b62f87e608a6ac5df50c7bbedc0caf7036ee1e0579bab39fedcd1d",
+      "ordered": false,
+      "columns": [
+        [
+          "order_id",
+          1042,
+          40
+        ],
+        [
+          "total_order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "remaining_quantity",
+          1700,
+          524296
+        ],
+        [
+          "order_fill_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ee5a91779fa26b23a40d735268fe9adb0da43d4fa0ba128a4fdc373567e8ddd3",
+      "values_digest": "79963f3069161c7bd4673969a7740fe523305929d7f06d93285a1a5fafa0e56e",
+      "ordered_digest": "572e202e482d050db9413f370c6b12cc492f02ca93d5d1117af85b77e52e1431"
+    },
+    "a904e674c8e2f019455094b38f019fd617fcedb77d63f9c995e501072f87b9e7": {
+      "sql": "SELECT\n    o.recordvault AS order_reference,\n    o.dealedge AS trade_side,\n    o.dealcount AS order_quantity,\n    md.quote_depth_snapshot->'depth'->>'askdepth' AS ask_depth,\n    md.quote_depth_snapshot->'depth'->>'askunits' AS ask_units,\n    md.quote_depth_snapshot->'depth'->>'biddepth' AS bid_depth,\n    md.quote_depth_snapshot->'depth'->>'bidunits' AS bid_units\nFROM\n    orders AS o\nJOIN (\n    SELECT\n        (quote_depth_snapshot->'metadata'->>'mktcombo')::varchar AS mktcombo,\n        quote_depth_snapshot,\n        row_number() OVER (PARTITION BY (quote_depth_snapshot->'metadata'->>'mktcombo') ORDER BY marketdatanode DESC) AS rn\n    FROM\n        marketdata\n    ) AS md\nON\n    o.mktnote = md.mktcombo AND md.rn = 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "54259d790ff8c46917b74885d910675414f63e4be6ba066574a0970bf8a73bd4",
+      "ordered": false,
+      "columns": [
+        [
+          "order_reference",
+          1042,
+          40
+        ],
+        [
+          "trade_side",
+          17322,
+          -1
+        ],
+        [
+          "order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "ask_depth",
+          25,
+          -1
+        ],
+        [
+          "ask_units",
+          25,
+          -1
+        ],
+        [
+          "bid_depth",
+          25,
+          -1
+        ],
+        [
+          "bid_units",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "b0b8a64238921e604bd4523cffea470f6e512589725432659e85c27feeaa2e0f",
+      "values_digest": "670a7187c839d10c5817c8c64d7ffeb2772a68a52e96f4d71614c47c21d427f6",
+      "ordered_digest": "e400451edff1b6029c9d59bcac3cb51d1b258c45f6861ebc21f057d29d6642e8"
+    },
+    "bec27ecc08fa345fc4784bf80244afbc5706ec5a6c4ba6d647a13039e62ff6e9": {
+      "sql": "SELECT\n    o.recordvault AS order_reference,\n    o.dealedge AS trade_side,\n    o.dealcount AS order_quantity,\n    md.quote_depth_snapshot->>'askdepth' AS ask_depth,\n    md.quote_depth_snapshot->>'askunits' AS ask_units,\n    md.quote_depth_snapshot->>'biddepth' AS bid_depth,\n    md.quote_depth_snapshot->>'bidunits' AS bid_units\nFROM\n    orders AS o\nJOIN\n    marketdata AS md ON o.exchspot = md.quote_depth_snapshot->>'exchnote'\nJOIN\n    analyticsindicators AS ai ON md.marketdatanode = ai.mdataref\nORDER BY\n    ai.analyticsindicatorsnode DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2ec1698fe76d2e451af5c45f73d57cf8df7d710e8aac38711571b8b10d28c9f7",
+      "ordered": true,
+      "columns": [
+        [
+          "order_reference",
+          1042,
+          40
+        ],
+        [
+          "trade_side",
+          17322,
+          -1
+        ],
+        [
+          "order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "ask_depth",
+          25,
+          -1
+        ],
+        [
+          "ask_units",
+          25,
+          -1
+        ],
+        [
+          "bid_depth",
+          25,
+          -1
+        ],
+        [
+          "bid_units",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "fcee2c9d67ce74d00be2208e22e0ed1d8c2e7d845d6417ba467f54ee61a93c2c",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "fcee2c9d67ce74d00be2208e22e0ed1d8c2e7d845d6417ba467f54ee61a93c2c"
+    },
+    "c9cd52832b34d0ce6ee59f08051cfddecbf48d4aa8381beb4fe9da1aae7cdba4": {
+      "sql": "SELECT\n    o.recordvault AS order_reference,\n    o.dealedge AS trade_side,\n    o.dealcount AS order_quantity,\n    md.quote_depth_snapshot->>'askdepth' AS ask_depth,\n    md.quote_depth_snapshot->>'askunits' AS ask_units,\n    md.quote_depth_snapshot->>'biddepth' AS bid_depth,\n    md.quote_depth_snapshot->>'bidunits' AS bid_units\nFROM\n    orders AS o\nJOIN\n    marketdata AS md ON o.exchspot = md.quote_depth_snapshot->>'exchnote'\nJOIN\n    marketstats AS ms ON md.marketdatanode = ms.mdlink\nORDER BY\n    ms.marketstatsmark DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c4c48fea0aefd62c2ef8cfeffb131eabb3d9107bf839d19a1617b8e5d249e99e",
+      "ordered": true,
+      "columns": [
+        [
+          "order_reference",
+          1042,
+          40
+        ],
+        [
+          "trade_side",
+          17322,
+          -1
+        ],
+        [
+          "order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "ask_depth",
+          25,
+          -1
+        ],
+        [
+          "ask_units",
+          25,
+          -1
+        ],
+        [
+          "bid_depth",
+          25,
+          -1
+        ],
+        [
+          "bid_units",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "fcee2c9d67ce74d00be2208e22e0ed1d8c2e7d845d6417ba467f54ee61a93c2c",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "fcee2c9d67ce74d00be2208e22e0ed1d8c2e7d845d6417ba467f54ee61a93c2c"
+    },
+    "93cdab9214bdd33a8620d72f62b752d90df015ed1e6e2e14f6ebe693bec94f23": {
+      "sql": "SELECT\n    rm.risk_margin_profile -> 'margin_thresholds' ->> 'inithold' AS risk_profile_id,\n    o.recordvault AS related_order,\n    ab.accountbalancesnode AS account_balance_id,\n    rm.risk_margin_profile -> 'margin_rates' ->> 'margrate' AS margin_requirement,\n    ab.margsum AS margin_balance,\n    rm.risk_margin_profile -> 'collateral' ->> 'collsum' AS margin_usage\nFROM\n    riskandmargin rm\nJOIN\n    orders o ON rm.ordervault = o.recordvault\nJOIN\n    accountbalances ab ON o.userlink = ab.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "49e656ca7ee3a0096f8884ee805d27e69221025f3078aafdc25077384cc7e1c5",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_profile_id",
+          25,
+          -1
+        ],
+        [
+          "related_order",
+          1042,
+          40
+        ],
+        [
+          "account_balance_id",
+          20,
+          -1
+        ],
+        [
+          "margin_requirement",
+          25,
+          -1
+        ],
+        [
+          "margin_balance",
+          1700,
+          786439
+        ],
+        [
+          "margin_usage",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "5e089ddad560e9f496e4d12227b00b65f25da344fbe342d2c0593cf96163946a",
+      "values_digest": "d3619abb263456e6322ad9d526eb130ef650d8b4ae5ec1ab41e1ac9510bc4354",
+      "ordered_digest": "54a49c204f54112bfc6a1090aba5773368d4bbee7b350545c2290872d24d2ee1"
+    },
+    "5415b3b44c3ae07b90dc308699950f313a00bd5ee9c566ea1dc4bfa5efe0b8a7": {
+      "sql": "SELECT\n    rm.riskandmarginpivot AS risk_and_margin_pivot,\n    o.notionsum AS notional_value,\n    ms.volmeter AS volatility_measure,\n    -- Calculate PVaR using the formula: PVaR = Notional Value * Volatility Measure\n    (o.notionsum * ms.volmeter) AS calculated_pvar\nFROM\n    riskandmargin rm\nJOIN\n    orders o ON rm.ordervault = o.recordvault\nJOIN\n    marketstats ms ON o.orderspivot = ms.marketstatsmark;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7ead4a1b02df618446a000cdf1e2dab73d4da92a0200123ab7dbf761c7aebcc7",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_and_margin_pivot",
+          20,
+          -1
+        ],
+        [
+          "notional_value",
+          1700,
+          786439
+        ],
+        [
+          "volatility_measure",
+          1700,
+          524294
+        ],
+        [
+          "calculated_pvar",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "e5416efc9df4eb82d3fdeaf2e6a02fba625f10bcc0fd235162209bd0bafd50d3",
+      "values_digest": "efb65830741900be636bd4350ff790eca3c00516df2b79df0a659550f094863c",
+      "ordered_digest": "5d6e6eb6b4c6243d7bf7d673c0e8c27aece2d22e8f104dcd45db2f1b651c1a82"
+    },
+    "bd47f513682c9cb4f4ba917858e05064e2a8c18478e69a068fbbb3c795a8b604": {
+      "sql": "SELECT\r\n    (\r\n        market_sentiment_indicators->'oscillators'->>'bbandspan'\r\n    )::NUMERIC AS bollinger_band_width,\r\n    (\r\n        market_sentiment_indicators->'momentum'->>'techmeter'\r\n    ) AS technical_meter_direction\r\nFROM\r\n    analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b5028f7aab8ae5a261e04bddcb5f79237ea3593fcad371615e08feb81001ed1e",
+      "ordered": false,
+      "columns": [
+        [
+          "bollinger_band_width",
+          1700,
+          -1
+        ],
+        [
+          "technical_meter_direction",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "d3971e855db36a8eab1403a9e9c06b9663b54989d5927cf4c1f985c541be5d8a",
+      "values_digest": "66ba8a16bf1348ea01b116e19cfbaa663c70291fc66591ff8b25cf5cd19e43ff",
+      "ordered_digest": "52cf94be83e14c3da211157164a7350f998146baa918930eeeef0383da6e767a"
+    },
+    "76653c9119bd1a16ba667d42ea9dcdd3057e92bbc5d369537500c685a1c859cf": {
+      "sql": "SELECT\r\n    (market_sentiment_indicators->>'bbandspan')::DECIMAL AS bollinger_band_width,\r\n    (market_sentiment_indicators->>'techmeter') AS technical_meter_direction,\r\n    (market_sentiment_indicators->>'technical_signal_strength')::DECIMAL AS technical_signal_strength\r\nFROM\r\n    analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "469e12258288f56b97519570a44943a5a945dc4c42f02601ccfdfdd6d6879fc8",
+      "ordered": false,
+      "columns": [
+        [
+          "bollinger_band_width",
+          1700,
+          -1
+        ],
+        [
+          "technical_meter_direction",
+          25,
+          -1
+        ],
+        [
+          "technical_signal_strength",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "0b6aa4c6f6e3ad02b3812ff1fb44762cb1a0a229bd5648d1084787bb2f1f517a",
+      "values_digest": "14ba4c73b0924e2daab100e8333edab1f64f2144b578f7bb744c7fbcaa33b051",
+      "ordered_digest": "0b6aa4c6f6e3ad02b3812ff1fb44762cb1a0a229bd5648d1084787bb2f1f517a"
+    },
+    "1b2188870a074aef3f946eb7384383580efd89e578671d5e346a14c9dc309fe8": {
+      "sql": "SELECT\r\n    (market_sentiment_indicators->>'bbandspan')::NUMERIC AS bbandspan,\r\n    (market_sentiment_indicators->>'techmeter') AS techmeter\r\nFROM\r\n    analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7cd48128f1b2e04a98838c617df5af4cbc0c0a02488cea31b0ceacb5c72f41b4",
+      "ordered": false,
+      "columns": [
+        [
+          "bbandspan",
+          1700,
+          -1
+        ],
+        [
+          "techmeter",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "dc5dd277e540dbaed6413688321e894491f8d03ac8afa1c1ae6723cde7f8bc88",
+      "values_digest": "4f7645da3e798f68ad81391f43e00385060068d4f597ec0f8f366bb2e3288e4f",
+      "ordered_digest": "dc5dd277e540dbaed6413688321e894491f8d03ac8afa1c1ae6723cde7f8bc88"
+    },
+    "cb26ba778d65daf15f6b78895c826d3af2f2ff47cabd8903f6380a1f7ce04ced": {
+      "sql": "SELECT\r\n    (quote_depth_snapshot->'metadata'->>'exchnote')::text AS exchange_code,\r\n    (quote_depth_snapshot->'metadata'->>'timetrack')::timestamp AS snapshot_timestamp,\r\n    ((quote_depth_snapshot->'quotes'->>'askquote')::decimal - (quote_depth_snapshot->'quotes'->>'bidquote')::decimal) /\r\n    (quote_depth_snapshot->'quotes'->>'bidquote')::decimal * 100 AS price_gap_percentage\r\nFROM\r\n    marketdata\r\nORDER BY\r\n    snapshot_timestamp DESC\r\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ee0a0c2dc19af51ec69883fb73f37da84177e6983299d9e80db453d05ed3946a",
+      "ordered": true,
+      "columns": [
+        [
+          "exchange_code",
+          25,
+          -1
+        ],
+        [
+          "snapshot_timestamp",
+          1114,
+          -1
+        ],
+        [
+          "price_gap_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "e119ce8d08321029ced0c7fe9c58994b3f102e2bb17e768fc88ca652b30c6d54",
+      "values_digest": "655a9935f9b03ab400f6bd7210a72c30d25b66ae8bda5d490b6f6f61fe102eee",
+      "ordered_digest": "e119ce8d08321029ced0c7fe9c58994b3f102e2bb17e768fc88ca652b30c6d54"
+    },
+    "857fdd15141872f02143dc4793c0327d71ea55d837130edb5fc1bc50d5b95244": {
+      "sql": "SELECT\r\n    market_sentiment_indicators\r\nFROM\r\n    analyticsindicators\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6b0609031d3138e47a81735cb5776b619d55a11fa7e86d9e408ffda14f2619cf",
+      "ordered": false,
+      "columns": [
+        [
+          "market_sentiment_indicators",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "d012333893164c2a6e4feb4cf38f91b91685279208102ecd607716fab349a8df",
+      "values_digest": "e9d0dc031e8345149768f74ac2a51f825887bcfdd981f57531fc32c4758eec12",
+      "ordered_digest": "a01861d9c42cfa5650da6b932b294f70046d2c773782160c71356bb69aaf4b04"
+    },
+    "e36183d70bb35300350b386921554fac227bffc5948bb1ad1582fe40ceaf26f4": {
+      "sql": "SELECT\r\n    md.marketdatanode,\r\n    (quote_depth_snapshot->>'exchnote') AS exchange_code,\r\n    (quote_depth_snapshot->>'timetrack')::timestamp AS snapshot_timestamp,\r\n    (\r\n        (\r\n            CAST(\r\n                (quote_depth_snapshot->'quotes'->>'askquote') AS DECIMAL\r\n            ) - \r\n            CAST(\r\n                (quote_depth_snapshot->'quotes'->>'bidquote') AS DECIMAL\r\n            )\r\n        ) /\r\n        CAST(\r\n            (quote_depth_snapshot->'quotes'->>'bidquote') AS DECIMAL\r\n        )\r\n    ) * 100 AS price_gap_percentage\r\nFROM\r\n    marketdata md\r\nORDER BY\r\n    snapshot_timestamp DESC\r\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d1b635784e8ca9a6431b96411d56ddaf06dbd1324c7c17032660de6a062fac3c",
+      "ordered": true,
+      "columns": [
+        [
+          "marketdatanode",
+          20,
+          -1
+        ],
+        [
+          "exchange_code",
+          25,
+          -1
+        ],
+        [
+          "snapshot_timestamp",
+          1114,
+          -1
+        ],
+        [
+          "price_gap_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "4ce0cd4308e7876dca271a23906fc36820844d5afb38ad9d545fb22cd1d40793",
+      "values_digest": "dea52e42874f833af239159f5e5b9b96fd19f9bc07362a83321db0985ba6e838",
+      "ordered_digest": "4ce0cd4308e7876dca271a23906fc36820844d5afb38ad9d545fb22cd1d40793"
+    },
+    "15a592629dccf914152d73bc348a50da5743d60f8f0ec8621796bff0338649da": {
+      "sql": "SELECT\r\n  (\r\n    market_sentiment_indicators -> 'oscillators' ->> 'bbandspan'\r\n  ) :: NUMERIC AS bbandspan,\r\n  (market_sentiment_indicators -> 'momentum' ->> 'techmeter') AS techmeter\r\nFROM\r\n  analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e01e7543575d815f1630d1da2ecb5e2078c5c291f4cc62471ecd0690e52d7c2d",
+      "ordered": false,
+      "columns": [
+        [
+          "bbandspan",
+          1700,
+          -1
+        ],
+        [
+          "techmeter",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "0d6ec8427de13eda22fa9dde4b3cc478b46762d99006b83a8eb06f253c28fccd",
+      "values_digest": "66ba8a16bf1348ea01b116e19cfbaa663c70291fc66591ff8b25cf5cd19e43ff",
+      "ordered_digest": "e1f88ff73f2c6d565a376cfffb5816f5df7df7226b214c8c1287f08dd1ce49c8"
+    },
+    "0ec1a7711f9b520c4ac4a7d9193982c05ba5fcb309c48ad513e5b06dc9803520": {
+      "sql": "SELECT\r\n  (\r\n    market_sentiment_indicators -> 'oscillators' ->> 'rsi14spot'\r\n  ) :: NUMERIC AS rsi14spot,\r\n  (market_sentiment_indicators -> 'oscillators' ->> 'macdtrail') :: NUMERIC AS macdtrail\r\nFROM\r\n  analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "23a2dbbc849c05adf5e46435628bf01e18a48087c1c0e778b764e2ef06b4a119",
+      "ordered": false,
+      "columns": [
+        [
+          "rsi14spot",
+          1700,
+          -1
+        ],
+        [
+          "macdtrail",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "d93f6c649e6f5bf8c9230c263121ca61b21d406e253b0d936d8db658bf48a4d0",
+      "values_digest": "a3beb8267a256c103a7e56c4b579d4bf9ad874d530f163bc84fe31bf193a6b19",
+      "ordered_digest": "189e43bd7cd7d47f6780b567d4c3d466645be45e2e16016cb32e6854175a39ea"
+    },
+    "57169842c2558f1dbbf655a6bdbdb600a7fc7ff389bdedc701cc474f880820ed": {
+      "sql": "SELECT\r\n  (market_sentiment_indicators->>'bbandspan')::DECIMAL(12, 3) AS bollinger_band_width\r\nFROM\r\n  analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d71cb5b682b9fab671bf22f86f44c4fcca973b7921ea2bedaddd9e0ffafd8850",
+      "ordered": false,
+      "columns": [
+        [
+          "bollinger_band_width",
+          1700,
+          786439
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "3a93d83d70f8e7001130864a4cac48fd9294af69b184516cdc15e4924e2efe2a",
+      "values_digest": "b73b0abafb26a101db7dd73d017d44b2734eb343800a1b865bedec8e39d6df72",
+      "ordered_digest": "3a93d83d70f8e7001130864a4cac48fd9294af69b184516cdc15e4924e2efe2a"
+    },
+    "d9321881c2172d29cb3ab59d3290214adc806c2093652f5e632bfea9ba52b1ac": {
+      "sql": "SELECT\r\n  (market_sentiment_indicators->>'bbandspan')::DECIMAL(12, 3) AS bollinger_band_width,\r\n  (market_sentiment_indicators->'momentum'->>'techmeter') AS technical_meter_direction,\r\n  (market_sentiment_indicators->'technical_signal_strength')::DECIMAL(12, 3) AS technical_signal_strength\r\nFROM\r\n  analyticsindicators;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "71196f915a7a474b0e4f781923534882e5df4339e7685eb7b1277ec2e4d72702",
+      "ordered": false,
+      "columns": [
+        [
+          "bollinger_band_width",
+          1700,
+          786439
+        ],
+        [
+          "technical_meter_direction",
+          25,
+          -1
+        ],
+        [
+          "technical_signal_strength",
+          1700,
+          786439
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "acc4fcc10d5e0c0ad45f643643b6b02703a3dfc2b8c25c3627a7909a8f2b1dab",
+      "values_digest": "c369648a6eb03359f3bd078a17fac8d7b87a2ab98d066acd3f26f6f1749452f0",
+      "ordered_digest": "50fd064e8e5cc576b523c2436fd4ad6d5fa0925de04102d2da8e2321e830accf"
+    },
+    "055128598857ee19bac4fd616000758340d7f37d8cb67573fb3f59f584b79e9a": {
+      "sql": "SELECT \n    riskandmarginpivot AS risk_margin_record_id,\n    (risk_margin_profile->'position'->>'possum')::DECIMAL AS position_value,\n    (risk_margin_profile->'position'->>'posmagn')::DECIMAL AS position_leverage_multiplier,\n    (risk_margin_profile->'collateral'->>'collsum')::DECIMAL AS account_balance,\n    (risk_margin_profile->'leverage'->>'levscale')::DECIMAL AS resulting_leverage_ratio\nFROM \n    riskandmargin;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b00ff5149f17c7a9b88037c80da076fd4411d6aff3ecfb57fa2102370d110c13",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_margin_record_id",
+          20,
+          -1
+        ],
+        [
+          "position_value",
+          1700,
+          -1
+        ],
+        [
+          "position_leverage_multiplier",
+          1700,
+          -1
+        ],
+        [
+          "account_balance",
+          1700,
+          -1
+        ],
+        [
+          "resulting_leverage_ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "fc7dfcd83fd5f2971a7f37e3e7b33a10e9239e21ed93c5f4fcd099eadfb8bac4",
+      "values_digest": "96e902b415ad6dbfb326216550f4d163f3e599d131af518c9c2984f50106bfd7",
+      "ordered_digest": "17d38fbe572d15b7919b79188a6e08993f05d7a349453eee2aa8254d226c329e"
+    },
+    "b6fa9eab5c55e3e8675b3ae40aaa08f68b7d46b732d9e7cfa3ab363b7cd47d44": {
+      "sql": "SELECT \n    rm.riskandmarginpivot AS \"Risk/Margin Record ID\", \n    (rm.risk_margin_profile->'position'->>'possum')::DECIMAL(12,3) AS \"Position Value\", \n    (rm.risk_margin_profile->'position'->>'posmagn')::TEXT AS \"Position Leverage Multiplier\", \n    ab.walletsum AS \"Account Balance\", \n    (rm.risk_margin_profile->'position'->>'possum')::DECIMAL(12,3) / ab.walletsum AS \"Leverage Ratio\" \nFROM \n    riskandmargin rm \nJOIN \n    accountbalances ab ON rm.ordervault = ab.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f2eb11202b39b35df4a661065f8b229e656ea71760536648e1bfcdb1a5f93215",
+      "ordered": false,
+      "columns": [
+        [
+          "Risk/Margin Record ID",
+          20,
+          -1
+        ],
+        [
+          "Position Value",
+          1700,
+          786439
+        ],
+        [
+          "Position Leverage Multiplier",
+          25,
+          -1
+        ],
+        [
+          "Account Balance",
+          1700,
+          786439
+        ],
+        [
+          "Leverage Ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "12c56eb9b80978f6d0833b17fe5e64ae0b86448c8e2095e084ea703e2f07194c",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "12c56eb9b80978f6d0833b17fe5e64ae0b86448c8e2095e084ea703e2f07194c"
+    },
+    "68936a769ff2e35e53c6da71e6cf5c3500f85e806780977628e58ddb18002cd6": {
+      "sql": "SELECT \n    rm.riskandmarginpivot AS \"Risk/Margin Record ID\", \n    (rm.risk_margin_profile->'position'->>'possum')::DECIMAL(12,3) AS \"Position Value\", \n    (rm.risk_margin_profile->'position'->>'posmagn')::TEXT AS \"Position Leverage Multiplier\", \n    ab.walletsum AS \"Account Balance\", \n    (rm.risk_margin_profile->'position'->>'possum')::DECIMAL(12,3) / ab.walletsum AS \"Leverage Ratio\" \nFROM \n    riskandmargin rm \nJOIN \n    orders o ON rm.ordervault = o.recordvault \nJOIN \n    accountbalances ab ON o.userlink = ab.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "499859e9599831b1e16824213487b656ded4bc7296ff1396f7593d0fd6d137c2",
+      "ordered": false,
+      "columns": [
+        [
+          "Risk/Margin Record ID",
+          20,
+          -1
+        ],
+        [
+          "Position Value",
+          1700,
+          786439
+        ],
+        [
+          "Position Leverage Multiplier",
+          25,
+          -1
+        ],
+        [
+          "Account Balance",
+          1700,
+          786439
+        ],
+        [
+          "Leverage Ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "f4e02fa1440a1b6381fbd8b688fde46758e29b572e9eea63d2d87d6a307e3f6e",
+      "values_digest": "94dd54aad81910cf0255802514d66cae508cc672dcb8b68691f16f3215ff3ed2",
+      "ordered_digest": "c00f41b6014fe2c744e94db5c5a579167a006f6a6be2778ea53d892434a8c6c8"
+    },
+    "c358f8353790938ed970919e1ef2b3306b3e33609f5a01be3357c8fa597fea74": {
+      "sql": "SELECT \n    rm.riskandmarginpivot AS risk_margin_record_id,\n    (rm.risk_margin_profile->>'possum')::DECIMAL AS position_value,\n    (rm.risk_margin_profile->>'posmagn')::DECIMAL AS position_leverage_multiplier,\n    ab.margsum AS account_balance,\n    (rm.risk_margin_profile->>'possum')::DECIMAL / ab.margsum AS leverage_ratio\nFROM \n    riskandmargin rm\nJOIN \n    accountbalances ab ON rm.riskandmarginpivot = ab.accountbalancesnode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d4ba71dfee34afd966512c3021be9465f19dfd91927407959de6083ecd3c9c39",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_margin_record_id",
+          20,
+          -1
+        ],
+        [
+          "position_value",
+          1700,
+          -1
+        ],
+        [
+          "position_leverage_multiplier",
+          1700,
+          -1
+        ],
+        [
+          "account_balance",
+          1700,
+          786439
+        ],
+        [
+          "leverage_ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "95422eda5ef4144c1c3f5e052bb513b7a228c2353dff66c45e51ed39b628d1bb",
+      "values_digest": "14148372cb99393698ef87fb50b45ccb562da552ff19997101082735f1d3e378",
+      "ordered_digest": "c1fbc3af5f9a085576d6b7ea373deb37f4914723f1cfa14fb3563d80b1925f9b"
+    },
+    "dee0b5cd1a6662284e5ee377cdd7ca4bb6e40ef5b17fba17b5d480b593049e53": {
+      "sql": "SELECT \n    rm.riskandmarginpivot AS risk_margin_record_id,\n    rm.risk_margin_profile->'position'->>'possum' AS position_value,\n    rm.risk_margin_profile->'leverage'->>'levscale' AS position_leverage_multiplier,\n    ab.margsum AS account_balance,\n    (rm.risk_margin_profile->'position'->>'possum')::DECIMAL / ab.margsum AS leverage_ratio\nFROM \n    riskandmargin rm\nJOIN \n    accountbalances ab ON rm.ordervault = ab.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fb83a7eb161c0f02314d4149df001cb388fc2cca6e6ce3d37e8f9bb652cbe391",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_margin_record_id",
+          20,
+          -1
+        ],
+        [
+          "position_value",
+          25,
+          -1
+        ],
+        [
+          "position_leverage_multiplier",
+          25,
+          -1
+        ],
+        [
+          "account_balance",
+          1700,
+          786439
+        ],
+        [
+          "leverage_ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "d77d65cbf60b9f426b43ceaa9fd29f97db34a5f87a93c0763dddd9b97620c53e",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "d77d65cbf60b9f426b43ceaa9fd29f97db34a5f87a93c0763dddd9b97620c53e"
+    },
+    "9e0b9230bbdb2b07caedaac40915f250a83011bdf712244b545e9606aba09cbc": {
+      "sql": "SELECT \n    rm.riskandmarginpivot AS risk_pivot, \n    o.notionsum AS notional_value, \n    ms.volmeter AS volatility_measure, \n    (rm.risk_margin_profile->'margin_rates'->>'margrate')::numeric AS margin_rate, \n    (o.notionsum * (rm.risk_margin_profile->'margin_rates'->>'margrate')::numeric * ms.volmeter) AS pvar \nFROM \n    riskandmargin rm \nJOIN \n    orders o ON rm.ordervault = o.recordvault \nJOIN \n    marketdata md ON rm.riskandmarginpivot = md.marketdatanode \nJOIN \n    marketstats ms ON md.marketdatanode = ms.mdlink \nORDER BY \n    o.notionsum DESC \nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "79df5b26cb83620b21ef8f6cb9c8ab31b0ace969c302c6189d48f16e4acdc858",
+      "ordered": true,
+      "columns": [
+        [
+          "risk_pivot",
+          20,
+          -1
+        ],
+        [
+          "notional_value",
+          1700,
+          786439
+        ],
+        [
+          "volatility_measure",
+          1700,
+          524294
+        ],
+        [
+          "margin_rate",
+          1700,
+          -1
+        ],
+        [
+          "pvar",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "3338fdbf5b59beb45e989c140fe00a788738c736f7900516abddc08c8743bffa",
+      "values_digest": "18725819665ef3e3758941d3d2a35489d074204c2c71f1cf64556abace2ba2b9",
+      "ordered_digest": "e98cff454265151bd17ff3aa853ef51bf4363f0d61d93b111036655f3f0e94c9"
+    },
+    "242019ed47965709b520e95fed373619b6d1b6da421db50052ca2f3a41d22bab": {
+      "sql": "SELECT \n  SUM(realline) AS total_realized_pnl,\n  AVG(realline) AS avg_realized_pnl,\n  STDDEV(realline) AS stddev_realized_pnl,\n  (\n    SUM(realline) / COUNT(*) * 1.0\n  ) AS profit_ratio \nFROM \n  accountbalances;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "909cb1c95da56ead10a176b97208462fbcfca6b34f3d31ed0c873327122f3aac",
+      "ordered": false,
+      "columns": [
+        [
+          "total_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "avg_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "stddev_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "profit_ratio",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "d0e95872bd2860ad1b805e75b525e01d087377a7dca4e7b9d2a91a5dd84900a2",
+      "values_digest": "765d61d1d7c9093cd96414c3b0522dcbed93785bf6b278042775232732fdec1d",
+      "ordered_digest": "d0e95872bd2860ad1b805e75b525e01d087377a7dca4e7b9d2a91a5dd84900a2"
+    },
+    "c2be287e73da2787a7f2d6536c634c4734359dfdb2e5e28ad00480a42a6840da": {
+      "sql": "SELECT \n  SUM(realline) AS total_realized_pnl, \n  AVG(realline) AS average_realized_pnl, \n  (SUM(realline) / NULLIF(COUNT(realline), 0)) AS profit_ratio \nFROM \n  accountbalances;",
+      "decisions": {
+        "N0": {
+          "key": "154db6145e652943cb6e8c1a8abfce021e563f1b4908927b3a142303648936e8",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "99f49e0b1cae6d6b5e7db2396f2a6ed7b14cea7908068e72d1318e035a48bee8",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "7d4916a42a8cb69f4a037c7a58fee5d38033129a9bec688c700fa9a2d1db8223",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "917a943612ed42f636391b5d6fe8aebce1b90eb97f2bca5629a910c8a2fd6d9e",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "cd2b3795e187d257ef1557d71a222a6c126345f8e26f6103db672e2006a56f4b",
+      "ordered": false,
+      "columns": [
+        [
+          "total_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "average_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "profit_ratio",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "d8cfccc882e6c42e8348f64837e5fcdcde7d46fd930a563e2520231bc179830a",
+      "values_digest": "3dae16a139a2bbb901c544f9982615c71b3c8bed98e243c05e8c1013c606cbb4",
+      "ordered_digest": "d8cfccc882e6c42e8348f64837e5fcdcde7d46fd930a563e2520231bc179830a"
+    },
+    "5a85f00ae2d0c0e336cdb0e9d17abb8ff602d6e77f88439595d370aac80764ef": {
+      "sql": "SELECT \n  SUM(realline) AS total_realized_pnl, \n  SUM(walletsum) AS total_account_balance, \n  (SUM(realline) / NULLIF(SUM(walletsum), 0)) AS profit_ratio \nFROM \n  accountbalances;",
+      "decisions": {
+        "N0": {
+          "key": "4c28d4a28ef9d1aaf1fae9f464e41a984ce1750d01b2cbe510fea2d20a447f3d",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "1f0792a0f61be158ffa57d06f28244581c436681a8a2c6c5c53c21d2d37add8e",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "3ff0d454f074b2ce4c634d9780f8a0a4f75ed0b37ceb3aec7d1a78ee45dc5cda",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "0e95ce394d97c82d2aae27abb399653802a3188c564066d94d0d115039fd059e",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "6093755e5d661cd67d04e61f284054688eaafbcfdaecf5342ca79b660023c1ec",
+      "ordered": false,
+      "columns": [
+        [
+          "total_realized_pnl",
+          701,
+          -1
+        ],
+        [
+          "total_account_balance",
+          1700,
+          -1
+        ],
+        [
+          "profit_ratio",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "c3a80f80bfe2b91d07e91b3daa9b79e465114ea7ebbc0ae33c911ed6bab697e9",
+      "values_digest": "570219655a6b9af0cffc25cadb199d32a083157f73a63e4c1873dc4e0cbc19fe",
+      "ordered_digest": "c3a80f80bfe2b91d07e91b3daa9b79e465114ea7ebbc0ae33c911ed6bab697e9"
+    },
+    "e2b6ed99b0b6bca15f3fa3cdfd5ef40d7f75a306b631ac1b1eeb2f3a2fcf90cf": {
+      "sql": "SELECT \n  a.market_sentiment_indicators -> 'flow' ->> 'smartforce' AS smart_trading_flow,\n  a.market_sentiment_indicators -> 'big_players' ->> 'whalemotion' AS whale_driven_market_activity,\n  m.quote_depth_snapshot -> 'metadata' ->> 'mktcombo' AS market_pair,\n  ms.priceshiftday AS price_change_24h,\n  ms.highspotday AS price_high_24h,\n  ms.lowspotday AS price_low_24h,\n  ms.vwapday AS average_price_24h\nFROM \n  analyticsindicators AS a\n  JOIN marketdata AS m ON a.mdataref = m.marketdatanode\n  JOIN marketstats AS ms ON m.marketdatanode = ms.mdlink;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e1ffcdeed4a7defc2ef9de063b94361dabe5d08856eb79b947d5b5b4b3f09e38",
+      "ordered": false,
+      "columns": [
+        [
+          "smart_trading_flow",
+          25,
+          -1
+        ],
+        [
+          "whale_driven_market_activity",
+          25,
+          -1
+        ],
+        [
+          "market_pair",
+          25,
+          -1
+        ],
+        [
+          "price_change_24h",
+          1700,
+          786439
+        ],
+        [
+          "price_high_24h",
+          1700,
+          786439
+        ],
+        [
+          "price_low_24h",
+          1700,
+          786439
+        ],
+        [
+          "average_price_24h",
+          1700,
+          786439
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "e51a38fc59865ebc967f42059b16942b67cca4bf9540eeba193f6c7db30ad70a",
+      "values_digest": "5c30dfd4574082d86608758373a0e84ea78004ee64fe320b085f05dd7817e440",
+      "ordered_digest": "4e9195d3576c6b71d85b2797af1618097a902388d246c3f0c460339d208211cf"
+    },
+    "721380e5b32ed6f3600e68fefc2e0fc9007bec6fed22e6ed5ed1a8005a6dea4e": {
+      "sql": "SELECT \r\n    (risk_margin_profile->>'posmagn')::NUMERIC AS posmagn,\r\n    (risk_margin_profile->>'possum')::NUMERIC AS possum,\r\n    walletsum\r\nFROM \r\n    riskandmargin\r\nJOIN \r\n    accountbalances ON riskandmargin.ordervault = accountbalances.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "82e8f9dc7f4aa17c272757a023195c2a87350bb3456d855a43abd1780b8daec1",
+      "ordered": false,
+      "columns": [
+        [
+          "posmagn",
+          1700,
+          -1
+        ],
+        [
+          "possum",
+          1700,
+          -1
+        ],
+        [
+          "walletsum",
+          1700,
+          786439
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "3249e25708e172fcacf5c9865e828dabc4b14d8fbd618956dd351bdc6182aca1",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "3249e25708e172fcacf5c9865e828dabc4b14d8fbd618956dd351bdc6182aca1"
+    },
+    "8a58ad13e42c252259ff2bb5c72d0d71f8dc0796ebf88422ef54e2f7ca8cff96": {
+      "sql": "SELECT \r\n    o.recordvault AS order_id,\r\n    SUM(o.dealcount) AS total_order_quantity,\r\n    SUM(oe.remaincount) AS remaining_quantity,\r\n    (SUM(o.dealcount) - SUM(oe.remaincount)) / SUM(o.dealcount) AS order_fill_rate\r\nFROM \r\n    orders o\r\nJOIN \r\n    orderexecutions oe ON o.recordvault = oe.ordersmark\r\nGROUP BY \r\n    o.recordvault\r\nORDER BY \r\n    o.recordvault;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f35d2473400810a8421020613497f279fe9956efa0da79eab8666756aef0af91",
+      "ordered": true,
+      "columns": [
+        [
+          "order_id",
+          1042,
+          40
+        ],
+        [
+          "total_order_quantity",
+          1700,
+          -1
+        ],
+        [
+          "remaining_quantity",
+          1700,
+          -1
+        ],
+        [
+          "order_fill_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "bceb1d7074ded3c25b92b9770416dbfecf64ef1dd2114e15d917ae9ccc72e876",
+      "values_digest": "ccb3bf7fd938a3c21dfcf0832f76880151dd215cf6de30b3fe7b12326bf4ca1c",
+      "ordered_digest": "1340560f16f6663ee189e0e46352ebef02046a4c46366684de5e9fa88f94af41"
+    },
+    "8430fc0aff59ef32653c96ec28a64df69b8df82a9168f86e1893ea1db5f02c68": {
+      "sql": "SELECT \r\n    o.recordvault AS order_id,\r\n    o.dealcount AS total_order_quantity,\r\n    oe.remaincount AS remaining_quantity,\r\n    (o.dealcount - oe.remaincount) / o.dealcount AS order_fill_rate\r\nFROM \r\n    orders o\r\nJOIN \r\n    orderexecutions oe ON o.recordvault = oe.ordersmark;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9a9bb040b1b62f87e608a6ac5df50c7bbedc0caf7036ee1e0579bab39fedcd1d",
+      "ordered": false,
+      "columns": [
+        [
+          "order_id",
+          1042,
+          40
+        ],
+        [
+          "total_order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "remaining_quantity",
+          1700,
+          524296
+        ],
+        [
+          "order_fill_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ee5a91779fa26b23a40d735268fe9adb0da43d4fa0ba128a4fdc373567e8ddd3",
+      "values_digest": "79963f3069161c7bd4673969a7740fe523305929d7f06d93285a1a5fafa0e56e",
+      "ordered_digest": "572e202e482d050db9413f370c6b12cc492f02ca93d5d1117af85b77e52e1431"
+    },
+    "4ffdfa2ca15b1131698e172a8a16e2aff1dc516d84eef48ba86ce026162d9801": {
+      "sql": "SELECT \r\n    o.recordvault AS order_reference,\r\n    o.dealedge AS trade_side,\r\n    o.dealcount AS order_quantity,\r\n    md.quote_depth_snapshot->>'askdepth' AS ask_depth,\r\n    md.quote_depth_snapshot->>'biddepth' AS bid_depth,\r\n    md.quote_depth_snapshot->>'askunits' AS ask_units,\r\n    md.quote_depth_snapshot->>'bidunits' AS bid_units\r\nFROM \r\n    orders o\r\nJOIN \r\n    marketdata md ON o.mktnote = md.quote_depth_snapshot->>'mktcombo'\r\nJOIN \r\n    marketstats ms ON md.marketdatanode = ms.mdlink\r\nWHERE \r\n    ms.marketstatsmark = (\r\n        SELECT MAX(marketstatsmark) FROM marketstats\r\n    )\r\nAND \r\n    o.dealcount > 0;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9ddf92914664d6c2824fbdbce2af63a42c59ed7e937a0d34c284ac8cbfc80f1e",
+      "ordered": false,
+      "columns": [
+        [
+          "order_reference",
+          1042,
+          40
+        ],
+        [
+          "trade_side",
+          17322,
+          -1
+        ],
+        [
+          "order_quantity",
+          1700,
+          786440
+        ],
+        [
+          "ask_depth",
+          25,
+          -1
+        ],
+        [
+          "bid_depth",
+          25,
+          -1
+        ],
+        [
+          "ask_units",
+          25,
+          -1
+        ],
+        [
+          "bid_units",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "31459a45422faf4ac69d320d2a0e98bd3f0eaa6319d7e7b31ac906e31f53eb2e",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "31459a45422faf4ac69d320d2a0e98bd3f0eaa6319d7e7b31ac906e31f53eb2e"
+    },
+    "71894295598ec30abfe4108a6aafe9a24e063744da656d86e2bb9fc1446733fe": {
+      "sql": "SELECT \r\n    rm.risk_margin_profile,\r\n    o.recordvault,\r\n    ab.accountbalancesnode,\r\n    rm.risk_margin_profile->'margin_rates'->>'margrate' AS margrate,\r\n    rm.risk_margin_profile->'margin_rates'->>'margcallquote' AS margcallquote,\r\n    ab.margsum\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    orders o ON rm.ordervault = o.recordvault\r\nJOIN \r\n    accountbalances ab ON o.userlink = ab.usertag;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "32f5aabcfabd9e3a7c3260547a38b53382e3b553ee629f530d75c70997c25302",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_margin_profile",
+          3802,
+          -1
+        ],
+        [
+          "recordvault",
+          1042,
+          40
+        ],
+        [
+          "accountbalancesnode",
+          20,
+          -1
+        ],
+        [
+          "margrate",
+          25,
+          -1
+        ],
+        [
+          "margcallquote",
+          25,
+          -1
+        ],
+        [
+          "margsum",
+          1700,
+          786439
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "fbe512ef6d0abdcd320a9038ee2259341f0dce857a810031d69971725e110523",
+      "values_digest": "30c87fc8ee9dd6d6fb36cbf195141ad4c1dc6cbd19b3ab793cb23fefaffe9140",
+      "ordered_digest": "f04c11b865ee69cc86028351210bc038c93f4dc1ca1baec00feeb06ad4ebdba5"
+    },
+    "c5ce6fae4debda80b437dcb63aa7c6702707065aa76c42140cf50c208f06f08a": {
+      "sql": "SELECT \r\n    rm.riskandmarginpivot AS risk_and_margin_pivot,\r\n    o.notionsum AS notional_value,\r\n    ms.volmeter AS volatility_measure,\r\n    (o.notionsum * ms.volmeter) AS pvar,\r\n    rm.risk_margin_profile\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    orders o ON rm.ordervault = o.recordvault\r\nJOIN \r\n    marketstats ms ON o.orderspivot = ms.marketstatsmark\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "05800ae025051949afe09b5c14a61fb2e23af894246e66e9eb1ef7e1a6cb0571",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_and_margin_pivot",
+          20,
+          -1
+        ],
+        [
+          "notional_value",
+          1700,
+          786439
+        ],
+        [
+          "volatility_measure",
+          1700,
+          524294
+        ],
+        [
+          "pvar",
+          1700,
+          -1
+        ],
+        [
+          "risk_margin_profile",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "4b77b6a840464b764cd850f7da5373b1275ed754827fd973c2bbc6322d3bdbdb",
+      "values_digest": "df0b8bef173fbd65124ab49c2d3332fcd44a6f7566e73336b5c304b0daabc7a9",
+      "ordered_digest": "84085b86732b7a909403084be0665393fe62961f45ac05628e93735572fc0f20"
+    },
+    "d8a82fa138ee0c68e2f908de83b30869176aafe1d0fc2ba74b0ba364fb58ecfd": {
+      "sql": "SELECT \r\n    rm.riskandmarginpivot AS risk_profile_id,\r\n    rm.ordervault AS related_order,\r\n    ab.accountbalancesnode AS account_balance_id,\r\n    rm.risk_margin_profile->'margin_rates'->>'margrate' AS margin_requirement,\r\n    rm.risk_margin_profile->'collateral'->>'collsum' AS margin_balance,\r\n    rm.risk_margin_profile->'collateral'->>'insfundshare' AS margin_usage\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    accountbalances ab ON rm.riskandmarginpivot = ab.accountbalancesnode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "12186cd4d01fefe2a3cd90e9df9a90dda34e12de0cfc792ec4e9faef250c57eb",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_profile_id",
+          20,
+          -1
+        ],
+        [
+          "related_order",
+          1042,
+          40
+        ],
+        [
+          "account_balance_id",
+          20,
+          -1
+        ],
+        [
+          "margin_requirement",
+          25,
+          -1
+        ],
+        [
+          "margin_balance",
+          25,
+          -1
+        ],
+        [
+          "margin_usage",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "c2bb1bdd8eb71d7159ec31c058ac118babcf5231c64dabbf4614512991df3191",
+      "values_digest": "fd878ddd698921ceb03e6a587156d50830b32b0d5a6f424d19235cc13b7b7434",
+      "ordered_digest": "a9cba8f74e48e15a9c6711e13e2e3b62856df4470097abec57025afdb9b1e4fb"
+    },
+    "09066ab084d9c41149800c9b0c67779d1f211567d44ab135b9356a0f981e678e": {
+      "sql": "SELECT \r\n    rm.riskandmarginpivot AS risk_profile_id,\r\n    rm.ordervault AS related_order,\r\n    ab.accountbalancesnode AS account_balance_id,\r\n    rm.risk_margin_profile->'margin_thresholds'->>'inithold' AS margin_requirement,\r\n    ab.margsum AS margin_balance,\r\n    (ab.margsum::numeric / (rm.risk_margin_profile->'margin_thresholds'->>'inithold')::numeric) AS margin_usage\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    accountbalances ab ON rm.riskandmarginpivot = ab.accountbalancesnode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a6d8f2b82ae4c59e350e4ef9b12392eb4f21bae6c0e83a879f5872c12c1a003a",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_profile_id",
+          20,
+          -1
+        ],
+        [
+          "related_order",
+          1042,
+          40
+        ],
+        [
+          "account_balance_id",
+          20,
+          -1
+        ],
+        [
+          "margin_requirement",
+          25,
+          -1
+        ],
+        [
+          "margin_balance",
+          1700,
+          786439
+        ],
+        [
+          "margin_usage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ed8f9fd883255e225c14712106d55245e29704db7103ea36424b95b5ee11a2c7",
+      "values_digest": "ac3d372caeae261adcb86c9231b6769d11d1ec45cdd339b136baa4579bc283f7",
+      "ordered_digest": "6fa8fa0fb5673e490807dd85a811191d0c32b2c56e48607a323b3a881b997406"
+    },
+    "f76b6f2926c2455fa19d74fb988a5c05f51b822a9bc9ee556d0ef14e9c946d12": {
+      "sql": "SELECT * FROM orderexecutions\nWHERE ordersmark IN (\n    SELECT recordvault\n    FROM orders\n    WHERE orderflow = 'Cancelled'\n    AND dealcount > 5\n);",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "1568115f09634de718c21c8554419f747395e6ada4f34e03da016b1750e8e7a8",
+      "ordered": false,
+      "columns": [
+        [
+          "orderexecmark",
+          20,
+          -1
+        ],
+        [
+          "fillcount",
+          1700,
+          524296
+        ],
+        [
+          "remaincount",
+          1700,
+          524296
+        ],
+        [
+          "fillquote",
+          1700,
+          786439
+        ],
+        [
+          "fillsum",
+          1700,
+          786439
+        ],
+        [
+          "expirespot",
+          1114,
+          -1
+        ],
+        [
+          "cancelnote",
+          17304,
+          -1
+        ],
+        [
+          "exectune",
+          17328,
+          -1
+        ],
+        [
+          "ordersmark",
+          1042,
+          40
+        ]
+      ],
+      "rows": 119,
+      "bag_digest": "3de68411fdd1f984795c81d6d7fd4ff42dc3c020b3da6209f1363bd023432661",
+      "values_digest": "d31e9ec0a1fff460b6e34ef5a5b9cf8f4cf7ed329b79f8bf235fc80f4f38eda0",
+      "ordered_digest": "84bd35937c12c0e7dd7ad66b3d9db982a688efce799c68d5d8f98892b655f59b"
+    },
+    "23bd82f5e919b4aff1a892e56581f35437ff73191d446ebf1d901810b8cbe5b8": {
+      "sql": "SELECT DISTINCT cancelnote\nFROM orderexecutions;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "39e49916ccd5fd57b73f5ff9c0f502a0058548a552fa1990528d3a39287bf108",
+      "ordered": false,
+      "columns": [
+        [
+          "cancelnote",
+          17304,
+          -1
+        ]
+      ],
+      "rows": 4,
+      "bag_digest": "13262f00ad6a7868d8bc817b89b0542438b6a146f44abd3fb39c8a7f8cefeda9",
+      "values_digest": "8539b08858de7644bbee14c8cb1c6c6c4e5c9b98a972bdd6bc9ae573c879e838",
+      "ordered_digest": "aa3e6c128b1f9a9ef1622a3035dde7a4daeddf87fd570ad5282d4ad144eac2d2"
+    },
+    "7d6b41aed482502f25e35a301b304759cb056fd9705ac0bd0d48d4dfd4f52e54": {
+      "sql": "SELECT DISTINCT mktnote\nFROM orders;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5c93b9e20e68ca7138cf8066f03c63769cdb10de1f2ca4e58051924baeacee60",
+      "ordered": false,
+      "columns": [
+        [
+          "mktnote",
+          1043,
+          34
+        ]
+      ],
+      "rows": 12,
+      "bag_digest": "e9d9c2ed07a1f8e384fb6332839a5391869ed10fecd3452f171284a8420cc64d",
+      "values_digest": "6fb40a1ae1a6f1998dedc1576b14e61d1f52ec9fb9f6904d00c5e8ca879b970f",
+      "ordered_digest": "772a168319b0c55ff7da26cf63b263e5f550091b7c8b551192601c1e63e2281e"
+    },
+    "7df43dc9143a8d92ddafa2e4d42bc358d1a31ca456133f2bbf2d6f685816188c": {
+      "sql": "SELECT MAX(marketstatsmark) AS max_market_stats_id\nFROM marketstats;",
+      "decisions": {
+        "N0": {
+          "key": "7f9574278a0a1d4c0a17576d61ad8da261d5454d652f17d49074112855ca39cd",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "d0dbe6c781ebbde1644a466788a3fce2d340b96979c5a6e82db1e9de3657174b",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "d58af53682c855fa25f560eaafd7fbeaecfb0b687d452043e97414f2893e8a3f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "cc59356264f4a8e5b36380b9c0be6719993f5ae9b8a632fd5079112a0eb74141",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "4c22274c438319f20f515fcc881b2e21aa93405643a2c764b76e0d18ffcf766b",
+      "ordered": false,
+      "columns": [
+        [
+          "max_market_stats_id",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "b3a86fa662e2c4eb768d6cb845c6dd0b5dd4f788ac7f355c0c513d80d8d890b4",
+      "values_digest": "83c67b772318c850bff2e56e8b4ca56e8a0880b1b0042185df2a16b2ea0a8f26",
+      "ordered_digest": "b3a86fa662e2c4eb768d6cb845c6dd0b5dd4f788ac7f355c0c513d80d8d890b4"
+    },
+    "665bc258be423a09d81dad20be94036e9d0121837b2c58ec166f671d71f39919": {
+      "sql": "SELECT quote_depth_snapshot\nFROM marketdata\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "43dc1fd00cd400189431457f91a9a0525f8704e824ec9859fe0adba146c8cad2",
+      "ordered": false,
+      "columns": [
+        [
+          "quote_depth_snapshot",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "c697b20c7ada7ef2999b17cdcddb5cc80ce899b7be8dc07d51f3a944fd8ab646",
+      "values_digest": "3713318dabb87752c8709715d380dcb614209323ea9e8b34c36c018ea09690c2",
+      "ordered_digest": "de183d4be2af04dc27c64f57c675ae6e2792c1cc13068b6c2ce6ca32a8346b52"
+    },
+    "b8d448cafed51e7ab6f0993f73c3808d2d05a0390f3c105a6deb92dee29042f2": {
+      "sql": "SELECT quote_depth_snapshot\nFROM marketdata;",
+      "decisions": {
+        "N0": {
+          "key": "d4510aff345d888e869175700dcccbf43e8fefb950410b61f80de55f8d85be26",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "5e33f617f5838a37caab835ddb52b6e349356d0d6e5c2098d78961364a96994b",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "58fa2c2ca556b1266ae609643b5e01c881cde651156d55c89dc7e3c5f61bf6d5",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "7ffe61420c476e4f1d7a1af2046c8d871c72f5e90d31378c2709ab1d79be9acd",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "d470376b78022a731ed49a8dc90c3e23277734b87eb559018936cc7e6e798675",
+      "ordered": false,
+      "columns": [
+        [
+          "quote_depth_snapshot",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "487c2e41379ca82f30d773dc14a75ae259d57c2ef4e2776db59a3a15ab88fe67",
+      "values_digest": "aa8329b8a1992f8fa04dda371a22598d7c5076ccfea7671e5ae31f98ad9ac08b",
+      "ordered_digest": "2f326b06bd86b8f64d50143057bbf3f9f1f319cdb88ba449a650942098a13453"
+    },
+    "c1c601c249a8bd12ea491282d8c2ca03b2c08e6d6d549bdd5d88e4194a4541f6": {
+      "sql": "SELECT quote_depth_snapshot\r\nFROM marketdata\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "43dc1fd00cd400189431457f91a9a0525f8704e824ec9859fe0adba146c8cad2",
+      "ordered": false,
+      "columns": [
+        [
+          "quote_depth_snapshot",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "c697b20c7ada7ef2999b17cdcddb5cc80ce899b7be8dc07d51f3a944fd8ab646",
+      "values_digest": "3713318dabb87752c8709715d380dcb614209323ea9e8b34c36c018ea09690c2",
+      "ordered_digest": "de183d4be2af04dc27c64f57c675ae6e2792c1cc13068b6c2ce6ca32a8346b52"
+    },
+    "7ff21b7f3d6d617e6c73217ad88c1cf570fd09675592f8e3607d471b6ce5c267": {
+      "sql": "SELECT risk_margin_profile FROM riskandmargin LIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6e1ce1c455675b116e5a1345d40fca91562b8378028b92dcf15164ecd7f15f00",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_margin_profile",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "2232cb4a9b23f93ae34054a6e456ab5a969554bd61d902f91cf538ffdb9354f7",
+      "values_digest": "189778b41f8102806ac24dbad9c015924852e49d7f873655c9dba501bf356eba",
+      "ordered_digest": "2232cb4a9b23f93ae34054a6e456ab5a969554bd61d902f91cf538ffdb9354f7"
+    },
+    "54a30f0aae534d956591b73486ffa86dcbfde7af55e6cc478d52a1761a4d0dd4": {
+      "sql": "WITH MarketMood AS (\r\n    SELECT \r\n        m.marketdatanode,\r\n        m.quote_depth_snapshot#>'{metadata, mktcombo}' AS market_pair,\r\n        (m.quote_depth_snapshot#>'{spread, spreadrate}')::float AS spread_percentage,\r\n        a.market_sentiment_indicators#>'{momentum, mktfeel}' AS overall_market_mood,\r\n        (a.market_sentiment_indicators#>'{momentum, buyforce}')::float AS buy_force\r\n    FROM \r\n        marketdata AS m\r\n    JOIN \r\n        analyticsindicators AS a ON m.marketdatanode = a.mdataref\r\n),\r\nMoodAvgSpread AS (\r\n    SELECT \r\n        overall_market_mood, \r\n        AVG(spread_percentage) AS avg_spread_percentage\r\n    FROM \r\n        MarketMood\r\n    GROUP BY \r\n        overall_market_mood\r\n),\r\nPercentileRank AS (\r\n    SELECT \r\n        marketdatanode,\r\n        PERCENT_RANK() OVER (ORDER BY spread_percentage) AS percentile_rank\r\n    FROM \r\n        MarketMood\r\n)\r\nSELECT \r\n    mm.market_pair,\r\n    mm.spread_percentage,\r\n    mm.overall_market_mood,\r\n    mm.buy_force,\r\n    mas.avg_spread_percentage,\r\n    pr.percentile_rank\r\nFROM \r\n    MarketMood AS mm\r\nLEFT JOIN \r\n    MoodAvgSpread AS mas ON mm.overall_market_mood = mas.overall_market_mood\r\nLEFT JOIN \r\n    PercentileRank AS pr ON mm.marketdatanode = pr.marketdatanode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6b5396561e70037350af017080e3bcc352bf93a15ea0aa79b29f8218906056c8",
+      "ordered": false,
+      "columns": [
+        [
+          "market_pair",
+          3802,
+          -1
+        ],
+        [
+          "spread_percentage",
+          701,
+          -1
+        ],
+        [
+          "overall_market_mood",
+          3802,
+          -1
+        ],
+        [
+          "buy_force",
+          701,
+          -1
+        ],
+        [
+          "avg_spread_percentage",
+          701,
+          -1
+        ],
+        [
+          "percentile_rank",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "38fa35f32d91a65189ae4b26c9238ca96fe75cade229304a0bd8f0293727627c",
+      "values_digest": "8288b701b85ca43291bd3693f9a1aa1fd87fab6e6c37781e924cb5c0df6a1147",
+      "ordered_digest": "f516bc629dab8f9dd09913eedcab8ad58f93e4a75cc047347b425629acbb66cd"
+    },
+    "08f7e5ce3fe2ccf2336b1da104ff9e1def8ba8e735608c7f3ea8cd528cc2a8d0": {
+      "sql": "WITH TopPositions AS (\r\n    SELECT \r\n        rm.riskandmarginpivot, \r\n        o.notionsum AS notional_value, \r\n        ms.volmeter AS volatility_measure, \r\n        CAST(rm.risk_margin_profile->>'inithold' AS NUMERIC) AS initial_margin, \r\n        CAST(rm.risk_margin_profile->>'mainthold' AS NUMERIC) AS maintenance_margin, \r\n        ROW_NUMBER() OVER (ORDER BY o.notionsum DESC) AS position_rank\r\n    FROM \r\n        riskandmargin rm\r\n    JOIN \r\n        orders o ON rm.ordervault = o.recordvault\r\n    JOIN \r\n        marketstats ms ON rm.riskandmarginpivot = ms.marketstatsmark\r\n    WHERE \r\n        rm.risk_margin_profile->>'possum' IS NOT NULL \r\n        AND o.notionsum IS NOT NULL \r\n        AND ms.volmeter IS NOT NULL\r\n),\r\nPVaRCalculation AS (\r\n    SELECT \r\n        riskandmarginpivot, \r\n        notional_value, \r\n        volatility_measure, \r\n        initial_margin, \r\n        maintenance_margin, \r\n        (\r\n            (notional_value * volatility_measure) - \r\n            (initial_margin + maintenance_margin)\r\n        ) AS pvar\r\n    FROM \r\n        TopPositions\r\n    WHERE \r\n        position_rank <= 5\r\n)\r\nSELECT \r\n    pvar AS risk_and_margin_pivot, \r\n    notional_value, \r\n    volatility_measure, \r\n    pvar AS calculated_pvar\r\nFROM \r\n    PVaRCalculation;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e137703d660a7f2881c596997fbd449b549d78272ba535f7df46cdf0ffd0c76d",
+      "ordered": false,
+      "columns": [
+        [
+          "risk_and_margin_pivot",
+          1700,
+          -1
+        ],
+        [
+          "notional_value",
+          1700,
+          786439
+        ],
+        [
+          "volatility_measure",
+          1700,
+          524294
+        ],
+        [
+          "calculated_pvar",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "385794db572c537074f83b7db0bcf9692aafe1bfaeb513e300264be585258126",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "385794db572c537074f83b7db0bcf9692aafe1bfaeb513e300264be585258126"
+    },
+    "ffca08789321f7c801832c121a481686cdcda557eba1b76cc86c057260ac3a00": {
+      "sql": "WITH smart_trades AS (\r\n    SELECT \r\n        (market_sentiment_indicators->'flow'->>'smartforce')::FLOAT AS smartforce\r\n    FROM \r\n        analyticsindicators\r\n),\r\nsuccessful_smart_trades AS (\r\n    SELECT \r\n        COUNT(*) FILTER (WHERE smartforce > 0) AS successful_trades_count,\r\n        COUNT(*) AS total_trades_count\r\n    FROM \r\n        smart_trades\r\n)\r\nSELECT \r\n    successful_trades_count / total_trades_count AS success_rate\r\nFROM \r\n    successful_smart_trades;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b6037afec3007f8960d9ca718f87fcbb51a0d227b88c22f58042b90682922487",
+      "ordered": false,
+      "columns": [
+        [
+          "success_rate",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "f3c95a0d1da619dccdd024b171e4e9252ed227b437bb43fa30555b6e7e99ca3f",
+      "values_digest": "545177c5535181ca00468abc387db67a19980b801ee0bde4b293affe77d92345",
+      "ordered_digest": "f3c95a0d1da619dccdd024b171e4e9252ed227b437bb43fa30555b6e7e99ca3f"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "riskandmargin": {
+      "riskandmarginpivot": "int8",
+      "ordervault": "bpchar",
+      "risk_margin_profile": "jsonb"
+    },
+    "accountbalances": {
+      "accountbalancesnode": "int8",
+      "walletsum": "numeric",
+      "availsum": "numeric",
+      "frozensum": "numeric",
+      "margsum": "numeric",
+      "unrealline": "float8",
+      "realline": "float8",
+      "usertag": "bpchar"
+    },
+    "marketdata": {
+      "marketdatanode": "int8",
+      "quote_depth_snapshot": "jsonb"
+    },
+    "marketstats": {
+      "marketstatsmark": "int8",
+      "fundrate": "numeric",
+      "fundspot": "timestamp",
+      "openstake": "numeric",
+      "volday": "float8",
+      "tradeday": "int4",
+      "tnoverday": "numeric",
+      "priceshiftday": "numeric",
+      "highspotday": "numeric",
+      "lowspotday": "numeric",
+      "vwapday": "numeric",
+      "mktsize": "numeric",
+      "circtotal": "numeric",
+      "totsupply": "numeric",
+      "maxsupply": "numeric",
+      "mkthold": "numeric",
+      "traderank": "int4",
+      "liquidscore": "numeric",
+      "volmeter": "numeric",
+      "mdlink": "int8"
+    },
+    "analyticsindicators": {
+      "analyticsindicatorsnode": "int8",
+      "mdataref": "int8",
+      "mstatsref": "int8",
+      "market_sentiment_indicators": "jsonb"
+    }
+  }
+}

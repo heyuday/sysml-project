@@ -1,0 +1,2775 @@
+{
+  "version": 2,
+  "database": "fake",
+  "queries": {
+    "f1808e1b9644d90a3921eebd5adaa263c762b2149b6f63852e9d51bfa397dc38": {
+      "sql": "SELECT\n    t3.acctident AS account_id,\n    t2.netinflscore AS overall_reach_score,\n    t1.postfreq AS posting_frequency,\n    t2.clustsize AS cluster_member_count,\n    RANK() OVER (ORDER BY t2.netinflscore DESC) AS influence_rank\nFROM\n    contentbehavior AS t1\nJOIN\n    moderationaction AS t2 ON t1.cntref = t2.macntref\nJOIN\n    account AS t3 ON t2.macntref = t3.accindex\nWHERE\n    t2.clustrole = 'Amplifier'\n    AND t2.coordscore > 0.8\n    AND t1.postfreq > 0\nORDER BY\n    t2.netinflscore DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f12a4d79a65e388942517c689cd161a553d78d71cb4d314bf9e47fba8cb89de4",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_reach_score",
+          1700,
+          327686
+        ],
+        [
+          "posting_frequency",
+          1700,
+          327687
+        ],
+        [
+          "cluster_member_count",
+          21,
+          -1
+        ],
+        [
+          "influence_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f"
+    },
+    "ea678240044e1cdc9714c25026b7eb46fbf0e4704b04cd0f69ebf16abe2c0b29": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    (s.detection_score_profile->'overall'->>'riskval')::NUMERIC AS bot_behavior_index,\n    s.detection_score_profile->'overall'->>'threatlvl' AS risk_tier\nFROM \n    account AS a\nJOIN \n    securitydetection AS s\n        ON a.accindex = s.sectechref\nWHERE \n    a.acctstatus = 'Dormant'\n    AND a.acctcategory = 'Bot'\n    AND (s.detection_score_profile->'overall'->>'riskval')::NUMERIC > 0.8\n    AND s.detection_score_profile->'overall'->>'threatlvl' = 'Critical'\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3e9a61b8aa95f82ee8f779a17c2217c3b07a0ddea68cfd77e7fb5f339f75aafc",
+      "ordered": false,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "bot_behavior_index",
+          1700,
+          -1
+        ],
+        [
+          "risk_tier",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "c924ba6e6e4a1ebfb2d97fb8a66af52bbe08d680fdd4e131199063e2ba38a360",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "c924ba6e6e4a1ebfb2d97fb8a66af52bbe08d680fdd4e131199063e2ba38a360"
+    },
+    "03302baafed705b5e50a13df0b107255928c8b46b1a43ee77af0b1d7e1938a6e": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    a.acctstatus AS account_status,\n    ds.detection_score_profile->'behavior_scores'->>'autobehavscore' AS autobehavscore,\n    ds.detection_score_profile->'behavior_scores'->>'botlikscore' AS botlikscore\nFROM \n    account AS a\nJOIN \n    securitydetection AS ds ON a.accindex = ds.sectechref\nWHERE \n    a.acctstatus IN ('Dormant', 'Deleted')\n    AND a.acctcategory = 'Bot'\nGROUP BY \n    a.accindex, a.acctstatus, ds.detection_score_profile\nORDER BY \n    autobehavscore DESC, botlikscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "29cd6874b9354ab703f50b61a349a8d5e5b14796690e7b4d7fcd4807c64bba24",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "account_status",
+          22620,
+          -1
+        ],
+        [
+          "autobehavscore",
+          25,
+          -1
+        ],
+        [
+          "botlikscore",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "add557a8ce4e4093ac2c3c91bb8984397071739e97416d5a23b8c140a64ca22f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "add557a8ce4e4093ac2c3c91bb8984397071739e97416d5a23b8c140a64ca22f"
+    },
+    "969b5c7ea66a6dc402f9db712b10c426c9c95047eb899ef91e1b8e375955bf66": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    m.authenscore AS engagement_authenticity_score,\n    sb.acttimedist AS timing_pattern,\n    'Manipulator' AS status\nFROM \n    moderationaction AS m\nJOIN \n    networkmetrics AS nm ON m.masedetref = nm.netkey\nJOIN \n    sessionbehavior AS sb ON nm.netsessref = sb.sessref\nJOIN \n    account AS a ON sb.sessprofref = a.accindex\nORDER BY \n    m.authenscore ASC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c019db0ad677c00e8897d510f76cf33f4dd88f9fb6629e4a67306941f57bd301",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "engagement_authenticity_score",
+          1700,
+          327687
+        ],
+        [
+          "timing_pattern",
+          3802,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "3e92770763eb10f9a68f45ab48f8e34365be1e715bcdcc88ef8b3de56d2bdf9b",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "3e92770763eb10f9a68f45ab48f8e34365be1e715bcdcc88ef8b3de56d2bdf9b"
+    },
+    "063cde37fb6331cf9189609c913382d70f5a2dc46abccd21e0669fdb758f7183": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    ma.reputscore AS reputation_score,\n    ma.abuserepnum AS complaint_count,\n    ma.lastrevdate AS last_review_date\nFROM \n    account a\nJOIN \n    moderationaction ma ON a.accindex = ma.macntref\nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nWHERE \n    ma.impactval IS NOT NULL\nORDER BY \n    ma.impactval DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "acfd00286922b56c7080d5e045574bc20382bdfddf396a669982a1cdd6a593b6",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "reputation_score",
+          1700,
+          327688
+        ],
+        [
+          "complaint_count",
+          21,
+          -1
+        ],
+        [
+          "last_review_date",
+          1082,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85"
+    },
+    "76b9ed008e143dd4330d13bc03b37676e28b890442311063da84dd7af325c14a": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    ma.reputscore AS reputation_score,\n    ma.abuserepnum AS complaint_count,\n    ma.lastrevdate AS last_review_date\nFROM \n    account a\nJOIN \n    moderationaction ma ON a.accindex = ma.macntref\nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nWHERE \n    sd.detection_score_profile->'overall'->>'riskval' IS NOT NULL\nORDER BY \n    CAST(sd.detection_score_profile->'overall'->>'riskval' AS DECIMAL) DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f3cd5c6405a001ac86c2b21a4b42f1fdfcf101faaea94b36405c8b87aa366aaa",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "reputation_score",
+          1700,
+          327688
+        ],
+        [
+          "complaint_count",
+          21,
+          -1
+        ],
+        [
+          "last_review_date",
+          1082,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85"
+    },
+    "c785441aead72caa65c7264a232d0205f9440accb4eb9b4cf8c93e73c79219ca": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    nm.network_engagement_metrics->'engagement_metrics'->>'engauth' AS engagement_authenticity_score,\n    p.profile_composition->'timing_pattern' AS timing_pattern,\n    'Manipulator' AS status\nFROM \n    account AS a\nJOIN \n    profile AS p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior AS sb ON p.profkey = sb.sessprofref\nJOIN \n    networkmetrics AS nm ON sb.sessref = nm.netsessref\nORDER BY \n    nm.network_engagement_metrics->'engagement_metrics'->>'engauth' ASC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "637c9dfc6b9fab3fee6d30b4b4f5c760b3cc3878c99f2c06e663366769318e86",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "engagement_authenticity_score",
+          25,
+          -1
+        ],
+        [
+          "timing_pattern",
+          3802,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "3f39c4c143d76671060b5193a6292a624ef50a63b186824f52fedf61a141bcf9",
+      "values_digest": "0cb47c150de411e5829f44b77c7a9affbcf173d68867bd658451682256fcea6d",
+      "ordered_digest": "5db8a950f1319b81fe1dcab9357e408d5e3f8e6ab38489c595ecde14e661cd53"
+    },
+    "b7df4f7de49fabbddc84a0e905de598bc1506d3f8034e64ab838ab1ee0c84ea6": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON a.accindex = sd.sectechref\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "de11072d5d29ab7320d542898ef45296905e22f6beb05633ed0f99a3728b3b25",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87"
+    },
+    "a36d958ee98cabc23823e3a4c75b7d1b7a178ecddaccd046f2b449c5a0e90ea0": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON cb.cntref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ad067bad88458590a5d7018b9aa90ba18ce97b1c662bbeec7742423812e23a35",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87"
+    },
+    "03a2994c7e1fe1a798c98ac82233bb72ca4dae4cdfd02f2d2ef166a1f726a2be": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nLEFT JOIN \n    moderationaction ma ON cb.cntref = ma.macntref\nLEFT JOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fd67a95644c8cbf554b4a3606463415d91158f6475e90730400704600d411406",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "36d0450fa1e1b8a76efb6946c0f5730184c432d240441723dc28ca13bafdafe5",
+      "values_digest": "431b0cb85737b26f7637cc083123cd14c1e328cce12cd32240833da7c2204948",
+      "ordered_digest": "36d0450fa1e1b8a76efb6946c0f5730184c432d240441723dc28ca13bafdafe5"
+    },
+    "4bc169f3de3d0f9e634c3129dd66caa315ef86f0498f4a16e399490829beb111": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    sessionbehavior sb ON a.accindex = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON a.accindex = sd.sectechref\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5ab8b1aaee7ebaad8ceac7fa46edd0934098c0fce2e0e4ad627772928fde04fb",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87"
+    },
+    "7d7184cf4be6c7743cb6c0c25ca55395d1ed98908c781532ab3b5260ace0c1d2": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    sessionbehavior sb ON a.accindex = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON sd.sectechref = a.accindex\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "21b4422d49f2d1c0a7a944b20d2f2f08f050d585140d5c2959abfdb376082916",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87"
+    },
+    "02407cc24cdcdc41a028f47258c33f78b3c58148599717c64bac6beaa01d44c8": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    securitydetection sd\nJOIN \n    contentbehavior cb ON sd.secdetkey = cb.cntref\nJOIN \n    sessionbehavior sb ON cb.cntsessref = sb.sessref\nJOIN \n    profile p ON sb.sessprofref = p.profkey\nJOIN \n    account a ON p.profaccref = a.accindex\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ee6b03a4292df4f932078e93b4ed3948f25227745785fc41bece9a03e4ca3071",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          23,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          327687
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4afe781545e27dbe7e25e82b828a6f4e1cbabda98c4d933123ab90da3e060f87"
+    },
+    "8a744eac5f6ad754b5bec781dad1842d526701a64d591f5d68c71eb120cd5bda": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    ti.uaconsval AS tei_value,\n    ti.ipcountrynum AS countries_logged_in_from,\n    RANK() OVER (ORDER BY ti.uaconsval DESC) AS ranking\nFROM \n    technicalinfo ti\nJOIN \n    account a ON ti.technetref = a.accindex\nORDER BY \n    ranking;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c4036909aecfcfba6a2900bfa16b675f576c55a5fa2ccf5749b22553a53e1cea",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "tei_value",
+          1700,
+          393225
+        ],
+        [
+          "countries_logged_in_from",
+          21,
+          -1
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "5ecf0be541849dbd6ddc3bb469dcdd13f28aacbd4a6f61d8801c2d2980e07599",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "5ecf0be541849dbd6ddc3bb469dcdd13f28aacbd4a6f61d8801c2d2980e07599"
+    },
+    "56ee64faa7ca19878cee8694240460f90aa782761e5d80c50b0c255a3cf6d6ee": {
+      "sql": "SELECT \n    a.accindex AS account_id,\n    ti.uaconsval AS tei_value,\n    ti.ipcountrynum AS countries_logged_in_from,\n    RANK() OVER (ORDER BY ti.uaconsval DESC) AS ranking\nFROM \n    technicalinfo ti\nJOIN \n    networkmetrics nm ON ti.technetref = nm.netkey\nJOIN \n    account a ON nm.netsessref = a.accindex\nORDER BY \n    ranking;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3440a7fb28a46a1457f67a03d815855e9fcc4e4c826da5f3f9049ec5c4bd8cdb",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "tei_value",
+          1700,
+          393225
+        ],
+        [
+          "countries_logged_in_from",
+          21,
+          -1
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "5ecf0be541849dbd6ddc3bb469dcdd13f28aacbd4a6f61d8801c2d2980e07599",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "5ecf0be541849dbd6ddc3bb469dcdd13f28aacbd4a6f61d8801c2d2980e07599"
+    },
+    "ecd51f1c925fac492a8586419c58a48a7a8741e8e4f9c3fd144055f0ec4283be": {
+      "sql": "SELECT \n    a.accindex AS account_id, \n    ma.reputscore AS reputation_score, \n    ma.abuserepnum AS complaint_count, \n    ma.lastrevdate AS last_review_date \nFROM \n    account a \nJOIN \n    profile p ON a.accindex = p.profaccref \nJOIN \n    moderationaction ma ON a.accindex = ma.macntref \nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey \nWHERE \n    sd.detection_score_profile->>'Reputational Risk' = 'High' \nORDER BY \n    ma.reputscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cb69f0b4fe3431eacc4e0d988eefb9a6fe0fedf1398e2e3a435ad35979c6c7a9",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "reputation_score",
+          1700,
+          327688
+        ],
+        [
+          "complaint_count",
+          21,
+          -1
+        ],
+        [
+          "last_review_date",
+          1082,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85"
+    },
+    "bdf6208fe3cee6a96c881f6e8847bd4a05d25f0aab5c8b199eb489831230aea0": {
+      "sql": "SELECT \n    a.accindex AS account_id, \n    ma.reputscore AS reputation_score, \n    ma.abuserepnum AS complaint_count, \n    ma.lastrevdate AS last_review_date \nFROM \n    moderationaction ma \nJOIN \n    account a ON ma.macntref = a.accindex \nJOIN \n    profile p ON a.accindex = p.profaccref \nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey \nWHERE \n    a.acctstatus = 'Active' \n    AND ma.actiontaken IS NOT NULL \nORDER BY \n    ma.reputscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "45103c4cdd95d4e5af819a9359e8478b607cac44b9f633da114c28cf7e0ea6d0",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "reputation_score",
+          1700,
+          327688
+        ],
+        [
+          "complaint_count",
+          21,
+          -1
+        ],
+        [
+          "last_review_date",
+          1082,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85"
+    },
+    "d233f0ac078aba6aa6c3ba9a393042c7dd227254f8432f23392a9ed312b92e59": {
+      "sql": "SELECT \n    a.acctident AS account_id,\n    ma.netinflscore AS overall_reach_score,\n    cb.postfreq AS posting_frequency,\n    ma.clustsize AS cluster_member_count,\n    RANK() OVER (ORDER BY ma.netinflscore DESC) AS influence_rank\nFROM \n    account a\nJOIN \n    moderationaction ma ON a.accindex = ma.macntref\nJOIN \n    contentbehavior cb ON ma.macntref = cb.cntref\nWHERE \n    ma.clustrole = 'Amplifier'\nORDER BY \n    ma.netinflscore DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "dfbebc995fbe15ca2730f834e047db101a592e7f27e96f149761059b4a63f207",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_reach_score",
+          1700,
+          327686
+        ],
+        [
+          "posting_frequency",
+          1700,
+          327687
+        ],
+        [
+          "cluster_member_count",
+          21,
+          -1
+        ],
+        [
+          "influence_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f"
+    },
+    "aa87f13e179a5b8d88206448bff0acf9acc85db525ff50aa78b5eca7a8c04a39": {
+      "sql": "SELECT \n    a.acctident AS account_id,\n    ma.netinflscore AS overall_reach_score,\n    cb.postfreq AS posting_frequency,\n    ma.clustsize AS cluster_member_count,\n    RANK() OVER (ORDER BY ma.netinflscore DESC) AS influence_rank\nFROM \n    account a\nJOIN \n    moderationaction ma ON a.accindex = ma.macntref\nJOIN \n    contentbehavior cb ON ma.macntref = cb.cntref\nWHERE \n    ma.clustrole = 'Amplifier' \n    AND ma.netinflscore > (SELECT PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY netinflscore) FROM moderationaction)\nORDER BY \n    ma.netinflscore DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bc518efc9c6aa56caf37963155bf19336d456583b261e390494823a24ef25b50",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_reach_score",
+          1700,
+          327686
+        ],
+        [
+          "posting_frequency",
+          1700,
+          327687
+        ],
+        [
+          "cluster_member_count",
+          21,
+          -1
+        ],
+        [
+          "influence_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f"
+    },
+    "45a6877b7584d5c3e7bbb898fd1f78ba7a9f1f31bed0779307ea46bdefc1553d": {
+      "sql": "SELECT \n    a.acctident AS account_id,\n    ma.netinflscore AS overall_reach_score,\n    cb.postfreq AS posting_frequency,\n    ma.clustsize AS cluster_member_count,\n    RANK() OVER (ORDER BY ma.netinflscore DESC) AS influence_rank\nFROM \n    moderationaction AS ma\nJOIN \n    account AS a ON ma.macntref = a.accindex\nJOIN \n    contentbehavior AS cb ON ma.macntref = cb.cntref\nWHERE \n    ma.clustrole = 'Amplifier'\nORDER BY \n    ma.netinflscore DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "82afae417d87628a0e49c53ee4010162f42cba2b32cc99dc15e463283879bf0a",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_reach_score",
+          1700,
+          327686
+        ],
+        [
+          "posting_frequency",
+          1700,
+          327687
+        ],
+        [
+          "cluster_member_count",
+          21,
+          -1
+        ],
+        [
+          "influence_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "292eeaa5049cd825d1064f3246d25e12fc54cd5ad2e34b300d9b4f28d5a3316f"
+    },
+    "de360154eac6d5454f9c76fe82c7a79249a43cf29faed025eb98fe7216478a09": {
+      "sql": "SELECT \n    a.platident AS platform_id,\n    sd.detecttime AS time,\n    COUNT(DISTINCT a.accindex) AS total_member_count,\n    MAX(ma.coordscore) AS top_coordination_score,\n    ARRAY_AGG(DISTINCT a.acctident) AS account_list\nFROM \n    moderationaction ma\nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nJOIN \n    account a ON a.accindex = sd.sectechref\nGROUP BY \n    a.platident, sd.detecttime\nHAVING \n    COUNT(DISTINCT a.accindex) > 1\nORDER BY \n    sd.detecttime;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6ec69f0b95524cc2def1ad1bc21095764dbd2d0f920b8bf997e78377c147adc4",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          20,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          -1
+        ],
+        [
+          "account_list",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "962a8a43e1eb8a9b31196c9c2b2ae8fb73eb341051c8d7968052863804c7e6ca",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "962a8a43e1eb8a9b31196c9c2b2ae8fb73eb341051c8d7968052863804c7e6ca"
+    },
+    "67490fce4272cbd5fb52953d20d78c01a30c1e02a5269172583de98da4fcb218": {
+      "sql": "SELECT \n    a.platident AS platform_id,\n    sd.detecttime AS time,\n    COUNT(DISTINCT a.accindex) AS total_member_count,\n    MAX(ma.coordscore) AS top_coordination_score,\n    ARRAY_AGG(DISTINCT a.acctident) AS account_list\nFROM \n    moderationaction ma\nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nJOIN \n    account a ON ma.macntref = a.accindex\nGROUP BY \n    a.platident, sd.detecttime\nHAVING \n    COUNT(DISTINCT a.accindex) > 1\nORDER BY \n    sd.detecttime;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7e3a1210e5b49ec5b871149831b223ff1d2672b2560018dd946eed07c48b0d23",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          20,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          -1
+        ],
+        [
+          "account_list",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "962a8a43e1eb8a9b31196c9c2b2ae8fb73eb341051c8d7968052863804c7e6ca",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "962a8a43e1eb8a9b31196c9c2b2ae8fb73eb341051c8d7968052863804c7e6ca"
+    },
+    "30df25ecb63c0d8b6a1340ac596f21806c8919bcf033f23babf8bdfa8929a894": {
+      "sql": "SELECT \n    cb.cntref AS content_reference_id,\n    sd.detection_score_profile->'content_manipulation_score' AS content_manipulation_score,\n    cb.postfreq AS frequency_related_details,\n    DENSE_RANK() OVER (ORDER BY sd.detection_score_profile->'content_manipulation_score' DESC) AS manipulation_rank\nFROM \n    contentbehavior cb\nJOIN \n    moderationaction ma ON cb.cntref = ma.macntref\nJOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nORDER BY \n    manipulation_rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "abe383aff5b59bc54cc00c70f322f9b75222d69adfaec05e68bee1876964046c",
+      "ordered": true,
+      "columns": [
+        [
+          "content_reference_id",
+          1042,
+          16
+        ],
+        [
+          "content_manipulation_score",
+          3802,
+          -1
+        ],
+        [
+          "frequency_related_details",
+          1700,
+          327687
+        ],
+        [
+          "manipulation_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 998,
+      "bag_digest": "f8cae696c9b0a87ff23468c9c4b794d3e275082ff7f055968190047711b92102",
+      "values_digest": "dd5764a10c9908349a040bf6ed94c961436d08a2e7d4a960519847f6462ac5a2",
+      "ordered_digest": "87861c79fcd3980c7a4181e8ca852daf9965ce8c3d08c739b8ea07c6337533fd"
+    },
+    "dc7bcfae541380ce7d8b6c2dd88fa33a428fb462bb699531aa58627e086b0db2": {
+      "sql": "SELECT \n    ma.clustsize AS cluster_size,\n    AVG(CAST(sd.detection_score_profile->'behavior_scores'->>'botlikscore' AS DECIMAL)) AS avg_bot_behavior_index,\n    COUNT(p.profkey) AS total_account_count\nFROM \n    moderationaction AS ma\nJOIN \n    securitydetection AS sd ON ma.masedetref = sd.secdetkey\nJOIN \n    profile AS p ON sd.secdetkey = p.profkey\nJOIN \n    account AS a ON p.profaccref = a.accindex\nWHERE \n    a.acctcategory = 'Bot'\nGROUP BY \n    ma.clustsize\nORDER BY \n    cluster_size DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "66b9c94bf4867a44a55e09ede23145d08323bcae0e6a90793c0d6e1edb41d98c",
+      "ordered": true,
+      "columns": [
+        [
+          "cluster_size",
+          21,
+          -1
+        ],
+        [
+          "avg_bot_behavior_index",
+          1700,
+          -1
+        ],
+        [
+          "total_account_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f"
+    },
+    "834a04341a22dbab9011db093a2695436b1062776d3920b92d7c1477ee412bb2": {
+      "sql": "SELECT \n    macntref AS account_id,\n    netinflscore AS overall_prominence_score,\n    RANK() OVER (ORDER BY netinflscore DESC) AS ranking\nFROM \n    moderationaction\nWHERE \n    netinflscore > 0\nORDER BY \n    ranking ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2a4497ee42ae8ffe092688c36f9769608e7b80c1f208703fb906e2a9ea6b10a8",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "overall_prominence_score",
+          1700,
+          327686
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 998,
+      "bag_digest": "3132f9400143461f1918f8f38a732e5f9d4a540f5c84f5a56dbdb2f65acd0586",
+      "values_digest": "d76664c957e4509846574c00f8f8bbe253e7cb3c69350bd8e4f23681ea3deb61",
+      "ordered_digest": "af823e6624cc934a978c4a57c82505b1ff27c8d2e1ed428cd3608383c2753371"
+    },
+    "e4b17e4ecb712508004d7f644064db387255f6eb4a16a9ef8ea2cd47743a2dbb": {
+      "sql": "SELECT \n    platident AS platform_id,\n    detecttime AS time,\n    clustsize AS total_member_count,\n    MAX(coordscore) AS top_coordination_score,\n    ARRAY_AGG(acctident) AS account_list\nFROM \n    moderationaction AS ma\nJOIN \n    account AS a ON ma.modactkey = a.accindex\nJOIN \n    securitydetection AS sd ON ma.masedetref = sd.secdetkey\nWHERE \n    clustsize > 1 \nGROUP BY \n    platident, detecttime, clustsize\nORDER BY \n    top_coordination_score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e1b97173a7f6bd2eebb962274ab553c8120e27dff3f58cfa54cd5cc6beee5795",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          21,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          -1
+        ],
+        [
+          "account_list",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "58aab87231af3c8184b915b677e9ec0f897aafbc36e19c08cb5b3337eae30f81",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "58aab87231af3c8184b915b677e9ec0f897aafbc36e19c08cb5b3337eae30f81"
+    },
+    "cfa6fbe65cbfc7d12350bd551423605abadf47f3ac6c927b3020e61dea913bef": {
+      "sql": "SELECT \n    t1.acctident AS account_id,\n    t2.detection_score_profile->'overall' AS overall_weirdness_score,\n    t2.detection_score_profile->'behavior_scores'->>'botlikscore' AS recent_bot_rating\nFROM \n    account AS t1\nJOIN \n    securitydetection AS t2 ON t1.accindex = t2.sectechref\nWHERE \n    t1.acctcategory = 'Bot'\nORDER BY \n    recent_bot_rating DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c5149b98572febfb106ff69567cf3db2183df41588a2c99177399b1ca6650ba9",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_weirdness_score",
+          3802,
+          -1
+        ],
+        [
+          "recent_bot_rating",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc"
+    },
+    "edf10aaa6d47b4c395ae13f3f8b6f7f7033c97657af7223120c337acf986fe75": {
+      "sql": "SELECT \n    t1.acctident AS account_id,\n    t3.detection_score_profile->'overall' AS overall_weirdness_score,\n    t3.detection_score_profile->'behavior_scores'->>'botlikscore' AS recent_bot_rating\nFROM \n    account AS t1\nJOIN \n    profile AS t2 ON t1.accindex = t2.profaccref\nJOIN \n    securitydetection AS t3 ON t2.profkey = t3.sectechref\nWHERE \n    t1.acctcategory = 'Bot'\nORDER BY \n    recent_bot_rating DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f0d06d8371f801164f58f1d460a3d12b98d0902cb276abc7acdf2779800539ae",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_weirdness_score",
+          3802,
+          -1
+        ],
+        [
+          "recent_bot_rating",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc"
+    },
+    "abe2b7449a67d728d5881034725d46452811285f845aeb9522f41997dd9151b5": {
+      "sql": "SELECT \n  a.accindex AS account_id, \n  ma.trustval AS tei_value, \n  ti.ipcountrynum AS countries_logged_in_from, \n  DENSE_RANK() OVER (ORDER BY ti.vpnratio DESC) AS ranking \nFROM \n  technicalinfo AS ti \n  JOIN moderationaction AS ma ON ti.techkey = ma.masedetref \n  JOIN account AS a ON ti.techkey = a.accindex \nORDER BY \n  ti.vpnratio DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fb31c8195db9ed716020f7a230456be36807fd82e8a5351aa289f81cb331ef43",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "tei_value",
+          1700,
+          262150
+        ],
+        [
+          "countries_logged_in_from",
+          21,
+          -1
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "1607fd5f6349d083ee67f9b542a75f377b03a0e5a5275d675c508e43141e5aaf",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "1607fd5f6349d083ee67f9b542a75f377b03a0e5a5275d675c508e43141e5aaf"
+    },
+    "389ef926f925c79efb3b61b05ed27e5bfa2ad23a643f97e2b676729d225e4468": {
+      "sql": "SELECT \n  a.accindex AS account_id, \n  ti.ipcountrynum AS num_countries_logged_in, \n  ti.uaconsval AS tei_value, \n  RANK() OVER (ORDER BY ti.uaconsval DESC) AS ranking \nFROM \n  account AS a \n  JOIN technicalinfo AS ti ON a.accindex = ti.techkey \nGROUP BY \n  a.accindex, \n  ti.ipcountrynum, \n  ti.uaconsval \nORDER BY \n  ranking;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "78ac8cdebf9a95dcb851c15e490251894356d1d1a0f712e4af8dd2ed659449ea",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "num_countries_logged_in",
+          21,
+          -1
+        ],
+        [
+          "tei_value",
+          1700,
+          393225
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4427dc89fdc66ca41fad52bf7d57067129eadec47ecfbca53de718fb27e97985",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4427dc89fdc66ca41fad52bf7d57067129eadec47ecfbca53de718fb27e97985"
+    },
+    "8b512809703449ac73f284112b508b2b48c950e3bd0a88434e0e0cc07afbbd6e": {
+      "sql": "SELECT \n  a.accindex AS account_id, \n  ti.ipcountrynum AS num_countries_logged_in, \n  ti.uaconsval AS tei_value, \n  RANK() OVER (ORDER BY ti.uaconsval DESC) AS ranking \nFROM \n  account AS a \n  JOIN technicalinfo AS ti ON a.accindex = ti.technetref \nGROUP BY \n  a.accindex, \n  ti.ipcountrynum, \n  ti.uaconsval \nORDER BY \n  ranking;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "73d6aaaee2f97bc13d6c64174388cded406607f028c9265a3a53d3777575181d",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "num_countries_logged_in",
+          21,
+          -1
+        ],
+        [
+          "tei_value",
+          1700,
+          393225
+        ],
+        [
+          "ranking",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4427dc89fdc66ca41fad52bf7d57067129eadec47ecfbca53de718fb27e97985",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4427dc89fdc66ca41fad52bf7d57067129eadec47ecfbca53de718fb27e97985"
+    },
+    "57b6d60e59e216c0f0598a425147e6c5dae9cab40dac6cb055603d0ffc055427": {
+      "sql": "SELECT \n  a.platident AS platform_id, \n  sd.detecttime AS time, \n  MAX(ma.coordscore) AS top_coordination_score \nFROM \n  moderationaction AS ma \n  JOIN account AS a ON ma.modactkey = a.accindex \n  JOIN securitydetection AS sd ON ma.masedetref = sd.secdetkey \nGROUP BY \n  a.platident, \n  sd.detecttime \nORDER BY \n  top_coordination_score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2016899568a643a2c9cf38577a2b633e00e121bc416b5c880e0c008e17a6a5dc",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "dee01a941aa3e44f35bbfbd7e87ea52d71411233e870a949b2a2ab463047ae94",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "dee01a941aa3e44f35bbfbd7e87ea52d71411233e870a949b2a2ab463047ae94"
+    },
+    "9bde0ce28a0ebfccdb96cbb4c9048fb2b1f4868e9321d736dbcdd72037821eff": {
+      "sql": "SELECT \n  t1.accindex AS account_id, \n  t2.reputscore AS reputation_score, \n  t2.abuserepnum AS complaint_count, \n  t2.lastrevdate AS last_review_date \nFROM \n  account AS t1 \n  JOIN moderationaction AS t2 ON t1.accindex = t2.modactkey \nORDER BY \n  reputation_score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f1f869957b6e9c22140a7bca166f9acba28512e89208319da06292dd42524447",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "reputation_score",
+          1700,
+          327688
+        ],
+        [
+          "complaint_count",
+          21,
+          -1
+        ],
+        [
+          "last_review_date",
+          1082,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7c06b27d0f5f1c098337aa990baa956e517a5adb24af538bcd1b7983287f0e85"
+    },
+    "31093bb485da69a5d4d17c5a8f13f034e197d73445640f330f589bd48908d9f9": {
+      "sql": "SELECT \n  t1.accindex, \n  t3.authenscore, \n  t2.acttimedist, \n  'Manipulator' AS status \nFROM \n  account AS t1 \n  JOIN sessionbehavior AS t2 ON t1.accindex = t2.sessprofref \n  JOIN moderationaction AS t3 ON t1.accindex = t3.macntref \nORDER BY \n  t3.authenscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c307e931fff3edf73d541971f9286995fcd3f2b6a96b79974a33e519fcef6845",
+      "ordered": true,
+      "columns": [
+        [
+          "accindex",
+          1042,
+          16
+        ],
+        [
+          "authenscore",
+          1700,
+          327687
+        ],
+        [
+          "acttimedist",
+          3802,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "5ccec29d705dfa016d82d4952800ed4c594ca5c866b8f879a334d8be18d02539",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "5ccec29d705dfa016d82d4952800ed4c594ca5c866b8f879a334d8be18d02539"
+    },
+    "b46959546738b615d4465abe5807cf364f26810f91f68d2eecc5d262f37b6893": {
+      "sql": "SELECT \n  t1.accindex, \n  t3.authenscore, \n  t2.acttimedist, \n  'Manipulator' AS status \nFROM \n  account AS t1 \n  JOIN sessionbehavior AS t2 ON t1.accindex = t2.sessprofref \n  JOIN moderationaction AS t3 ON t2.sessprofref = t3.macntref \nORDER BY \n  t3.authenscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "91256ff2bf1e9722f3c8272a3010f7c83099e8030f895d074a49402a346992b6",
+      "ordered": true,
+      "columns": [
+        [
+          "accindex",
+          1042,
+          16
+        ],
+        [
+          "authenscore",
+          1700,
+          327687
+        ],
+        [
+          "acttimedist",
+          3802,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "5ccec29d705dfa016d82d4952800ed4c594ca5c866b8f879a334d8be18d02539",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "5ccec29d705dfa016d82d4952800ed4c594ca5c866b8f879a334d8be18d02539"
+    },
+    "1dba1235c0dfb80b5e921fb27a07e1422495eb0bd6d860145e67129872a3aff6": {
+      "sql": "SELECT \n  t1.acctident, \n  t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS autobehavscore\nFROM \n  account AS t1 \n  JOIN securitydetection AS t2 ON t1.accindex = t2.sectechref \nWHERE \n  t1.acctstatus = 'Dormant' \n  AND CAST(t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS DECIMAL) > 0;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2a2d1bdf49c3376ba238bb31d6f612e684b425236eca69f6efde43adf39f89f1",
+      "ordered": false,
+      "columns": [
+        [
+          "acctident",
+          1043,
+          18
+        ],
+        [
+          "autobehavscore",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "615d4efc72ab4e6ba4d9edb6ddbb48bde0d9dc383fa775174a8fcf009029daeb",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "615d4efc72ab4e6ba4d9edb6ddbb48bde0d9dc383fa775174a8fcf009029daeb"
+    },
+    "c3f9ee334f22b46fc440259e3fc79313d298cfdcb91deed19e538e1e83c94c89": {
+      "sql": "SELECT \n  t1.acctident, \n  t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS autobehavscore, \n  t1.acctstatus \nFROM \n  account AS t1 \n  JOIN securitydetection AS t2 ON t1.accindex = t2.sectechref \nWHERE \n  t1.acctstatus != 'Active' \n  AND CAST(t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS DECIMAL) > 0;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cde1f284da6f48ebe19fcb29eb127cd029bdcb0b79f8b9145d05d364966110b7",
+      "ordered": false,
+      "columns": [
+        [
+          "acctident",
+          1043,
+          18
+        ],
+        [
+          "autobehavscore",
+          25,
+          -1
+        ],
+        [
+          "acctstatus",
+          22620,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "ff6b1bd41569e0cfc734bc3994971cd3def47f32385aae052414af63cb79f4dc",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "ff6b1bd41569e0cfc734bc3994971cd3def47f32385aae052414af63cb79f4dc"
+    },
+    "7226a355ecb881337c9513738328043d4b075f74ca4c23ece6c40528aacff9cc": {
+      "sql": "SELECT \n  t4.acctident AS account_id, \n  t1.authenscore AS engagement_authenticity_score, \n  t3.acttimedist AS timing_pattern, \n  'Manipulator' AS status \nFROM \n  moderationaction AS t1 \n  JOIN contentbehavior AS t2 ON t1.macntref = t2.cntref \n  JOIN sessionbehavior AS t3 ON t2.cntsessref = t3.sessref \n  JOIN account AS t4 ON t3.sessprofref = t4.accindex \nORDER BY \n  t1.authenscore ASC \nLIMIT \n  10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "486da7c05a53e2a69c46265126a8a045870fe247253cdfc1163b74eed8ea6c51",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "engagement_authenticity_score",
+          1700,
+          327687
+        ],
+        [
+          "timing_pattern",
+          3802,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "d5c4f9abeb6def93a2a45dfee017d4f418cb2d1fc92680ad27bb4e163cae15a3",
+      "values_digest": "9c4deebdcb980d905f59a9a42bd5b7bb66a7f07c0a7f564c5cd07fa9ef9ef40f",
+      "ordered_digest": "1bc5cc82774d6c9adbe138d2eb52fa2fc19d010fabdd9a500d24535cb592b6e0"
+    },
+    "47757104601eacf13aa9966c61043aa9c7603aa38ae5e5790d5c06ad6c13cb54": {
+      "sql": "SELECT \r\n    a.platident AS platform_id,\r\n    s.detecttime AS time,\r\n    ma.clustsize AS total_member_count,\r\n    ma.coordscore AS top_coordination_score,\r\n    ARRAY_AGG(a.acctident) AS account_list\r\nFROM \r\n    moderationaction AS ma\r\nJOIN \r\n    securitydetection AS s ON ma.masedetref = s.secdetkey\r\nJOIN \r\n    account AS a ON ma.modactkey = a.accindex\r\nWHERE \r\n    ma.clustsize > 1 \r\nGROUP BY \r\n    a.platident, s.detecttime, ma.clustsize, ma.coordscore\r\nORDER BY \r\n    a.platident;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f3f67ef059805aaa5882af6a6684343b061e12e9e352513f3abaf0c88f18b0a0",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          21,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          262150
+        ],
+        [
+          "account_list",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "2031e77dc02106a40f1f856ca1e818effb4207783732b8e7c02c51570bf371ba",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "2031e77dc02106a40f1f856ca1e818effb4207783732b8e7c02c51570bf371ba"
+    },
+    "bb1201e79c52ea4ec6d70f02934f10249d528e759533a11b0db775484d020240": {
+      "sql": "SELECT \r\n    cb.cntref AS content_reference_id,\r\n    cb.cntsimscore AS content_manipulation_score,\r\n    cb.postfreq AS post_frequency,\r\n    cb.postintvar AS post_interval_variance,\r\n    DENSE_RANK() OVER (ORDER BY cb.cntsimscore DESC) AS manipulation_rank\r\nFROM \r\n    contentbehavior AS cb\r\nWHERE \r\n    cb.cntsimscore > 0.7\r\n    AND cb.postfreq > 50\r\nORDER BY \r\n    manipulation_rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6bd423328ad4f692a321ee39fe0f65e03d6e6e11ddb059f7f0903c4701927e3b",
+      "ordered": true,
+      "columns": [
+        [
+          "content_reference_id",
+          1042,
+          16
+        ],
+        [
+          "content_manipulation_score",
+          1700,
+          262150
+        ],
+        [
+          "post_frequency",
+          1700,
+          327687
+        ],
+        [
+          "post_interval_variance",
+          1700,
+          393223
+        ],
+        [
+          "manipulation_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 449,
+      "bag_digest": "37cf6e109eaff694e4f475efeabed5df6c2de562dba62fdd2daa2a7b61a15988",
+      "values_digest": "01a885f2e71ffb9668a88babcc64836d1aaad965759493e073e02c207e04988e",
+      "ordered_digest": "a47020bd62d0a38f266c4731e3a85ac9da053966b4cbfd9d369f6811f04804ff"
+    },
+    "795adc6379833f61238b304b4d6b1408640c439e1d4c85cc36a7bac8ff707638": {
+      "sql": "SELECT \r\n    cntref AS content_reference_id,\r\n    cntsimscore AS content_manipulation_score,\r\n    postintvar AS frequency_related_details,\r\n    postfreq AS frequency_related_details\r\nFROM \r\n    contentbehavior\r\nWHERE \r\n    cntsimscore > 0.7 AND postfreq > 50\r\nORDER BY \r\n    cntsimscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d7acd5005fc8145927614114e9eacd74e695cfaae12ac193399d370c07fd6fe4",
+      "ordered": true,
+      "columns": [
+        [
+          "content_reference_id",
+          1042,
+          16
+        ],
+        [
+          "content_manipulation_score",
+          1700,
+          262150
+        ],
+        [
+          "frequency_related_details",
+          1700,
+          393223
+        ],
+        [
+          "frequency_related_details",
+          1700,
+          327687
+        ]
+      ],
+      "rows": 449,
+      "bag_digest": "064c402828df4cf08be19bbf9c565d781623a2341364323c807ff43d3e2a3eee",
+      "values_digest": "657dc467032b9f2ab0bf779e5f934cc7ac7bd758555fe135eca837e6c54c3855",
+      "ordered_digest": "187c9ff3aa8c8fbe691e3789388e4ca26858ec9739207e9b36cac1d6629a9e77"
+    },
+    "7c1254b050ba66d3606e281d68396f0a23b0c7b570ec710f588ed0f9da6d2ed7": {
+      "sql": "SELECT \r\n    ma.clustsize AS cluster_size,\r\n    AVG(\r\n        (\r\n            sd.detection_score_profile -> 'behavior_scores' ->> 'botlikscore'\r\n        )::NUMERIC\r\n    ) AS avg_bot_behavior_index,\r\n    COUNT(a.accindex) AS total_account_count\r\nFROM \r\n    moderationaction AS ma\r\nJOIN \r\n    account AS a ON ma.modactkey = a.accindex\r\nJOIN \r\n    securitydetection AS sd ON ma.masedetref = sd.secdetkey\r\nWHERE \r\n    a.acctcategory = 'Bot'\r\nGROUP BY \r\n    ma.clustsize\r\nORDER BY \r\n    cluster_size DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5a0e7d8c4491d29390e2e7561c22952090162d45c61795be9db921d90c64584f",
+      "ordered": true,
+      "columns": [
+        [
+          "cluster_size",
+          21,
+          -1
+        ],
+        [
+          "avg_bot_behavior_index",
+          1700,
+          -1
+        ],
+        [
+          "total_account_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f"
+    },
+    "7084fa35733363edb236c66b695254eac0bcfe1d753c8745dc4a53be1c5d01e4": {
+      "sql": "SELECT \r\n    ma.clustsize AS cluster_size,\r\n    AVG(\r\n        (\r\n            sd.detection_score_profile -> 'behavior_scores' ->> 'botlikscore'\r\n        )::NUMERIC\r\n    ) AS avg_bot_behavior_index,\r\n    COUNT(a.accindex) AS total_account_count\r\nFROM \r\n    moderationaction AS ma\r\nJOIN \r\n    securitydetection AS sd ON ma.masedetref = sd.secdetkey\r\nJOIN \r\n    profile AS p ON sd.secdetkey = p.profkey\r\nJOIN \r\n    account AS a ON p.profaccref = a.accindex\r\nWHERE \r\n    a.acctcategory = 'Bot'\r\nGROUP BY \r\n    ma.clustsize\r\nORDER BY \r\n    cluster_size DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "995726cc74a8c4580bb6947904647dc2f89dc360da81d2c573f17a43608603b9",
+      "ordered": true,
+      "columns": [
+        [
+          "cluster_size",
+          21,
+          -1
+        ],
+        [
+          "avg_bot_behavior_index",
+          1700,
+          -1
+        ],
+        [
+          "total_account_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "f53f0f9f87ddb8948e7a3a78f9c313505c582818a6c5df1a618a2eec0ed9227f"
+    },
+    "024c7ef39928989f46238256daed6d508869a68cd3b044147397ecf9041bbba9": {
+      "sql": "SELECT \r\n    platident AS platform_id,\r\n    detecttime AS time,\r\n    clustsize AS total_member_count,\r\n    MAX(coordscore) AS top_coordination_score,\r\n    ARRAY_AGG(acctident) AS account_list\r\nFROM \r\n    moderationaction AS ma\r\nJOIN \r\n    account AS a ON ma.modactkey = a.accindex\r\nJOIN \r\n    securitydetection AS s ON ma.masedetref = s.secdetkey\r\nWHERE \r\n    clustsize > 1 \r\nGROUP BY \r\n    platident, detecttime, clustsize\r\nORDER BY \r\n    platident;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a35670ad53895229eb6eb36001600bfd4ee12e5969896825fbf2ba4031bd2706",
+      "ordered": true,
+      "columns": [
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          21,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          -1
+        ],
+        [
+          "account_list",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "58aab87231af3c8184b915b677e9ec0f897aafbc36e19c08cb5b3337eae30f81",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "58aab87231af3c8184b915b677e9ec0f897aafbc36e19c08cb5b3337eae30f81"
+    },
+    "9f7c5190341f2c438758dc89308c7896d0afc045b469ab9eade57a8c5b7e3a71": {
+      "sql": "SELECT \r\n    t1.accindex AS account_id,\r\n    t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS bot_behavior_index,\r\n    CASE \r\n        WHEN CAST(t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS NUMERIC) > 0.8 THEN 'High'\r\n        WHEN CAST(t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS NUMERIC) > 0.6 THEN 'Medium'\r\n        ELSE 'Low'\r\n    END AS risk_tier\r\nFROM \r\n    account AS t1\r\nJOIN \r\n    securitydetection AS t2 ON t1.accindex = t2.sectechref\r\nWHERE \r\n    t1.acctstatus = 'Dormant' \r\n    AND t1.acctcategory = 'Bot'\r\n    AND CAST(t2.detection_score_profile->'behavior_scores'->>'autobehavscore' AS NUMERIC) > 0.2\r\nORDER BY \r\n    risk_tier DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "aaa7ff334e993c526822a0bff040c5eab8f44f51cd52974aa9f98f1e66c353fe",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "bot_behavior_index",
+          25,
+          -1
+        ],
+        [
+          "risk_tier",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "3b49a773749da550eacada951dc3b502ea01ebf82abe245cf14a476fde35f09d",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "3b49a773749da550eacada951dc3b502ea01ebf82abe245cf14a476fde35f09d"
+    },
+    "3e82405013548ce6a52cc719a2de3d874cb6d80c150bcfb6cdd3bb54537f3d66": {
+      "sql": "SELECT \r\n    t2.acctident AS account_id,\r\n    t1.detection_score_profile->'overall' AS overall_weirdness_score,\r\n    t1.detection_score_profile->'behavior_scores'->>'botlikscore' AS recent_bot_rating\r\nFROM \r\n    securitydetection AS t1\r\nJOIN \r\n    account AS t2 ON t1.sectechref = t2.accindex\r\nWHERE \r\n    t2.acctcategory = 'Bot'\r\nORDER BY \r\n    recent_bot_rating DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c178d7b7993b8ffaca768662b608fad1567e27112393def5b4cd8ae9b3966784",
+      "ordered": true,
+      "columns": [
+        [
+          "account_id",
+          1043,
+          18
+        ],
+        [
+          "overall_weirdness_score",
+          3802,
+          -1
+        ],
+        [
+          "recent_bot_rating",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "eb7601eb0f60b497a1a65162a25b2dcba34b4b38ecf3a6031deb2223c60a89bc"
+    },
+    "0698ab38ee8e5515f27252ff61c0edf572c4fb102d3a5baa74348d129f5b30b7": {
+      "sql": "SELECT DISTINCT acctstatus FROM account;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "edc83d04c8a58a824183a38aa9383d817bdd2257b8df31165a4a776a4b16cd57",
+      "ordered": false,
+      "columns": [
+        [
+          "acctstatus",
+          22620,
+          -1
+        ]
+      ],
+      "rows": 4,
+      "bag_digest": "6ba8a9cca1ee13d4ccfb6c36c07d72d7e909aca03dc82575e26819c43b9bf5fc",
+      "values_digest": "4dcc13f6556d544492e27920bcfc67611613238efb32ac5fbd7b2195193569a1",
+      "ordered_digest": "6ba8a9cca1ee13d4ccfb6c36c07d72d7e909aca03dc82575e26819c43b9bf5fc"
+    },
+    "a4fc3b182f42df547550b78b3d5dc51347b1e2a1a496d5bbe6a35576f81c6aae": {
+      "sql": "SELECT DISTINCT plattype\nFROM account;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cb50f863de53998500bb09598c958f5c8988c1fcdd93299f9eedf7924ea96160",
+      "ordered": false,
+      "columns": [
+        [
+          "plattype",
+          22824,
+          -1
+        ]
+      ],
+      "rows": 4,
+      "bag_digest": "58847e62dbdecbada5ab74ccdfda539ce792ec5f2a7f7a63a2680b0f19909b21",
+      "values_digest": "da0e505c6686cd82dddacaf4283506c64099baa0a7958c878b0c2b4715f49d43",
+      "ordered_digest": "ba2c32dcef88703cce5fbbb00d490ac9eee645091579c66df7eb1d64681570a1"
+    },
+    "3c1a976006f87ae7c8ca1c59c8b2debdae28f5f0de9361fff5de467fa1ce9556": {
+      "sql": "WITH content_farms AS (\r\n    SELECT \r\n        cb.cntref AS content_reference_id,\r\n        cb.cntsimscore AS content_manipulation_score,\r\n        cb.postfreq AS frequency_related_details,\r\n        RANK() OVER (ORDER BY cb.cntsimscore DESC) AS manipulation_rank\r\n    FROM \r\n        contentbehavior cb\r\n    WHERE \r\n        cb.cntsimscore > 0.7\r\n        AND cb.postfreq > 50\r\n)\r\nSELECT \r\n    content_reference_id,\r\n    content_manipulation_score,\r\n    frequency_related_details,\r\n    manipulation_rank\r\nFROM \r\n    content_farms\r\nORDER BY \r\n    manipulation_rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c71451741e40329d52cee123ad5af64cabec004bd3ae861bdabf793fdbd8c91b",
+      "ordered": true,
+      "columns": [
+        [
+          "content_reference_id",
+          1042,
+          16
+        ],
+        [
+          "content_manipulation_score",
+          1700,
+          262150
+        ],
+        [
+          "frequency_related_details",
+          1700,
+          327687
+        ],
+        [
+          "manipulation_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 449,
+      "bag_digest": "2af03f6afcd3021d3f6274245aea51359ee9e9a0ed96b28dbf98ed411a1a6f66",
+      "values_digest": "179c320533b8b1a69b4fdaac1defb2b5dc3c69b3fdb19ec98aa828c1ae232b8d",
+      "ordered_digest": "c7b8f168c00aedd9f622bb066a72f72e2791a182728d47a8ebded74522d2f48f"
+    },
+    "9212405ac93684cbfc10bb333dc8a35a0db5cf2a602531110e3bff4a2ab4fdbe": {
+      "sql": "WITH potential_amplification_activity AS (\n    SELECT \n        ma.modactkey,\n        ma.clustsize AS total_member_count,\n        ma.coordscore AS top_coordination_score,\n        array_agg(DISTINCT a.accindex) AS account_list\n    FROM \n        moderationaction AS ma\n    JOIN \n        securitydetection AS sd ON ma.masedetref = sd.secdetkey\n    JOIN \n        account AS a ON a.accindex = sd.sectechref -- Assuming sectechref references the account\n    WHERE \n        ma.clustsize > 1 \n    GROUP BY \n        ma.modactkey, ma.clustsize, ma.coordscore, sd.detecttime\n),\nplatform_grouped AS (\n    SELECT \n        a.plattype, \n        a.platident AS platform_id,\n        sd.detecttime AS time,\n        paa.total_member_count, \n        paa.top_coordination_score,\n        paa.account_list\n    FROM \n        potential_amplification_activity AS paa\n    JOIN \n        securitydetection AS sd ON paa.modactkey = sd.secdetkey\n    JOIN \n        account AS a ON a.accindex = sd.sectechref\n)\nSELECT \n    *\nFROM \n    platform_grouped;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2174108acf6ccbf6fa52b70f46bf817616aea6fb5f7ee772a6b801529c045ab4",
+      "ordered": false,
+      "columns": [
+        [
+          "plattype",
+          22824,
+          -1
+        ],
+        [
+          "platform_id",
+          1043,
+          12
+        ],
+        [
+          "time",
+          1114,
+          -1
+        ],
+        [
+          "total_member_count",
+          21,
+          -1
+        ],
+        [
+          "top_coordination_score",
+          1700,
+          262150
+        ],
+        [
+          "account_list",
+          1014,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "3899975750b392e748d5fdcfcaed1b2d9137ee90e4d16ce19a001faa9f956368",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "3899975750b392e748d5fdcfcaed1b2d9137ee90e4d16ce19a001faa9f956368"
+    },
+    "f9e616e8549044b7a3f07fc11cb97a8a9e1dbe1af95a7c0cd60559c61bde8d9a": {
+      "sql": "WITH ranked_accounts AS (\r\n    SELECT \r\n        a.accindex AS account_id,\r\n        ma.authenscore AS engagement_authenticity_score,\r\n        sb.acttimedist->>'timing_pattern' AS timing_pattern,\r\n        'Manipulator' AS status,\r\n        ROW_NUMBER() OVER (ORDER BY ma.authenscore DESC) AS rank\r\n    FROM \r\n        account a\r\n    JOIN \r\n        profile p ON a.accindex = p.profaccref\r\n    JOIN \r\n        sessionbehavior sb ON p.profkey = sb.sessprofref\r\n    JOIN \r\n        moderationaction ma ON a.accindex = ma.macntref\r\n)\r\nSELECT \r\n    account_id, \r\n    engagement_authenticity_score,\r\n    timing_pattern,\r\n    status\r\nFROM \r\n    ranked_accounts\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "44f798aadaf007e3f0bce253f8842780ad7e48dab56eb5620eaa5f09013df0bc",
+      "ordered": false,
+      "columns": [
+        [
+          "account_id",
+          1042,
+          16
+        ],
+        [
+          "engagement_authenticity_score",
+          1700,
+          327687
+        ],
+        [
+          "timing_pattern",
+          25,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "874c293adb0273d2dc7034207481c72db3f8cdda04712b60b0acbaa6df0a4cbe",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "874c293adb0273d2dc7034207481c72db3f8cdda04712b60b0acbaa6df0a4cbe"
+    },
+    "e0f03d9861e46de2747842d0953ca5b2b4f62622206f69709f17402421ef9c02": {
+      "sql": "WITH security_risk_scores AS (\r\n    SELECT \r\n        secdetkey,\r\n        (\r\n            (detection_score_profile->'overall'->>'riskval')::FLOAT * \r\n            (1 + 0.2 * ti.ipcountrynum)\r\n        ) AS cross_risk_score\r\n    FROM securitydetection\r\n    INNER JOIN technicalinfo AS ti ON securitydetection.sectechref = ti.techkey\r\n),\r\nsession_tallies AS (\r\n    SELECT \r\n        sessprofref,\r\n        SUM(sesscount) AS session_tally\r\n    FROM sessionbehavior\r\n    GROUP BY sessprofref\r\n),\r\nposting_speeds AS (\r\n    SELECT \r\n        cntsessref,\r\n        AVG(postfreq) AS overall_posting_speed\r\n    FROM contentbehavior\r\n    GROUP BY cntsessref\r\n),\r\naccount_metrics AS (\r\n    SELECT \r\n        a.accindex,\r\n        COALESCE(st.session_tally, 0) AS session_tally,\r\n        COALESCE(ps.overall_posting_speed, 0) AS overall_posting_speed,\r\n        1 AS fixed_platform_count,\r\n        COALESCE(srs.cross_risk_score, 0) AS cross_risk_score\r\n    FROM account AS a\r\n    LEFT JOIN profile AS p ON a.accindex = p.profaccref\r\n    LEFT JOIN session_tallies AS st ON p.profkey = st.sessprofref\r\n    LEFT JOIN posting_speeds AS ps ON p.profkey = ps.cntsessref\r\n    LEFT JOIN security_risk_scores AS srs ON p.profkey = srs.secdetkey\r\n)\r\nSELECT \r\n    accindex,\r\n    session_tally,\r\n    overall_posting_speed,\r\n    fixed_platform_count,\r\n    cross_risk_score\r\nFROM account_metrics\r\nORDER BY session_tally DESC\r\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2d2888ce6777f1cde3717c3aa9db8f4aced423bc7354bb18dfba629f314bd99d",
+      "ordered": true,
+      "columns": [
+        [
+          "accindex",
+          1042,
+          16
+        ],
+        [
+          "session_tally",
+          20,
+          -1
+        ],
+        [
+          "overall_posting_speed",
+          1700,
+          -1
+        ],
+        [
+          "fixed_platform_count",
+          23,
+          -1
+        ],
+        [
+          "cross_risk_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "df6a5f4262e06e4d19efedf3c3f2f31e4a403b947f9677ae3b3e8db2a9878c77",
+      "values_digest": "d57b5298d6fddc6d3a0be20e7c8fa3264cb260fe6f91f346c1a6cbc9ec2ae5cc",
+      "ordered_digest": "df6a5f4262e06e4d19efedf3c3f2f31e4a403b947f9677ae3b3e8db2a9878c77"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "profile": {
+      "profkey": "bpchar",
+      "profaccref": "bpchar",
+      "profile_composition": "jsonb"
+    },
+    "networkmetrics": {
+      "netkey": "bpchar",
+      "netsessref": "bpchar",
+      "network_engagement_metrics": "jsonb"
+    }
+  }
+}

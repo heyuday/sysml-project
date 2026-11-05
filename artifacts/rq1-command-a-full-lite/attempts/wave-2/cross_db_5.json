@@ -1,0 +1,205 @@
+{
+  "wave": 2,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "cross_db_5",
+    "instance_id": "cross_db_5",
+    "database": "cross_db",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 293.24531149864197,
+    "budget_used": 3.0,
+    "budget_remaining": 17.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"dataflow\" (\nrecordregistry character NOT NULL,\nflowstamp timestamp without time zone NULL,\nflowtag character varying NULL,\norignation character varying NULL,\ndestnation character varying NULL,\norigactor character varying NULL,\ndestactor character varying NULL,\nchanproto character varying NULL,\nchanfreq character varying NULL,\ndatasizemb numeric NULL,\ndurmin smallint NULL,\nbwidthpct numeric NULL,\nsuccesspct numeric NULL,\nerrtally smallint NULL,\nrtrytally smallint NULL,\n    PRIMARY KEY (recordregistry)\n);\n\nFirst 3 rows:\nrecordregistry    flowstamp                   flowtag    orignation                    destnation    origactor       destactor                chanproto        chanfreq      datasizemb    durmin    bwidthpct    successpct    errtally    rtrytally\n----------------  --------------------------  ---------  ----------------------------  ------------  --------------  -----------------------  ---------------  ----------  ------------  --------  -----------  ------------  ----------  -----------\nCB932064          2024-03-11 11:43:31.039769  DF7811     Niue                          Djibouti      Hill Ltd        Davis, Harper and Weber  Blockchain       Weekly           42668.4      1068        68.81         99.93          39            1\nCB339111          2024-05-01 07:58:45.040384  DF9309     Israel                        Monaco        Boyer-Mcdonald  Rogers Inc               SFTP             Hourly           32804         996         7.52         91.77          68           48\nCB899685          2024-05-07 04:39:04.040801  DF8105     United States Virgin Islands  Germany       Curtis Inc      Horton LLC               Private Network  Real-time        93843.2      1325        62.66         93.76          80           45\n...\n\n\nCREATE TABLE \"auditandcompliance\" (\naudittrace integer NOT NULL DEFAULT nextval('auditandcompliance_audittrace_seq1'::regclass),\nprofjoin integer NOT NULL,\ncompjoin integer NOT NULL,\nvendjoin integer NOT NULL,\nrecordregistry c...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"cross|dataflow|recordregistry\": \"CHAR(10) primary key uniquely identifying each data flow record in the DataFlow table.\",\n  \"cross|dataflow|flowstamp\": \"TIMESTAMP(6) for the moment this data flow record was created or logged. Microsecond precision.\",\n  \"cross|dataflow|flowtag\": \"A short identifier or tag (VARCHAR(20)) for the data flow, previously 'DataFlowID'.\",\n  \"cross|dataflow|orignation\": \"VARCHAR(80) storing the source/origin country's name for this data flow.\",\n  \"cross|dataflow|destnation\": \"VARCHAR(80) storing the destination country's name for this data flow.\",\n  \"cross|dataflow|origactor\": \"VARCHAR(150) referencing the source entity/system initiating the flow (person, organization, or app).\",\n  \"cross|dataflow|destactor\": \"VARCHAR(150) referencing the destination entity/system receiving the flow.\",\n  \"cross|dataflow|chanproto\": \"VARCHAR(30) for the protocol used (HTTP, FTP, SFTP, etc.). Currently possible values: (Blockchain, SFTP, Private Network, HTTPS).\",\n  \"cross|dataflow|chanfreq\": \"VARCHAR(25) specifying how frequently data is transferred (daily, weekly, on-demand, etc.). Currently possible values: (Weekly, Hourly, Real-time, Daily).\",\n  \"cross|dataflow|datasizemb\": \"NUMERIC(12,2) representing the size in MB of each data transfer.\",\n  \"cross|dataflow|durmin\": \"SMALLINT capturing the average or actual duration (in minutes) of the data flow.\",\n  \"cross|dataflow|bwidthpct\": \"NUMERIC(5,2) for bandwidth utilization percentage (0 to 100%).\",\n  \"cross|dataflow|successpct\": \"NUMERIC(5,2) measuring the success rate (0\\u2013100%) of the flow attempts.\",\n  \"cross|dataflow|errtally\": \"SMALLINT counting the total errors or failures observed for this data flow.\",\n  \"cross|dataflow|rtrytally\": \"SMALLINT storing how many retry attempts were made after failures.\",\n  \"cross|riskmanagement|risktrace\": \"SERIAL primary key uniquely identifying each risk management record.\",\n  \"cross|riskmanagement|flowlink\": \"CHAR(10) referencing DataFlow(RecordRegistry), linking t...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n  c.recordregistry AS record_id, \n  c.gdprcomp AS gdpr_compliance_status, \n  c.loclawcomp AS local_law_compliance_status, \n  CONCAT(d.orignation, ' -> ', d.destnation) AS transfer_path \nFROM \n  compliance AS c \n  JOIN dataflow AS d ON c.recordregistry = d.recordregistry \nWHERE \n  c.gdprcomp != 'Compliant' \n  OR c.loclawcomp != 'Compliant' \nORDER BY \n  record_id;"
+        },
+        "result": "record_id | gdpr_compliance_status | local_law_compliance_status | transfer_path -------------------------------------------------------------------------------- CB100432 | Non-compliant | Non-compliant | Guatemala -> Tonga CB100698 | Partial | Partial | Cambodia -> French Southern Territories CB102232 | Compliant | Partial | Montserrat -> Spain CB105271 | Partial | Non-compliant | Japan -> Equatorial Guinea CB105896 | Non-compliant | Partial | Jamaica -> Rwanda CB108116 | Non-compliant | Compliant | Isle of Man -> Micronesia CB108769 | Partial | Partial | Cameroon -> Canada CB108793 | Non-compliant | Compliant | Panama -> Andorra CB111176 | Partial | Non-compliant | Macao -> Zambia CB111373 | Partial | Compliant | French Southern Territories -> Trinidad and Tobago CB112003 | Partial | Partial | Mongolia -> Faroe Islands CB112493 | Partial | Compliant | Lebanon -> Namibia CB112784 | Non-compliant | Non-compliant | Mali -> Latvia CB113444 | Compliant | Non-compliant | Greece -> Antarctica (the territory South of 60 deg S) CB115407 | Non-compliant | Partial | Niger -> CB115541 | Compliant | Non-compliant | Afghanistan -> Congo CB117012 | Non-compliant | Partial | Sweden -> Guatemala CB117620 | Partial | Non-compliant | New Caledonia -> New Caledonia CB121252 | Partial | Compliant | Macao -> Trinidad and Tobago CB121824 | Non-compliant | Compliant | Liechtenstein -> Zimbabwe CB121953 | Partial | Non-compliant | Burkina Faso -> Botswana CB122034 | Compliant | Non-compliant | Nigeria -> Central African Republic CB122924 | Compliant | Partial | Cyprus -> American Samoa CB123225 | Non-compliant | Compliant | Montenegro -> Malta CB123342 | Non-compliant | Non-compliant | Djibouti -> Cayman Islands CB131484 | Non-compliant | Non-compliant | Palau -> Nicaragua CB132082 | Non-compliant | Non-compliant | Lithuania -> New Caledonia CB132456 | Partial | Partial | Australia -> Slovenia CB132620 | Non-compliant | Non-compliant | Holy See (Vatican City State) -> Timor-Leste CB133141...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: cross_db\nTask ID: cross_db_5\n\nUser Query:\nFind some compliance records with compliance issues. List each records ID, GDPR compliance status, local law compliance status, and the transfer path. Sort results.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-41d86644-ea28-4e10-8db0-4d4f8f44f43d",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_w1g89kkbaen3",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_nwbhs139g60g",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-41d86644-ea28-4e10-8db0-4d4f8f44f43d",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_w1g89kkbaen3",
+              "response": "{\"result\": \"CREATE TABLE \\\"dataflow\\\" (\\nrecordregistry character NOT NULL,\\nflowstamp timestamp without time zone NULL,\\nflowtag character varying NULL,\\norignation character varying NULL,\\ndestnation character varying NULL,\\norigactor character varying NULL,\\ndestactor character varying NULL,\\nchanproto character varying NULL,\\nchanfreq character varying NULL,\\ndatasizemb numeric NULL,\\ndurmin smallint NULL,\\nbwidthpct numeric NULL,\\nsuccesspct numeric NULL,\\nerrtally smallint NULL,\\nrtrytally smallint NULL,\\n    PRIMARY KEY (recordregistry)\\n);\\n\\nFirst 3 rows:\\nrecordregistry    flowstamp                   flowtag    orignation                    destnation    origactor       destactor                chanproto        chanfreq      datasizemb    durmin    bwidthpct    successpct    errtally    rtrytally\\n----------------  --------------------------  ---------  ----------------------------  ------------  --------------  -----------------------  ---------------  ----------  ------------  --------  -----------  ------------  ----------  -----------\\nCB932064          2024-03-11 11:43:31.039769  DF7811     Niue                          Djibouti      Hill Ltd        Davis, Harper and Weber  Blockchain       Weekly           42668.4      1068        68.81         99.93          39            1\\nCB339111          2024-05-01 07:58:45.040384  DF9309     Israel                        Monaco        Boyer-Mcdonald  Rogers Inc               SFTP             Hourly           32804         996         7.52         91.77          68           48\\nCB899685          2024-05-07 04:39:04.040801  DF8105     United States Virgin Islands  Germany       Curtis Inc      Horton LLC               Private Network  Real-time        93843.2      1325        62.66         93.76          80           45\\n...\\n\\n\\nCREATE TABLE \\\"auditandcompliance\\\" (\\naudittrace integer NOT NULL DEFAULT nextval('auditandcompliance_audittrace_seq1'::regclass),\\nprofjoin integer NOT NULL,\\ncompjoin integer NOT NULL,\\nvendjoin integer NOT NULL,\\nrecordregistry character NULL,\\naudtrailstate USER-DEFINED NULL,\\nfindtally smallint NULL,\\ncritfindnum smallint NULL,\\nremedstate character varying NULL,\\nremeddue date NULL,\\nauthnotify character varying NULL,\\nbordermech character varying NULL,\\ntransimpassess text NULL,\\nlocalreqs text NULL,\\ndatamapstate character varying NULL,\\nsysintstate character varying NULL,\\naccreqnum smallint NULL,\\ndelreqnum smallint NULL,\\nrectreqnum smallint NULL,\\nportreqnum smallint NULL,\\nresptimeday numeric NULL,\\n    PRIMARY KEY (audittrace),\\n    FOREIGN KEY (compjoin) REFERENCES compliance(compliancetrace),\\n    FOREIGN KEY (profjoin) REFERENCES dataprofile(profiletrace),\\n    FOREIGN KEY (vendjoin) REFERENCES vendormanagement(vendortrace)\\n);\\n\\nFirst 3 rows:\\n  audittrace    profjoin    compjoin    vendjoin  recordregistry    audtrailstate      findtally    critfindnum  remedstate    remeddue    authnotify    bordermech         transimpassess    localreqs    datamapstate    sysintstate         accreqnum    delreqnum    rectreqnum    portreqnum    resptimeday\\n------------  ----------  ----------  ----------  ----------------  ---------------  -----------  -------------  ------------  ----------  ------------  -----------------  ----------------  -----------  --------------  ----------------  -----------  -----------  ------------  ------------  -------------\\n           1           1           1           1  CB932064          Complete                   3              6  In Progress   2025-03-16  Not Required  SCCs               Required          Not Met      Partial         Fully Integrated          959          409            76            53            4.5\\n           2           2           2           2  CB339111          Complete                  49              8  In Progress   2025-04-14  Required      Adequacy Decision  Completed         Met          Partial         Manual                     36          326           196            2...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_nwbhs139g60g",
+              "response": "{\"result\": \"{\\n  \\\"cross|dataflow|recordregistry\\\": \\\"CHAR(10) primary key uniquely identifying each data flow record in the DataFlow table.\\\",\\n  \\\"cross|dataflow|flowstamp\\\": \\\"TIMESTAMP(6) for the moment this data flow record was created or logged. Microsecond precision.\\\",\\n  \\\"cross|dataflow|flowtag\\\": \\\"A short identifier or tag (VARCHAR(20)) for the data flow, previously 'DataFlowID'.\\\",\\n  \\\"cross|dataflow|orignation\\\": \\\"VARCHAR(80) storing the source/origin country's name for this data flow.\\\",\\n  \\\"cross|dataflow|destnation\\\": \\\"VARCHAR(80) storing the destination country's name for this data flow.\\\",\\n  \\\"cross|dataflow|origactor\\\": \\\"VARCHAR(150) referencing the source entity/system initiating the flow (person, organization, or app).\\\",\\n  \\\"cross|dataflow|destactor\\\": \\\"VARCHAR(150) referencing the destination entity/system receiving the flow.\\\",\\n  \\\"cross|dataflow|chanproto\\\": \\\"VARCHAR(30) for the protocol used (HTTP, FTP, SFTP, etc.). Currently possible values: (Blockchain, SFTP, Private Network, HTTPS).\\\",\\n  \\\"cross|dataflow|chanfreq\\\": \\\"VARCHAR(25) specifying how frequently data is transferred (daily, weekly, on-demand, etc.). Currently possible values: (Weekly, Hourly, Real-time, Daily).\\\",\\n  \\\"cross|dataflow|datasizemb\\\": \\\"NUMERIC(12,2) representing the size in MB of each data transfer.\\\",\\n  \\\"cross|dataflow|durmin\\\": \\\"SMALLINT capturing the average or actual duration (in minutes) of the data flow.\\\",\\n  \\\"cross|dataflow|bwidthpct\\\": \\\"NUMERIC(5,2) for bandwidth utilization percentage (0 to 100%).\\\",\\n  \\\"cross|dataflow|successpct\\\": \\\"NUMERIC(5,2) measuring the success rate (0\\\\u2013100%) of the flow attempts.\\\",\\n  \\\"cross|dataflow|errtally\\\": \\\"SMALLINT counting the total errors or failures observed for this data flow.\\\",\\n  \\\"cross|dataflow|rtrytally\\\": \\\"SMALLINT storing how many retry attempts were made after failures.\\\",\\n  \\\"cross|riskmanagement|risktrace\\\": \\\"SERIAL primary key uniquely identifying each risk management record.\\\",\\n  \\\"cross|riskmanagement|flowlink\\\": \\\"CHAR(10) referencing DataFlow(RecordRegistry), linking this risk record to a specific data flow.\\\",\\n  \\\"cross|riskmanagement|recordregistry\\\": \\\"CHAR(10) formerly 'RecordID'; can be used for cross-references or historical reasons.\\\",\\n  \\\"cross|riskmanagement|riskassess\\\": \\\"NUMERIC(4,2) storing the assessed risk score (0\\\\u2013100 or custom).\\\",\\n  \\\"cross|riskmanagement|riskmitstate\\\": \\\"VARCHAR(40) describing how the risk is being mitigated. Currently possible values: (Pending, Partial, Implemented).\\\",\\n  \\\"cross|riskmanagement|secureaction\\\": \\\"TEXT describing security measures or controls used to reduce identified risks. Currently possible values: (Adequate, Strong, Insufficient).\\\",\\n  \\\"cross|riskmanagement|breachnotify\\\": \\\"TEXT outlining the procedure for breach notification if a security event occurs. Currently possible values: (Partial, Established, Missing).\\\",\\n  \\\"cross|riskmanagement|incidentplan\\\": \\\"TEXT capturing the incident response plan or steps for handling security/operational events. Currently possible values: (Missing, Active, Outdated).\\\",\\n  \\\"cross|riskmanagement|incidentcount\\\": \\\"SMALLINT counting incidents recorded for this data flow or scenario.\\\",\\n  \\\"cross|riskmanagement|breachcount\\\": \\\"SMALLINT counting data breaches recorded.\\\",\\n  \\\"cross|riskmanagement|nearmissnum\\\": \\\"SMALLINT enumerating near misses (close calls that didn't escalate).\\\",\\n  \\\"cross|riskmanagement|avgresolhrs\\\": \\\"NUMERIC(5,2) average incident resolution time in hours.\\\",\\n  \\\"cross|riskmanagement|slapct\\\": \\\"NUMERIC(4,2) indicating SLA (Service Level Agreement) compliance percentage (0\\\\u2013100%).\\\",\\n  \\\"cross|riskmanagement|costusd\\\": \\\"NUMERIC(11,2) capturing the cost of compliance in USD (security, risk measures, etc.).\\\",\\n  \\\"cross|riskmanagement|penusd\\\": \\\"NUMERIC(11,2) storing potential or actual penalty/fine risk in USD.\\\",\\n  \\\"cross|riskmanagement|coveragestate\\\": \\\"VARCHAR(40) describing insurance cove...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-41d86644-ea28-4e10-8db0-4d4f8f44f43d",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_ywfyhj9v3t4j",
+              "args": {
+                "sql": "SELECT \n  c.recordregistry AS record_id, \n  c.gdprcomp AS gdpr_compliance_status, \n  c.loclawcomp AS local_law_compliance_status, \n  CONCAT(d.orignation, ' -> ', d.destnation) AS transfer_path \nFROM \n  compliance AS c \n  JOIN dataflow AS d ON c.recordregistry = d.recordregistry \nWHERE \n  c.gdprcomp != 'Compliant' \n  OR c.loclawcomp != 'Compliant' \nORDER BY \n  record_id;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-41d86644-ea28-4e10-8db0-4d4f8f44f43d",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_ywfyhj9v3t4j",
+              "response": "{\"result\": \"record_id | gdpr_compliance_status | local_law_compliance_status | transfer_path -------------------------------------------------------------------------------- CB100432 | Non-compliant | Non-compliant | Guatemala -> Tonga CB100698 | Partial | Partial | Cambodia -> French Southern Territories CB102232 | Compliant | Partial | Montserrat -> Spain CB105271 | Partial | Non-compliant | Japan -> Equatorial Guinea CB105896 | Non-compliant | Partial | Jamaica -> Rwanda CB108116 | Non-compliant | Compliant | Isle of Man -> Micronesia CB108769 | Partial | Partial | Cameroon -> Canada CB108793 | Non-compliant | Compliant | Panama -> Andorra CB111176 | Partial | Non-compliant | Macao -> Zambia CB111373 | Partial | Compliant | French Southern Territories -> Trinidad and Tobago CB112003 | Partial | Partial | Mongolia -> Faroe Islands CB112493 | Partial | Compliant | Lebanon -> Namibia CB112784 | Non-compliant | Non-compliant | Mali -> Latvia CB113444 | Compliant | Non-compliant | Greece -> Antarctica (the territory South of 60 deg S) CB115407 | Non-compliant | Partial | Niger -> CB115541 | Compliant | Non-compliant | Afghanistan -> Congo CB117012 | Non-compliant | Partial | Sweden -> Guatemala CB117620 | Partial | Non-compliant | New Caledonia -> New Caledonia CB121252 | Partial | Compliant | Macao -> Trinidad and Tobago CB121824 | Non-compliant | Compliant | Liechtenstein -> Zimbabwe CB121953 | Partial | Non-compliant | Burkina Faso -> Botswana CB122034 | Compliant | Non-compliant | Nigeria -> Central African Republic CB122924 | Compliant | Partial | Cyprus -> American Samoa CB123225 | Non-compliant | Compliant | Montenegro -> Malta CB123342 | Non-compliant | Non-compliant | Djibouti -> Cayman Islands CB131484 | Non-compliant | Non-compliant | Palau -> Nicaragua CB132082 | Non-compliant | Non-compliant | Lithuania -> New Caledonia CB132456 | Partial | Partial | Australia -> Slovenia CB132620 | Non-compliant | Non-compliant | Holy See (Vatican City State) -> Timor-Leste CB133141 | Non-compliant | Non-compliant | Mayotte -> United Arab Emirates CB133427 | Compliant | Partial | Hungary -> Barbados CB134463 | Compliant | Non-compliant | Bhutan -> Barbados CB135909 | Compliant | Partial | Turkmenistan -> Zimbabwe CB137850 | Partial | Non-compliant | Thailand -> Marshall Islands CB137876 | Non-compliant | Compliant | Rwanda -> Madagascar CB137895 | Non-compliant | Non-compliant | Palestinian Territory -> Cambodia CB138081 | Non-compliant | Partial | Bosnia and Herzegovina -> Christmas Island CB139645 | Partial | Partial | Estonia -> Bouvet Island (Bouvetoya) CB139779 | Non-compliant | Partial | Montserrat -> Mayotte CB143153 | Non-compliant | Compliant | Cameroon -> Turkmenistan CB143488 | Non-compliant | Non-compliant | Moldova -> Nauru CB145020 | Partial | Compliant | Barbados -> Sierra Leone CB145904 | Partial | Compliant | Switzerland -> Saint Lucia CB146221 | Non-compliant | Non-compliant | New Zealand -> Qatar CB146852 | Partial | Partial | Monaco -> Trinidad and Tobago CB147041 | Partial | Compliant | Faroe Islands -> Bangladesh CB147392 | Partial | Partial | Maldives -> Azerbaijan CB147721 | Non-compliant | Non-compliant | Puerto Rico -> Gambia CB148684 | Non-compliant | Non-compliant | Cyprus -> Vietnam CB149901 | Non-compliant | Non-compliant...\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-41d86644-ea28-4e10-8db0-4d4f8f44f43d",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here are some compliance records with compliance issues:\n\n| record_id | gdpr_compliance_status | local_law_compliance_status | transfer_path |\n|---|---|---|---|\n| CB100432 | Non-compliant | Non-compliant | Guatemala -> Tonga |\n| CB100698 | Partial | Partial | Cambodia -> French Southern Territories |\n| CB102232 | Compliant | Partial | Montserrat -> Spain |\n| CB105271 | Partial | Non-compliant | Japan -> Equatorial Guinea |\n| CB105896 | Non-compliant | Partial | Jamaica -> Rwanda |\n| CB108116 | Non-compliant | Compliant | Isle of Man -> Micronesia |\n| CB108769 | Partial | Partial | Cameroon -> Canada |\n| CB108793 | Non-compliant | Compliant | Panama -> Andorra |\n| CB111176 | Partial | Non-compliant | Macao -> Zambia |\n| CB111373 | Partial | Compliant | French Southern Territories -> Trinidad and Tobago |\n| CB112003 | Partial | Partial | Mongolia -> Faroe Islands |\n| CB112493 | Partial | Compliant | Lebanon -> Namibia |\n| CB112784 | Non-compliant | Non-compliant | Mali -> Latvia |\n| CB113444 | Compliant | Non-compliant | Greece -> Antarctica (the territory South of 60 deg S) |\n| CB115407 | Non-compliant | Partial | Niger |\n| CB115541 | Compliant | Non-compliant | Afghanistan -> Congo |\n| CB117012 | Non-compliant | Partial | Sweden -> Guatemala |\n| CB117620 | Partial | Non-compliant | New Caledonia -> New Caledonia |\n| CB121252 | Partial | Compliant | Macao -> Trinidad and Tobago |\n| CB121824 | Non-compliant | Compliant | Liechtenstein -> Zimbabwe |\n| CB121953 | Partial | Non-compliant | Burkina Faso -> Botswana |\n| CB122034 | Compliant | Non-compliant | Nigeria -> Central African Republic |\n| CB122924 | Compliant | Partial | Cyprus -> American Samoa |\n| CB123225 | Non-compliant | Compliant | Montenegro -> Malta |\n| CB123342 | Non-compliant | Non-compliant | Djibouti -> Cayman Islands |\n| CB131484 | Non-compliant | Non-compliant | Palau -> Nicaragua |\n| CB132082 | Non-compliant | Non-compliant | Lithuania -> New Caledonia |\n| CB132456 | Partial | Partial | Australia -> Slovenia |\n| CB132620 | Non-compliant | Non-compliant | Holy See (Vatican City State) -> Timor-Leste |\n| CB133141 | Non-compliant | Non-compliant | Mayotte -> United Arab Emirates |\n| CB133427 | Compliant | Partial | Hungary -> Barbados |\n| CB134463 | Compliant | Non-compliant | Bhutan -> Barbados |\n| CB135909 | Compliant | Partial | Turkmenistan -> Zimbabwe |\n| CB137850 | Partial | Non-compliant | Thailand -> Marshall Islands |\n| CB137876 | Non-compliant | Compliant | Rwanda -> Madagascar |\n| CB137895 | Non-compliant | Non-compliant | Palestinian Territory -> Cambodia |\n| CB138081 | Non-compliant | Partial | Bosnia and Herzegovina -> Christmas Island |\n| CB139645 | Partial | Partial | Estonia -> Bouvet Island (Bouvetoya) |\n| CB139779 | Non-compliant | Partial | Montserrat -> Mayotte |\n| CB143153 | Non-compliant | Compliant | Cameroon -> Turkmenistan |\n| CB143488 | Non-compliant | Non-compliant | Moldova -> Nauru |\n| CB145020 | Partial | Compliant | Barbados -> Sierra Leone |\n| CB145904 | Partial | Compliant | Switzerland -> Saint Lucia |\n| CB146221 | Non-compliant | Non-compliant | New Zealand -> Qatar |\n| CB146852 | Partial | Partial | Monaco -> Trinidad and Tobago |\n| CB147041 | Partial | Compliant | Faroe Islands -> Bangladesh |\n| CB147392 | Partial | Partial | Maldives -> Azerbaijan |\n| CB147721 | Non-compliant | Non-compliant | Puerto Rico -> Gambia |\n| CB148684 | Non-compliant | Non-compliant | Cyprus -> Vietnam |\n\nThe results are sorted by record ID."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here are some compliance records with compliance issues:\n\n| record_id | gdpr_compliance_status | local_law_compliance_status | transfer_path |\n|---|---|---|---|\n| CB100432 | Non-compliant | Non-compliant | Guatemala -> Tonga |\n| CB100698 | Partial | Partial | Cambodia -> French Southern Territories |\n| CB102232 | Compliant | Partial | Montserrat -> Spain |\n| CB105271 | Partial | Non-compliant | Japan -> Equatorial Guinea |\n| CB105896 | Non-compliant | Partial | Jamaica -> Rwanda |\n| CB108116 | Non-compliant | Compliant | Isle of Man -> Micronesia |\n| CB108769 | Partial | Partial | Cameroon -> Canada |\n| CB108793 | Non-compliant | Compliant | Panama -> Andorra |\n| CB111176 | Partial | Non-compliant | Macao -> Zambia |\n| CB111373 | Partial | Compliant | French Southern Territories -> Trinidad and Tobago |\n| CB112003 | Partial | Partial | Mongolia -> Faroe Islands |\n| CB112493 | Partial | Compliant | Lebanon -> Namibia |\n| CB112784 | Non-compliant | Non-compliant | Mali -> Latvia |\n| CB113444 | Compliant | Non-compliant | Greece -> Antarctica (the territory South of 60 deg S) |\n| CB115407 | Non-compliant | Partial | Niger |\n| CB115541 | Compliant | Non-compliant | Afghanistan -> Congo |\n| CB117012 | Non-compliant | Partial | Sweden -> Guatemala |\n| CB117620 | Partial | Non-compliant | New Caledonia -> New Caledonia |\n| CB121252 | Partial | Compliant | Macao -> Trinidad and Tobago |\n| CB121824 | Non-compliant | Compliant | Liechtenstein -> Zimbabwe |\n| CB121953 | Partial | Non-compliant | Burkina Faso -> Botswana |\n| CB122034 | Compliant | Non-compliant | Nigeria -> Central African Republic |\n| CB122924 | Compliant | Partial | Cyprus -> American Samoa |\n| CB123225 | Non-compliant | Compliant | Montenegro -> Malta |\n| CB123342 | Non-compliant | Non-compliant | Djibouti -> Cayman Islands |\n| CB131484 | Non-compliant | Non-compliant | Palau -> Nicaragua |\n| CB132082 | Non-compliant | Non-compliant | Lithuania -> New Caledonia |\n| CB132456 | Partial | Partial | Australia -> Slovenia |\n| CB132620 | Non-compliant | Non-compliant | Holy See (Vatican City State) -> Timor-Leste |\n| CB133141 | Non-compliant | Non-compliant | Mayotte -> United Arab Emirates |\n| CB133427 | Compliant | Partial | Hungary -> Barbados |\n| CB134463 | Compliant | Non-compliant | Bhutan -> Barbados |\n| CB135909 | Compliant | Partial | Turkmenistan -> Zimbabwe |\n| CB137850 | Partial | Non-compliant | Thailand -> Marshall Islands |\n| CB137876 | Non-compliant | Compliant | Rwanda -> Madagascar |\n| CB137895 | Non-compliant | Non-compliant | Palestinian Territory -> Cambodia |\n| CB138081 | Non-compliant | Partial | Bosnia and Herzegovina -> Christmas Island |\n| CB139645 | Partial | Partial | Estonia -> Bouvet Island (Bouvetoya) |\n| CB139779 | Non-compliant | Partial | Montserrat -> Mayotte |\n| CB143153 | Non-compliant | Compliant | Cameroon -> Turkmenistan |\n| CB143488 | Non-compliant | Non-compliant | Moldova -> Nauru |\n| CB145020 | Partial | Compliant | Barbados -> Sierra Leone |\n| CB145904 | Partial | Compliant | Switzerland -> Saint Lucia |\n| CB146221 | Non-compliant | Non-compliant | New Zealand -> Qatar |\n| CB146852 | Partial | Partial | Monaco -> Trinidad and Tobago |\n| CB147041 | Partial | Compliant | Faroe Islands -> Bangladesh |\n| CB147392 | Partial | Partial | Maldives -> Azerbaijan |\n| CB147721 | Non-compliant | Non-compliant | Puerto Rico -> Gambia |\n| CB148684 | Non-compliant | Non-compliant | Cyprus -> Vietnam |\n\nThe results are sorted by record ID."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "28972554198246769a786da85d0a1642",
+      "client": "cross_db_5",
+      "database": "cross_db",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/27d9e081625d4810b86733679239be97/0",
+      "at": 1793845575.2392397,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 5.814000003738329,
+      "response_bytes": 15319,
+      "response_digest": "43359dd655c890b5849bd3f44b1a608b5f910bc4766b21ad282b1a6bf6444d42"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "9028829775b04aeb8ffc34f487fdd512",
+      "client": "cross_db_5",
+      "database": "cross_db",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/27d9e081625d4810b86733679239be97/0",
+      "at": 1793845671.2884712,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.516399995831307,
+      "response_bytes": 15319,
+      "response_digest": "43359dd655c890b5849bd3f44b1a608b5f910bc4766b21ad282b1a6bf6444d42"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "b2016bc7b26a4c79b3cb12925914bd8a",
+      "client": "cross_db_5",
+      "database": "cross_db",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/27d9e081625d4810b86733679239be97/0",
+      "at": 1793845754.6419392,
+      "sql": "SELECT \n  c.recordregistry AS record_id, \n  c.gdprcomp AS gdpr_compliance_status, \n  c.loclawcomp AS local_law_compliance_status, \n  CONCAT(d.orignation, ' -> ', d.destnation) AS transfer_path \nFROM \n  compliance AS c \n  JOIN dataflow AS d ON c.recordregistry = d.recordregistry \nWHERE \n  c.gdprcomp != 'Compliant' \n  OR c.loclawcomp != 'Compliant' \nORDER BY \n  record_id;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 39.419100001396146,
+      "response_bytes": 3338,
+      "response_digest": "f8ca88198f4aa18a53182f809144746313bffc6be0ff77a194ccf581406c7961",
+      "successful": true
+    }
+  ]
+}

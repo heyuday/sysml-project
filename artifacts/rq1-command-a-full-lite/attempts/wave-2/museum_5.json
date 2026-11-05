@@ -1,0 +1,334 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "museum_5",
+    "instance_id": "museum_5",
+    "database": "museum",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 364.2739968299866,
+    "budget_used": 5.0,
+    "budget_remaining": 11.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"artifactscore\" (\nartregistry character NOT NULL,\nartname character varying NOT NULL,\nartdynasty character varying NULL,\nartageyears integer NULL,\nmattype USER-DEFINED NULL,\nconservestatus USER-DEFINED NULL,\n    PRIMARY KEY (artregistry)\n);\n\nFirst 3 rows:\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\n-------------  ----------------  ------------  -------------  ---------  ----------------\nART54317       Culture Painting  Ming                    943  Stone      Good\nART54254       Poor Vase         Song                   2179  Textile    Fair\nART69978       Order Painting    Qing                    366  Bronze     Poor\n...\n\n\nCREATE TABLE \"surfaceandphysicalreadings\" (\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\nenvreadref bigint NOT NULL,\nvibralvlmms2 real NULL,\nnoisedb smallint NULL,\ndustaccummgm2 numeric NULL,\nmicrobialcountcfu integer NULL,\nmoldriskidx numeric NULL,\npestactivitylvl character varying NULL,\npesttrapcount smallint NULL,\npestspeciesdetected text NULL,\nsurfaceph numeric NULL,\nmatmoistcontent numeric NULL,\nsaltcrystalrisk character NULL,\nmetalcorroderate numeric NULL,\norganicdegradidx numeric NULL,\ncolorchangedeltae real NULL,\nsurfacetempc numeric NULL,\nsurfacerh numeric NULL,\ncondenserisk character varying NULL,\nthermalimgstatus character NULL,\nstructstability character varying NULL,\ncrackmonitor text NULL,\ndeformmm numeric NULL,\nwtchangepct numeric NULL,\nsurfdustcoverage smallint NULL,\no2concentration numeric NULL,\nn2concentration numeric NULL,\n    PRIMARY KEY (surfphysregistry),\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\n);\n\nFirst 3 rows:\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegr...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"museum|artifactscore|artregistry\": \"CHAR(10) PRIMARY KEY uniquely identifying each artifact record (e.g., 'ART000012').\",\n  \"museum|artifactscore|artname\": \"VARCHAR(100) providing the artifact\\u2019s name or label (free text, no strict list).\",\n  \"museum|artifactscore|artdynasty\": \"VARCHAR(50) indicating the historical period/era/dynasty (e.g., 'Ming', 'Song', 'Qing', 'Han', 'Tang', 'Yuan'). No strict enumeration.\",\n  \"museum|artifactscore|artageyears\": \"INT denoting the artifact\\u2019s approximate age in years (any integer value).\",\n  \"museum|artifactscore|mattype\": \"CHAR(30) showing the artifact\\u2019s primary material (e.g., 'Stone', 'Textile', 'Bronze', 'Jade', 'Wood', 'Ceramic', 'Paper'). Could be enumerated by your policy but often open-ended.\",\n  \"museum|artifactscore|conservestatus\": \"VARCHAR(150) describing the artifact\\u2019s current conservation condition. Possible values might include 'Excellent', 'Good', 'Fair', 'Poor', 'Critical'.\",\n  \"museum|artifactratings|ratingrecordregistry\": \"BIGSERIAL PRIMARY KEY, unique ID for each rating record.\",\n  \"museum|artifactratings|artref\": \"CHAR(10) FOREIGN KEY referencing ArtifactsCore(ArtRegistry). Links the record to a specific artifact.\",\n  \"museum|artifactratings|histsignrating\": \"SMALLINT rating for historical significance (scale is flexible).\",\n  \"museum|artifactratings|researchvalrating\": \"INT rating for research value (range is flexible).\",\n  \"museum|artifactratings|exhibitvalrating\": \"INT rating evaluating the artifact\\u2019s exhibition value (scale is flexible).\",\n  \"museum|artifactratings|cultscore\": \"SMALLINT measuring the artifact\\u2019s cultural importance (common range or flexible scale).\",\n  \"museum|artifactratings|publicaccessrating\": \"SMALLINT rating the artifact\\u2019s public accessibility or appeal (scale is flexible).\",\n  \"museum|artifactratings|eduvaluerating\": \"BIGINT rating for how much educational value the artifact provides (scale is flexible).\",\n  \"museum|artifactratings|conservediff\":...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(sd.envsensitivity, '0') +\r\n        COALESCE(sd.lightsensitivity, '0') +\r\n        COALESCE(sd.tempsensitivity, '0') +\r\n        COALESCE(sd.humiditysensitivity, '0') +\r\n        COALESCE(sd.vibrasensitivity, '0') +\r\n        COALESCE(sd.pollutantsensitivity, '0') +\r\n        COALESCE(sd.pestsensitivity, '0') +\r\n        COALESCE(sd.handlesensitivity, '0') +\r\n        COALESCE(sd.transportsensitivity, '0') +\r\n        COALESCE(sd.displaysensitivity, '0') +\r\n        COALESCE(sd.storagesensitivity, '0')\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: operator does not exist: character + character varying\nLINE 20:         COALESCE(sd.envsensitivity, '0') +\n                                                  ^\nHINT:  No operator matches the given name and argument types. You might need to add explicit type casts.\n",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(CAST(sd.envsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.lightsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.tempsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.humiditysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.vibrasensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pollutantsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pestsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.handlesensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.transportsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.displaysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.storagesensitivity AS INTEGER), 0)\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: invalid input syntax for type integer: \"Low                 \"\n",
+        "cost": 1.0,
+        "budget_before": 13.0,
+        "budget_after": 12.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        CASE WHEN sd.envsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.lightsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.tempsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.humiditysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.vibrasensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pollutantsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pestsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.handlesensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.transportsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.displaysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.storagesensitivity = 'High' THEN 1 ELSE 0 END\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+        },
+        "result": "rapid_deterioration | artifact_id | artifact_name | display_case_material | seal_condition | maintenance_status | filter_status | silica_gel_status | silica_gel_change_date | humidity_buffer_capacity | pollutant_absorb_capacity | leak_rate | pressure | inert_gas_system_status | fire_suppression_system | emergency_power_status | backup_system_status | sensitive_factors_count | accelerated_deterioration_criteria\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nModerate | ART54317   | Culture Painting | Tempered Glass | Poor | Overdue                   | Replace Now | Active               | 2024-09-15 | 81 | 71.70 | 0.41 | -2 | Active | Maintenance | Testing    | Ready | 5 | No\nRapid | ART54254   | Poor Vase | Tempered Glass | Excellent | Overdue                   | Replace Now | Active               | 2024-12-15 | 78 | 79.80 | 0.07 | 3 | Standby | Active | Active     | Maintenance | 4 | Yes\nRapid | ART69978   | Order Painting | Glass | Good | Due                       | Replace Soon | Replace Soon         | 2024-12-21 | 92 | 66.30 | 0.2 | -3 | Active | Active | Active     | Testing | 5 | Yes\nModerate | ART50422   | Inside Sculpture | Tempered Glass | Fair | Due                       | Replace Soon | Replace Soon         | 2024-09-06 | 86 | 69.00 | 0.41 | 1 | Standby | Active | Testing    | Testing | 3 | No\nModerate | ART95251   | Development Vase | Glass | Good | Overdue                   | Replace Now | Replace Now          | 2024-09-23 | 70 | 71.40 | 0.31 | 0 | Standby | Active | Active     | Ready | 6 | No\nModerate | ART48028   | Pm Sculpture | Acrylic | Excellent | Due                       | Replace Soon | Active               | 2025-02-03 | 93 | 69.70 | 0.04 | 0 | Standby | Active | Standby    | Maintenance | 4 | No\nModerate | ART69512   | Partner Painting | Tempered Glass | Fair | Overdue                   | Rep...<truncated>",
+        "cost": 1.0,
+        "budget_before": 12.0,
+        "budget_after": 11.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: museum\nTask ID: museum_5\n\nUser Query:\nShow me whether items are in rapid deterioration, along with artifact's ID and name, the current conditions in their display case, how many sensitive factors they have, and whether they meet the accelerated deterioration criteria ('Yes' or 'No').\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_4x1czbeh466t",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_pkhgnqf9jwrg",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_4x1czbeh466t",
+              "response": "{\"result\": \"CREATE TABLE \\\"artifactscore\\\" (\\nartregistry character NOT NULL,\\nartname character varying NOT NULL,\\nartdynasty character varying NULL,\\nartageyears integer NULL,\\nmattype USER-DEFINED NULL,\\nconservestatus USER-DEFINED NULL,\\n    PRIMARY KEY (artregistry)\\n);\\n\\nFirst 3 rows:\\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\\n-------------  ----------------  ------------  -------------  ---------  ----------------\\nART54317       Culture Painting  Ming                    943  Stone      Good\\nART54254       Poor Vase         Song                   2179  Textile    Fair\\nART69978       Order Painting    Qing                    366  Bronze     Poor\\n...\\n\\n\\nCREATE TABLE \\\"surfaceandphysicalreadings\\\" (\\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\\nenvreadref bigint NOT NULL,\\nvibralvlmms2 real NULL,\\nnoisedb smallint NULL,\\ndustaccummgm2 numeric NULL,\\nmicrobialcountcfu integer NULL,\\nmoldriskidx numeric NULL,\\npestactivitylvl character varying NULL,\\npesttrapcount smallint NULL,\\npestspeciesdetected text NULL,\\nsurfaceph numeric NULL,\\nmatmoistcontent numeric NULL,\\nsaltcrystalrisk character NULL,\\nmetalcorroderate numeric NULL,\\norganicdegradidx numeric NULL,\\ncolorchangedeltae real NULL,\\nsurfacetempc numeric NULL,\\nsurfacerh numeric NULL,\\ncondenserisk character varying NULL,\\nthermalimgstatus character NULL,\\nstructstability character varying NULL,\\ncrackmonitor text NULL,\\ndeformmm numeric NULL,\\nwtchangepct numeric NULL,\\nsurfdustcoverage smallint NULL,\\no2concentration numeric NULL,\\nn2concentration numeric NULL,\\n    PRIMARY KEY (surfphysregistry),\\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\\n);\\n\\nFirst 3 rows:\\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegradidx    colorchangedeltae    surfacetempc    surfacerh  condenserisk    thermalimgstatus    structstability    crackmonitor           deformmm    wtchangepct    surfdustcoverage    o2concentration    n2concentration\\n------------------  ------------  --------------  ---------  ---------------  -------------------  -------------  -----------------  ---------------  ---------------------  -----------  -----------------  -----------------  ------------------  ------------------  -------------------  --------------  -----------  --------------  ------------------  -----------------  -------------------  ----------  -------------  ------------------  -----------------  -----------------\\n                 1             1           0.461         47             1.74                  234           0.1   Medium                          10                                 6.7               10.3  High                             0.04                0.47                 1.99           19.11         45.5  Medium          Normal              Stable             Significant Changes        0.08         -0.001                   5              20.8               78.75\\n                 2             2           0.053         50             0.39                  450           0.33  Low                              6                                 6.5               11    High                             0.05                0.37                 0.87           20.09         53                    Critical            Stable             Significant Changes        0.07         -0.011                   4              20.53              78.3\\n                 3             3           0.018         42             2.77                  486           0.43  Low                              7  Beetles                        6.6               10.1  Low                              0.02                0.92                 1.48       ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_pkhgnqf9jwrg",
+              "response": "{\"result\": \"{\\n  \\\"museum|artifactscore|artregistry\\\": \\\"CHAR(10) PRIMARY KEY uniquely identifying each artifact record (e.g., 'ART000012').\\\",\\n  \\\"museum|artifactscore|artname\\\": \\\"VARCHAR(100) providing the artifact\\\\u2019s name or label (free text, no strict list).\\\",\\n  \\\"museum|artifactscore|artdynasty\\\": \\\"VARCHAR(50) indicating the historical period/era/dynasty (e.g., 'Ming', 'Song', 'Qing', 'Han', 'Tang', 'Yuan'). No strict enumeration.\\\",\\n  \\\"museum|artifactscore|artageyears\\\": \\\"INT denoting the artifact\\\\u2019s approximate age in years (any integer value).\\\",\\n  \\\"museum|artifactscore|mattype\\\": \\\"CHAR(30) showing the artifact\\\\u2019s primary material (e.g., 'Stone', 'Textile', 'Bronze', 'Jade', 'Wood', 'Ceramic', 'Paper'). Could be enumerated by your policy but often open-ended.\\\",\\n  \\\"museum|artifactscore|conservestatus\\\": \\\"VARCHAR(150) describing the artifact\\\\u2019s current conservation condition. Possible values might include 'Excellent', 'Good', 'Fair', 'Poor', 'Critical'.\\\",\\n  \\\"museum|artifactratings|ratingrecordregistry\\\": \\\"BIGSERIAL PRIMARY KEY, unique ID for each rating record.\\\",\\n  \\\"museum|artifactratings|artref\\\": \\\"CHAR(10) FOREIGN KEY referencing ArtifactsCore(ArtRegistry). Links the record to a specific artifact.\\\",\\n  \\\"museum|artifactratings|histsignrating\\\": \\\"SMALLINT rating for historical significance (scale is flexible).\\\",\\n  \\\"museum|artifactratings|researchvalrating\\\": \\\"INT rating for research value (range is flexible).\\\",\\n  \\\"museum|artifactratings|exhibitvalrating\\\": \\\"INT rating evaluating the artifact\\\\u2019s exhibition value (scale is flexible).\\\",\\n  \\\"museum|artifactratings|cultscore\\\": \\\"SMALLINT measuring the artifact\\\\u2019s cultural importance (common range or flexible scale).\\\",\\n  \\\"museum|artifactratings|publicaccessrating\\\": \\\"SMALLINT rating the artifact\\\\u2019s public accessibility or appeal (scale is flexible).\\\",\\n  \\\"museum|artifactratings|eduvaluerating\\\": \\\"BIGINT rating for how much educational value the artifact provides (scale is flexible).\\\",\\n  \\\"museum|artifactratings|conservediff\\\": \\\"VARCHAR(100) describing difficulty in conserving the artifact (possible values: 'Medium', 'High', 'Low').\\\",\\n  \\\"museum|artifactratings|treatcomplexity\\\": \\\"CHAR(10) indicating treatment complexity (possible values: 'Complex', 'Moderate', 'Simple').\\\",\\n  \\\"museum|artifactratings|matstability\\\": \\\"VARCHAR(30) for material stability classification (possible values: 'Unstable', 'Stable', 'Moderate').\\\",\\n  \\\"museum|artifactratings|deteriorrate\\\": \\\"TEXT field detailing the specific deterioration rate or pattern (e.g., 'Moderate', 'Rapid', 'Slow').\\\",\\n  \\\"museum|sensitivitydata|sensitivityregistry\\\": \\\"BIGSERIAL PRIMARY KEY, unique ID for each record of sensitivity details.\\\",\\n  \\\"museum|sensitivitydata|artref\\\": \\\"CHAR(10) FOREIGN KEY referencing ArtifactsCore(ArtRegistry).\\\",\\n  \\\"museum|sensitivitydata|envsensitivity\\\": \\\"CHAR(20) for overall environmental sensitivity (possible values: 'Low', 'High', 'Medium').\\\",\\n  \\\"museum|sensitivitydata|lightsensitivity\\\": \\\"VARCHAR(80) describing light/UV sensitivity (possible values: 'High', 'Low', 'Medium').\\\",\\n  \\\"museum|sensitivitydata|tempsensitivity\\\": \\\"VARCHAR(50) summarizing temperature tolerance (possible values: 'High', 'Low', 'Medium').\\\",\\n  \\\"museum|sensitivitydata|humiditysensitivity\\\": \\\"TEXT detailing humidity requirements or maximum humidity tolerance (possible values: 'Medium', 'High', 'Low').\\\",\\n  \\\"museum|sensitivitydata|vibrasensitivity\\\": \\\"CHAR(20) describing vibration tolerance (possible values: 'Medium', 'High', 'Low').\\\",\\n  \\\"museum|sensitivitydata|pollutantsensitivity\\\": \\\"VARCHAR(100) indicating susceptibility to pollutants (possible values: 'High', 'Medium', 'Low').\\\",\\n  \\\"museum|sensitivitydata|pestsensitivity\\\": \\\"TEXT describing vulnerability to pests (possible values: 'High', 'Low', 'Medium').\\\",\\n  \\\"museum|sensitivitydata|handlesensitivity\\\": \\\"CHAR(20) for handling sensitivity (possible val...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_0d85zec5rwke",
+              "args": {
+                "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(sd.envsensitivity, '0') +\r\n        COALESCE(sd.lightsensitivity, '0') +\r\n        COALESCE(sd.tempsensitivity, '0') +\r\n        COALESCE(sd.humiditysensitivity, '0') +\r\n        COALESCE(sd.vibrasensitivity, '0') +\r\n        COALESCE(sd.pollutantsensitivity, '0') +\r\n        COALESCE(sd.pestsensitivity, '0') +\r\n        COALESCE(sd.handlesensitivity, '0') +\r\n        COALESCE(sd.transportsensitivity, '0') +\r\n        COALESCE(sd.displaysensitivity, '0') +\r\n        COALESCE(sd.storagesensitivity, '0')\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_0d85zec5rwke",
+              "response": "{\"result\": \"SQL Error: SQL error: operator does not exist: character + character varying\\nLINE 20:         COALESCE(sd.envsensitivity, '0') +\\n                                                  ^\\nHINT:  No operator matches the given name and argument types. You might need to add explicit type casts.\\n\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_hanjywknpmkj",
+              "args": {
+                "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(CAST(sd.envsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.lightsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.tempsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.humiditysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.vibrasensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pollutantsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pestsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.handlesensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.transportsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.displaysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.storagesensitivity AS INTEGER), 0)\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_hanjywknpmkj",
+              "response": "{\"result\": \"SQL Error: SQL error: invalid input syntax for type integer: \\\"Low                 \\\"\\n\\n\\n[SYSTEM NOTE: Remaining budget: 12.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_dr56c094ws5a",
+              "args": {
+                "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        CASE WHEN sd.envsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.lightsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.tempsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.humiditysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.vibrasensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pollutantsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pestsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.handlesensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.transportsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.displaysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.storagesensitivity = 'High' THEN 1 ELSE 0 END\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_dr56c094ws5a",
+              "response": "{\"result\": \"rapid_deterioration | artifact_id | artifact_name | display_case_material | seal_condition | maintenance_status | filter_status | silica_gel_status | silica_gel_change_date | humidity_buffer_capacity | pollutant_absorb_capacity | leak_rate | pressure | inert_gas_system_status | fire_suppression_system | emergency_power_status | backup_system_status | sensitive_factors_count | accelerated_deterioration_criteria\\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nModerate | ART54317   | Culture Painting | Tempered Glass | Poor | Overdue                   | Replace Now | Active               | 2024-09-15 | 81 | 71.70 | 0.41 | -2 | Active | Maintenance | Testing    | Ready | 5 | No\\nRapid | ART54254   | Poor Vase | Tempered Glass | Excellent | Overdue                   | Replace Now | Active               | 2024-12-15 | 78 | 79.80 | 0.07 | 3 | Standby | Active | Active     | Maintenance | 4 | Yes\\nRapid | ART69978   | Order Painting | Glass | Good | Due                       | Replace Soon | Replace Soon         | 2024-12-21 | 92 | 66.30 | 0.2 | -3 | Active | Active | Active     | Testing | 5 | Yes\\nModerate | ART50422   | Inside Sculpture | Tempered Glass | Fair | Due                       | Replace Soon | Replace Soon         | 2024-09-06 | 86 | 69.00 | 0.41 | 1 | Standby | Active | Testing    | Testing | 3 | No\\nModerate | ART95251   | Development Vase | Glass | Good | Overdue                   | Replace Now | Replace Now          | 2024-09-23 | 70 | 71.40 | 0.31 | 0 | Standby | Active | Active     | Ready | 6 | No\\nModerate | ART48028   | Pm Sculpture | Acrylic | Excellent | Due                       | Replace Soon | Active               | 2025-02-03 | 93 | 69.70 | 0.04 | 0 | Standby | Active | Standby    | Maintenance | 4 | No\\nModerate | ART69512   | Partner Painting | Tempered Glass | Fair | Overdue                   | Replace Soon | Active               | 2024-10-20 | 82 | 61.30 | 0.09 | 2 | Maintenance | Standby | Active     | Maintenance | 4 | No\\nModerate | ART44049   | Tree Vase | Tempered Glass | Excellent | Good                      | Clean | Replace Now          | 2025-01-24 | 99 | 72.00 | 0.29 | 2 | Standby | Active | Testing    | Testing | 0 | No\\nSlow | ART22173   | Actually Painting | Tempered Glass | Poor | Good                      | Replace Soon | Replace Now          | 2024-12-24 | 78 | 81.30 | 0.17 | 2 | Active | Active | Standby    | Ready | 4 | No\\nRapid | ART48053   | Believe Manuscript | Glass | Excellent | Overdue                   | Replace Now | Replace Now          | 2024-09-06 | 91 | 88.20 | 0.04 | 3 | Maintenance | Standby | Standby    | Testing | 5 | Yes\\n\\n[SYSTEM NOTE: Remaining budget: 11.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-aae49ff4-1721-4540-98a3-45b3463262b1",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the information about artifacts and their display cases:\n\n| Rapid Deterioration | Artifact ID | Artifact Name | Display Case Material | Seal Condition | Maintenance Status | Filter Status | Silica Gel Status | Silica Gel Change Date | Humidity Buffer Capacity | Pollutant Absorb Capacity | Leak Rate | Pressure | Inert Gas System Status | Fire Suppression System | Emergency Power Status | Backup System Status | Sensitive Factors Count | Accelerated Deterioration Criteria |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| Moderate | ART54317 | Culture Painting | Tempered Glass | Poor | Overdue | Replace Now | Active | 2024-09-15 | 81 | 71.70 | 0.41 | -2 | Active | Maintenance | Testing | Ready | 5 | No |\n| Rapid | ART54254 | Poor Vase | Tempered Glass | Excellent | Overdue | Replace Now | Active | 2024-12-15 | 78 | 79.80 | 0.07 | 3 | Standby | Active | Active | Maintenance | 4 | Yes |\n| Rapid | ART69978 | Order Painting | Glass | Good | Due | Replace Soon | Replace Soon | 2024-12-21 | 92 | 66.30 | 0.2 | -3 | Active | Active | Active | Testing | 5 | Yes |\n| Moderate | ART50422 | Inside Sculpture | Tempered Glass | Fair | Due | Replace Soon | Replace Soon | 2024-09-06 | 86 | 69.00 | 0.41 | 1 | Standby | Active | Testing | Testing | 3 | No |\n| Moderate | ART95251 | Development Vase | Glass | Good | Overdue | Replace Now | Replace Now | 2024-09-23 | 70 | 71.40 | 0.31 | 0 | Standby | Active | Active | Ready | 6 | No |\n| Moderate | ART48028 | Pm Sculpture | Acrylic | Excellent | Due | Replace Soon | Active | 2025-02-03 | 93 | 69.70 | 0.04 | 0 | Standby | Active | Standby | Maintenance | 4 | No |\n| Moderate | ART69512 | Partner Painting | Tempered Glass | Fair | Overdue | Replace Soon | Active | 2024-10-20 | 82 | 61.30 | 0.09 | 2 | Maintenance | Standby | Active | Maintenance | 4 | No |\n| Moderate | ART44049 | Tree Vase | Tempered Glass | Excellent | Good | Clean | Replace Now | 2025-01-24 | 99 | 72.00 | 0.29 | 2 | Standby | Active | Testing | Testing | 0 | No |\n| Slow | ART22173 | Actually Painting | Tempered Glass | Poor | Good | Replace Soon | Replace Now | 2024-12-24 | 78 | 81.30 | 0.17 | 2 | Active | Active | Standby | Ready | 4 | No |\n| Rapid | ART48053 | Believe Manuscript | Glass | Excellent | Overdue | Replace Now | Replace Now | 2024-09-06 | 91 | 88.20 | 0.04 | 3 | Maintenance | Standby | Standby | Testing | 5 | Yes |"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the information about artifacts and their display cases:\n\n| Rapid Deterioration | Artifact ID | Artifact Name | Display Case Material | Seal Condition | Maintenance Status | Filter Status | Silica Gel Status | Silica Gel Change Date | Humidity Buffer Capacity | Pollutant Absorb Capacity | Leak Rate | Pressure | Inert Gas System Status | Fire Suppression System | Emergency Power Status | Backup System Status | Sensitive Factors Count | Accelerated Deterioration Criteria |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| Moderate | ART54317 | Culture Painting | Tempered Glass | Poor | Overdue | Replace Now | Active | 2024-09-15 | 81 | 71.70 | 0.41 | -2 | Active | Maintenance | Testing | Ready | 5 | No |\n| Rapid | ART54254 | Poor Vase | Tempered Glass | Excellent | Overdue | Replace Now | Active | 2024-12-15 | 78 | 79.80 | 0.07 | 3 | Standby | Active | Active | Maintenance | 4 | Yes |\n| Rapid | ART69978 | Order Painting | Glass | Good | Due | Replace Soon | Replace Soon | 2024-12-21 | 92 | 66.30 | 0.2 | -3 | Active | Active | Active | Testing | 5 | Yes |\n| Moderate | ART50422 | Inside Sculpture | Tempered Glass | Fair | Due | Replace Soon | Replace Soon | 2024-09-06 | 86 | 69.00 | 0.41 | 1 | Standby | Active | Testing | Testing | 3 | No |\n| Moderate | ART95251 | Development Vase | Glass | Good | Overdue | Replace Now | Replace Now | 2024-09-23 | 70 | 71.40 | 0.31 | 0 | Standby | Active | Active | Ready | 6 | No |\n| Moderate | ART48028 | Pm Sculpture | Acrylic | Excellent | Due | Replace Soon | Active | 2025-02-03 | 93 | 69.70 | 0.04 | 0 | Standby | Active | Standby | Maintenance | 4 | No |\n| Moderate | ART69512 | Partner Painting | Tempered Glass | Fair | Overdue | Replace Soon | Active | 2024-10-20 | 82 | 61.30 | 0.09 | 2 | Maintenance | Standby | Active | Maintenance | 4 | No |\n| Moderate | ART44049 | Tree Vase | Tempered Glass | Excellent | Good | Clean | Replace Now | 2025-01-24 | 99 | 72.00 | 0.29 | 2 | Standby | Active | Testing | Testing | 0 | No |\n| Slow | ART22173 | Actually Painting | Tempered Glass | Poor | Good | Replace Soon | Replace Now | 2024-12-24 | 78 | 81.30 | 0.17 | 2 | Active | Active | Standby | Ready | 4 | No |\n| Rapid | ART48053 | Believe Manuscript | Glass | Excellent | Overdue | Replace Now | Replace Now | 2024-09-06 | 91 | 88.20 | 0.04 | 3 | Maintenance | Standby | Standby | Testing | 5 | Yes |"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "909e9bc5a48146fdb93c7dcae1e93a44",
+      "client": "museum_5",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/bbfb95312cbf47e1b65e0898a7e2f951/0",
+      "at": 1793841969.0000918,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.6990999972913414,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "7ad0bc03fdb24116bf2e70890ffd6b69",
+      "client": "museum_5",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/bbfb95312cbf47e1b65e0898a7e2f951/0",
+      "at": 1793841988.1370726,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.958000000740867,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "bab769fc1a0b4963b992fa2eb0ab373a",
+      "client": "museum_5",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/bbfb95312cbf47e1b65e0898a7e2f951/0",
+      "at": 1793842071.1360822,
+      "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(sd.envsensitivity, '0') +\r\n        COALESCE(sd.lightsensitivity, '0') +\r\n        COALESCE(sd.tempsensitivity, '0') +\r\n        COALESCE(sd.humiditysensitivity, '0') +\r\n        COALESCE(sd.vibrasensitivity, '0') +\r\n        COALESCE(sd.pollutantsensitivity, '0') +\r\n        COALESCE(sd.pestsensitivity, '0') +\r\n        COALESCE(sd.handlesensitivity, '0') +\r\n        COALESCE(sd.transportsensitivity, '0') +\r\n        COALESCE(sd.displaysensitivity, '0') +\r\n        COALESCE(sd.storagesensitivity, '0')\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 37.16899999562884,
+      "response_bytes": 319,
+      "response_digest": "c01d7514598cb1d0269d6ef4e00c227ed0b1dc04e0d0d51839c744037e8e52bf",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "40de050e786c457f9b9422d0fa2421ad",
+      "client": "museum_5",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/bbfb95312cbf47e1b65e0898a7e2f951/0",
+      "at": 1793842145.9983156,
+      "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        COALESCE(CAST(sd.envsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.lightsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.tempsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.humiditysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.vibrasensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pollutantsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.pestsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.handlesensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.transportsensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.displaysensitivity AS INTEGER), 0) +\r\n        COALESCE(CAST(sd.storagesensitivity AS INTEGER), 0)\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 13.095099995553028,
+      "response_bytes": 116,
+      "response_digest": "2b2450094b4293c86cdc2a58934e6ff54a3b173dcaaefa8bbb513f9c5d3ef71b",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "6c62cf2b97de4705a322d3d8d7029a5e",
+      "client": "museum_5",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/bbfb95312cbf47e1b65e0898a7e2f951/0",
+      "at": 1793842245.3995917,
+      "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        CASE WHEN sd.envsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.lightsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.tempsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.humiditysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.vibrasensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pollutantsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pestsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.handlesensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.transportsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.displaysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.storagesensitivity = 'High' THEN 1 ELSE 0 END\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 15.536999999312684,
+      "response_bytes": 2823,
+      "response_digest": "f80f3f4369d171e7fb7d548b527272a7d986b87bb9362af43fa3372be18ef860",
+      "successful": true
+    }
+  ]
+}

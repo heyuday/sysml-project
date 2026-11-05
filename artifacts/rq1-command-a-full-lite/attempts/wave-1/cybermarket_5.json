@@ -1,0 +1,563 @@
+{
+  "wave": 1,
+  "result": {
+    "task_id": "cybermarket_5",
+    "instance_id": "cybermarket_5",
+    "database": "cybermarket",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 417.45738792419434,
+    "budget_used": 11.5,
+    "budget_remaining": 8.5,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"markets\" (\nmktregistry character varying NOT NULL,\nmktdenom character varying NULL,\nmktclass USER-DEFINED NULL,\nmktspan integer NULL,\nsizecluster USER-DEFINED NULL,\ndlyflow bigint NULL,\nmthactive bigint NULL,\nvendcount integer NULL,\nbuycount integer NULL,\nlisttotal bigint NULL,\ninterscore numeric NULL,\nesccomprate numeric NULL,\nmarket_status_reputation jsonb NULL,\n    PRIMARY KEY (mktregistry)\n);\n\nFirst 3 rows:\nmktregistry    mktdenom    mktclass      mktspan  sizecluster      dlyflow    mthactive    vendcount    buycount    listtotal    interscore    esccomprate  market_status_reputation\n-------------  ----------  ----------  ---------  -------------  ---------  -----------  -----------  ----------  -----------  ------------  -------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nMKT_SOB5D      Market_84   Forum             168  Large               5388        38982          232       73577        34839          76.3           12.8  {'status': 'Under Investigation', 'trust_level': 'High', 'reputation_score': 91.1, 'compliance_metrics': {'penalty_count': 1, 'warning_count': 6, 'rule_break_count': 10, 'restriction_level': 'Partial'}, 'community_trust_score': 35.8, 'dispute_resolution_score': 3.4}\nMKT_3VNMP      Market_35   Service           745  Small               5691        38209           59       75138        34217          27.3           97.6  {'status': 'Under Investigation', 'trust_level': 'Low', 'reputation_score': 75.7, 'compliance_metrics': {'penalty_count': 0, 'warning_count': 4, 'rule_break_count': 4, 'restriction_level': 'Full'}, 'community_trust_score': 64.0, 'dispute_resolution_score': 3.2}\nMKT_3Y1WX      Market_91   Forum             579  Medium              3093        43189          185       60697        38732 ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"cybermarket|markets|mktregistry\": \"Primary key (VARCHAR(30)) uniquely identifying a specific market entry (e.g., 'MKT-AlphaBay').\",\n  \"cybermarket|markets|mktdenom\": \"A descriptive name or label for the dark market (e.g., 'AlphaBay', 'DreamMarket').\",\n  \"cybermarket|markets|mktclass\": \"An enum (MktClass_enum) denoting the market's general class (Forum, Service, Marketplace, Exchange).\",\n  \"cybermarket|markets|mktspan\": \"An INT representing how many days this market has been active (e.g., 345).\",\n  \"cybermarket|markets|sizecluster\": \"An enum (SizeCluster_enum) labeling market size (Mega, Medium, Large, Small).\",\n  \"cybermarket|markets|dlyflow\": \"A BIGINT indicating daily transaction volume (e.g., 123456).\",\n  \"cybermarket|markets|mthactive\": \"A BIGINT counting monthly active users on the market (e.g., 500000).\",\n  \"cybermarket|markets|vendcount\": \"An INT tally of how many vendors operate in this market (e.g., 15000).\",\n  \"cybermarket|markets|buycount\": \"An INT count of buyer accounts on this market (e.g., 100000).\",\n  \"cybermarket|markets|listtotal\": \"A BIGINT total number of product or service listings (e.g., 250000).\",\n  \"cybermarket|markets|interscore\": \"A NUMERIC(6,3) (0\\u2013999.999) scoring the market's interaction or activity level (e.g., 458.234).\",\n  \"cybermarket|markets|esccomprate\": \"A NUMERIC(5,3) (0\\u2013999.999) measuring escrow completion rate (e.g., 95.745).\",\n  \"cybermarket|vendors|vendregistry\": \"Primary key (VARCHAR(30)) uniquely identifying a vendor (e.g., 'VEND-Abc123').\",\n  \"cybermarket|vendors|vendspan\": \"An INT indicating how many days the vendor has been active (e.g., 120).\",\n  \"cybermarket|vendors|vendrate\": \"A NUMERIC(4,2) (0\\u201399.99) rating for the vendor based on reviews (e.g., 92.75).\",\n  \"cybermarket|vendors|vendtxcount\": \"An INT total number of completed transactions for the vendor (e.g., 3500).\",\n  \"cybermarket|vendors|vendsucccount\": \"An INT number of undisputed or successful transactions (e.g., 3400).\",\n  \"cybermarket|vendor...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"cybermarket|markets|mktclass\", \"cybermarket|markets|sizecluster\", \"cybermarket|transactions|paymethod\", \"cybermarket|transactions|txstatus\", \"cybermarket|products|prodtheme\", \"cybermarket|communication|vpnflag\", \"cybermarket|communication|langpattern\", \"cybermarket|vendors|vendchecklvl\", \"cybermarket|riskanalysis|moneyrisk\", \"cybermarket|securitymonitoring|alertsev\", \"Market Risk Score (MRS)\", \"Vendor Trust Index (VTI)\", \"Transaction Anomaly Score (TAS)\", \"Communication Security Risk (CSR)\", \"Wallet Risk Index (WRI)\", \"Transaction Chain Risk (TCR)\", \"Security Posture Score (SPS)\", \"Investigation Priority Score (IPS)\", \"Anonymity Protection Level (APL)\", \"High-Risk Market\", \"Trusted Vendor\", \"Suspicious Transaction Pattern\", \"Money Laundering Indicator\", \"High-Security Entity\", \"Priority Investigation Target\", \"Identity-Protected User\", \"Market Migration Indicator\", \"Sophisticated Operational Security\", \"Cross-Platform Operator\", \"Market Vulnerability Index (MVI)\", \"Vendor Network Centrality (VNC)\", \"Product Risk Exposure (PRE)\", \"Communication Pattern Risk (CPR)\", \"Transaction Velocity Metric (TVM)\", \"Market Diversification Score (MDS)\", \"Operational Security Index (OSI)\", \"Vendor Relationship Strength (VRS)\", \"Cross-Platform Risk Amplification (CPRA)\", \"Money Flow Complexity (MFC)\", \"Unstable Market\", \"Market Kingpin\", \"High-Exposure Product\", \"Deceptive Communication Pattern\", \"Flash Transaction Cluster\", \"Diversified Marketplace\", \"OpSec Specialist\", \"Customer Loyalty Network\", \"Multi-Platform Threat Entity\", \"Complex Money Laundering Operation\"]",
+        "cost": 0.5,
+        "budget_before": 18.0,
+        "budget_after": 17.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Market Risk Score (MRS)"
+        },
+        "result": "{\n  \"id\": 10,\n  \"knowledge\": \"Market Risk Score (MRS)\",\n  \"description\": \"Calculates overall risk level of a market based on multiple factors\",\n  \"definition\": \"MRS = \\\\frac{dlyflow}{1000} + (esccomprate \\\\times 0.2) + (interscore \\\\times 0.3) + (vendcount \\\\times 0.1) - \\\\frac{mktspan}{100}, \\\\text{where higher scores indicate greater risk exposure requiring enhanced monitoring.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 17.5,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Vendor Trust Index (VTI)"
+        },
+        "result": "{\n  \"id\": 11,\n  \"knowledge\": \"Vendor Trust Index (VTI)\",\n  \"description\": \"Measures vendor reliability based on transaction history\",\n  \"definition\": \"VTI = \\\\frac{vendsucccount}{vendtxcount} \\\\times 100 - \\\\frac{venddisputecount}{vendtxcount} \\\\times 50 + (vendrate \\\\times 5), \\\\text{where higher scores indicate more trustworthy vendors.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 17.0,
+        "budget_after": 16.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Transaction Anomaly Score (TAS)"
+        },
+        "result": "{\n  \"id\": 12,\n  \"knowledge\": \"Transaction Anomaly Score (TAS)\",\n  \"description\": \"Detects unusual transactions based on multiple variables\",\n  \"definition\": \"TAS = \\\\frac{payamtusd}{1000} \\\\times \\\\frac{txfinishhrs}{24} \\\\times \\\\left(1 + \\\\frac{escrowhrs}{100}\\\\right) \\\\times \\\\left(1 - \\\\frac{esccomprate}{100}\\\\right), \\\\text{where esccomprate is from the associated market, and higher scores indicate more suspicious transactions.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 16.5,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Communication Security Risk (CSR)"
+        },
+        "result": "{\n  \"id\": 13,\n  \"knowledge\": \"Communication Security Risk (CSR)\",\n  \"description\": \"Evaluates the security risk of a communication channel\",\n  \"definition\": \"CSR = (iptally \\\\times 5) + (tornodecount \\\\times 2) + (vpnflag\\\\_numeric \\\\times 30) + \\\\frac{brwsrunique}{10} + (susppatscore \\\\times 3) + (riskindiccount \\\\times 4), \\\\text{where vpnflag\\\\_numeric maps Yes=1, Suspected=0.5, No=0, and higher scores indicate greater security concerns.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 16.0,
+        "budget_after": 15.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Wallet Risk Index (WRI)"
+        },
+        "result": "{\n  \"id\": 14,\n  \"knowledge\": \"Wallet Risk Index (WRI)\",\n  \"description\": \"Assesses the risk level of cryptocurrency wallets\",\n  \"definition\": \"WRI = (fraudprob \\\\times 100) + (wallrisksc \\\\times 0.5) - \\\\frac{wallage}{30} + (wallturnrt \\\\times 10) + \\\\frac{txvel}{10}, \\\\text{where higher scores indicate potentially suspicious wallet activity.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 15.5,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Transaction Chain Risk (TCR)"
+        },
+        "result": "{\n  \"id\": 16,\n  \"knowledge\": \"Transaction Chain Risk (TCR)\",\n  \"description\": \"Evaluates the risk level of a transaction chain\",\n  \"definition\": \"TCR = (txchainlen \\\\times 10) + (linkedtxcount \\\\times 5) + (fraudprob \\\\times 100) - (profilecomplete \\\\times 0.5) - (idverifyscore \\\\times 0.5), \\\\text{where higher scores indicate higher risk transaction chains.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 15.0,
+        "budget_after": 14.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Security Posture Score (SPS)"
+        },
+        "result": "{\n  \"id\": 17,\n  \"knowledge\": \"Security Posture Score (SPS)\",\n  \"description\": \"Evaluates the overall security posture of an entity\",\n  \"definition\": \"SPS = (100 - (vulntally \\\\times 5)) + (securitymeasurecount \\\\times 2) + (sessionsecurityscore \\\\times 0.5) + (privprotscore \\\\times 0.3) - (fpprob \\\\times 100), \\\\text{where higher scores indicate stronger security postures.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 14.5,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Investigation Priority Score (IPS)"
+        },
+        "result": "{\n  \"id\": 18,\n  \"knowledge\": \"Investigation Priority Score (IPS)\",\n  \"description\": \"Determines how urgently an investigation should be handled\",\n  \"definition\": \"IPS = (lawinterest\\\\_numeric \\\\times 30) + (regrisklvl\\\\_numeric \\\\times 20) + (fraudprob \\\\times 100) - (compliancescore \\\\times 0.5) + (notescount \\\\times 2), \\\\text{where lawinterest\\\\_numeric and regrisklvl\\\\_numeric map Low=1, Medium=2, High=3, Unknown=2, and higher scores indicate higher priority.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 14.0,
+        "budget_after": 13.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Anonymity Protection Level (APL)"
+        },
+        "result": "{\n  \"id\": 19,\n  \"knowledge\": \"Anonymity Protection Level (APL)\",\n  \"description\": \"Measures how well a user's identity is protected\",\n  \"definition\": \"APL = (vpnflag\\\\_numeric \\\\times 30) + (tornodecount \\\\times 2) + (encryptmethod\\\\_numeric \\\\times 15) + (connpatscore \\\\times 0.2) + \\\\frac{brwsrunique}{20}, \\\\text{where vpnflag\\\\_numeric maps Yes=1, Suspected=0.5, No=0, encryptmethod\\\\_numeric maps Standard=1, Enhanced=2, Custom=3, else=0 and higher scores indicate stronger anonymity protections.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 13.5,
+        "budget_after": 13.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Operational Security Index (OSI)"
+        },
+        "result": "{\n  \"id\": 36,\n  \"knowledge\": \"Operational Security Index (OSI)\",\n  \"description\": \"Quantifies an entity's operational security practices\",\n  \"definition\": \"OSI = (APL \\\\times 0.5) + (SPS \\\\times 0.2) + (tornodecount \\\\times 2) + (CASE WHEN encryptmethod = 'Standard' THEN 1 WHEN encryptmethod = 'Enhanced' THEN 2 WHEN encryptmethod = 'Custom' THEN 3 ELSE 0 END \\\\times 5) - (iptally \\\\times 0.5), \\\\text{where APL and SPS are defined by the Anonymity Protection Level and Security Posture Score respectively, and higher scores indicate stronger operational security.}\"\n}",
+        "cost": 0.5,
+        "budget_before": 13.0,
+        "budget_after": 12.5
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.iptally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                iptally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, iptally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;"
+        },
+        "result": "SQL failed Phase 1. Error executing submitted SQL: column \"iptally\" does not exist\nLINE 74:                         secmonregistry, iptally, tornodecoun...\n                                                 ^\nHINT:  Perhaps you meant to reference the column \"securitymonitoring.inctally\".\n\nBudget remaining: 9.5 bird-coins",
+        "cost": 3.0,
+        "budget_before": 12.5,
+        "budget_after": 9.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.inctally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                inctally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, inctally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;"
+        },
+        "result": "SQL Error: SQL error: column \"tornodecount\" does not exist\nLINE 74:                         secmonregistry, inctally, tornodecou...\n                                                           ^\n",
+        "cost": 1.0,
+        "budget_before": 9.5,
+        "budget_after": 8.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: cybermarket\nTask ID: cybermarket_5\n\nUser Query:\nCalculate and rank all cybermarket markets by their operational stability. Show each platform's details, stability score, and current state. Include all markets in the results, treating them as having zero disputes. Present the results in descending order.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_k00vhebb2k69",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_t091ep3ebfhr",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_gs0ww5f24ftn",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_k00vhebb2k69",
+              "response": "{\"result\": \"CREATE TABLE \\\"markets\\\" (\\nmktregistry character varying NOT NULL,\\nmktdenom character varying NULL,\\nmktclass USER-DEFINED NULL,\\nmktspan integer NULL,\\nsizecluster USER-DEFINED NULL,\\ndlyflow bigint NULL,\\nmthactive bigint NULL,\\nvendcount integer NULL,\\nbuycount integer NULL,\\nlisttotal bigint NULL,\\ninterscore numeric NULL,\\nesccomprate numeric NULL,\\nmarket_status_reputation jsonb NULL,\\n    PRIMARY KEY (mktregistry)\\n);\\n\\nFirst 3 rows:\\nmktregistry    mktdenom    mktclass      mktspan  sizecluster      dlyflow    mthactive    vendcount    buycount    listtotal    interscore    esccomprate  market_status_reputation\\n-------------  ----------  ----------  ---------  -------------  ---------  -----------  -----------  ----------  -----------  ------------  -------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nMKT_SOB5D      Market_84   Forum             168  Large               5388        38982          232       73577        34839          76.3           12.8  {'status': 'Under Investigation', 'trust_level': 'High', 'reputation_score': 91.1, 'compliance_metrics': {'penalty_count': 1, 'warning_count': 6, 'rule_break_count': 10, 'restriction_level': 'Partial'}, 'community_trust_score': 35.8, 'dispute_resolution_score': 3.4}\\nMKT_3VNMP      Market_35   Service           745  Small               5691        38209           59       75138        34217          27.3           97.6  {'status': 'Under Investigation', 'trust_level': 'Low', 'reputation_score': 75.7, 'compliance_metrics': {'penalty_count': 0, 'warning_count': 4, 'rule_break_count': 4, 'restriction_level': 'Full'}, 'community_trust_score': 64.0, 'dispute_resolution_score': 3.2}\\nMKT_3Y1WX      Market_91   Forum             579  Medium              3093        43189          185       60697        38732           4.3           89.4  {'status': 'Suspended', 'trust_level': 'Medium', 'reputation_score': 84.4, 'compliance_metrics': {'penalty_count': 1, 'warning_count': 7, 'rule_break_count': 7, 'restriction_level': 'Partial'}, 'community_trust_score': 95.2, 'dispute_resolution_score': 33.2}\\n...\\n\\n\\nCREATE TABLE \\\"securitymonitoring\\\" (\\nsecmonregistry character varying NOT NULL,\\nsecurityauditstatus USER-DEFINED NULL,\\nvulntally smallint NULL,\\ninctally smallint NULL,\\nsecuritymeasurecount smallint NULL,\\nencryptionstrength USER-DEFINED NULL,\\nauthenticationmethod USER-DEFINED NULL,\\nsessionsecurityscore numeric NULL,\\ndataprotectionlevel USER-DEFINED NULL,\\nprivprotscore numeric NULL,\\noperationalsecurityscore numeric NULL,\\nfpprob numeric NULL,\\nalertsev USER-DEFINED NULL,\\nalertcategory USER-DEFINED NULL,\\nalertconfidencescore numeric NULL,\\nriskref character varying NULL,\\ncommref character varying NULL,\\nthreat_analysis_metrics jsonb NULL,\\n    PRIMARY KEY (secmonregistry),\\n    FOREIGN KEY (commref) REFERENCES communication(commregistry),\\n    FOREIGN KEY (riskref) REFERENCES riskanalysis(riskregistry)\\n);\\n\\nFirst 3 rows:\\nsecmonregistry    securityauditstatus      vulntally    inctally    securitymeasurecount  encryptionstrength    authenticationmethod      sessionsecurityscore  dataprotectionlevel      privprotscore    operationalsecurityscore    fpprob  alertsev    alertcategory      alertconfidencescore  riskref     commref     threat_analysis_metrics\\n----------------  ---------------------  -----------  ----------  ----------------------  --------------------  ----------------------  ----------------------  ---------------------  ---------------  --------------------------  --------  ----------  ---------------  ----------------------  ----------  ----------  ------------------------------------------------------------------------------------------------------------------------------------------------------------------...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_t091ep3ebfhr",
+              "response": "{\"result\": \"{\\n  \\\"cybermarket|markets|mktregistry\\\": \\\"Primary key (VARCHAR(30)) uniquely identifying a specific market entry (e.g., 'MKT-AlphaBay').\\\",\\n  \\\"cybermarket|markets|mktdenom\\\": \\\"A descriptive name or label for the dark market (e.g., 'AlphaBay', 'DreamMarket').\\\",\\n  \\\"cybermarket|markets|mktclass\\\": \\\"An enum (MktClass_enum) denoting the market's general class (Forum, Service, Marketplace, Exchange).\\\",\\n  \\\"cybermarket|markets|mktspan\\\": \\\"An INT representing how many days this market has been active (e.g., 345).\\\",\\n  \\\"cybermarket|markets|sizecluster\\\": \\\"An enum (SizeCluster_enum) labeling market size (Mega, Medium, Large, Small).\\\",\\n  \\\"cybermarket|markets|dlyflow\\\": \\\"A BIGINT indicating daily transaction volume (e.g., 123456).\\\",\\n  \\\"cybermarket|markets|mthactive\\\": \\\"A BIGINT counting monthly active users on the market (e.g., 500000).\\\",\\n  \\\"cybermarket|markets|vendcount\\\": \\\"An INT tally of how many vendors operate in this market (e.g., 15000).\\\",\\n  \\\"cybermarket|markets|buycount\\\": \\\"An INT count of buyer accounts on this market (e.g., 100000).\\\",\\n  \\\"cybermarket|markets|listtotal\\\": \\\"A BIGINT total number of product or service listings (e.g., 250000).\\\",\\n  \\\"cybermarket|markets|interscore\\\": \\\"A NUMERIC(6,3) (0\\\\u2013999.999) scoring the market's interaction or activity level (e.g., 458.234).\\\",\\n  \\\"cybermarket|markets|esccomprate\\\": \\\"A NUMERIC(5,3) (0\\\\u2013999.999) measuring escrow completion rate (e.g., 95.745).\\\",\\n  \\\"cybermarket|vendors|vendregistry\\\": \\\"Primary key (VARCHAR(30)) uniquely identifying a vendor (e.g., 'VEND-Abc123').\\\",\\n  \\\"cybermarket|vendors|vendspan\\\": \\\"An INT indicating how many days the vendor has been active (e.g., 120).\\\",\\n  \\\"cybermarket|vendors|vendrate\\\": \\\"A NUMERIC(4,2) (0\\\\u201399.99) rating for the vendor based on reviews (e.g., 92.75).\\\",\\n  \\\"cybermarket|vendors|vendtxcount\\\": \\\"An INT total number of completed transactions for the vendor (e.g., 3500).\\\",\\n  \\\"cybermarket|vendors|vendsucccount\\\": \\\"An INT number of undisputed or successful transactions (e.g., 3400).\\\",\\n  \\\"cybermarket|vendors|venddisputecount\\\": \\\"An INT number of disputed transactions (e.g., 100).\\\",\\n  \\\"cybermarket|vendors|vendplacecount\\\": \\\"A SMALLINT representing how many listings the vendor has created (e.g., 45).\\\",\\n  \\\"cybermarket|vendors|vendpaymethods\\\": \\\"A SMALLINT showing how many payment methods the vendor accepts (e.g., 3).\\\",\\n  \\\"cybermarket|vendors|vendchecklvl\\\": \\\"An enum (VendCheckLvl_enum) describing the vendor\\\\u2019s verification tier (Basic, Advanced, Premium).\\\",\\n  \\\"cybermarket|vendors|vendlastmoment\\\": \\\"A DATE recording the vendor's last activity (e.g., '2025-03-15').\\\",\\n  \\\"cybermarket|vendors|mktref\\\": \\\"FK referencing Markets(MktRegistry) linking this vendor to a specific market.\\\",\\n  \\\"cybermarket|buyers|buyregistry\\\": \\\"Primary key (VARCHAR(30)) for a buyer record (e.g., 'BUY-xyz890').\\\",\\n  \\\"cybermarket|buyers|buyspan\\\": \\\"An INT specifying how many days the buyer has been active (e.g., 60).\\\",\\n  \\\"cybermarket|buyers|buytxtally\\\": \\\"A SMALLINT counting how many purchases/transactions the buyer made (e.g., 25).\\\",\\n  \\\"cybermarket|buyers|buyspending\\\": \\\"An enum (BuySpending_enum) describing spending pattern (Variable, High, Low, Medium).\\\",\\n  \\\"cybermarket|buyers|buyfreqcat\\\": \\\"An enum (BuyFreqCat_enum) labeling purchase frequency (Heavy, Regular, One-time, Occasional).\\\",\\n  \\\"cybermarket|buyers|buychecklvl\\\": \\\"An enum (BuyCheckLvl_enum) specifying buyer verification level (Advanced, Basic).\\\",\\n  \\\"cybermarket|buyers|buyriskrate\\\": \\\"A NUMERIC(5,2) measure of fraud or chargeback risk for this buyer (e.g., 82.50).\\\",\\n  \\\"cybermarket|buyers|mktref\\\": \\\"FK referencing Markets(MktRegistry), linking buyer to its main or home market.\\\",\\n  \\\"cybermarket|buyers|vendref\\\": \\\"FK referencing Vendors(VendRegistry), if the buyer is directly associated with a vendor.\\\",\\n  \\\"cybermarket|products|prodregistry\\\": \\\"Primary key (VARCHAR(30)) for each pro...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_gs0ww5f24ftn",
+              "response": "{\"result\": \"[\\\"cybermarket|markets|mktclass\\\", \\\"cybermarket|markets|sizecluster\\\", \\\"cybermarket|transactions|paymethod\\\", \\\"cybermarket|transactions|txstatus\\\", \\\"cybermarket|products|prodtheme\\\", \\\"cybermarket|communication|vpnflag\\\", \\\"cybermarket|communication|langpattern\\\", \\\"cybermarket|vendors|vendchecklvl\\\", \\\"cybermarket|riskanalysis|moneyrisk\\\", \\\"cybermarket|securitymonitoring|alertsev\\\", \\\"Market Risk Score (MRS)\\\", \\\"Vendor Trust Index (VTI)\\\", \\\"Transaction Anomaly Score (TAS)\\\", \\\"Communication Security Risk (CSR)\\\", \\\"Wallet Risk Index (WRI)\\\", \\\"Transaction Chain Risk (TCR)\\\", \\\"Security Posture Score (SPS)\\\", \\\"Investigation Priority Score (IPS)\\\", \\\"Anonymity Protection Level (APL)\\\", \\\"High-Risk Market\\\", \\\"Trusted Vendor\\\", \\\"Suspicious Transaction Pattern\\\", \\\"Money Laundering Indicator\\\", \\\"High-Security Entity\\\", \\\"Priority Investigation Target\\\", \\\"Identity-Protected User\\\", \\\"Market Migration Indicator\\\", \\\"Sophisticated Operational Security\\\", \\\"Cross-Platform Operator\\\", \\\"Market Vulnerability Index (MVI)\\\", \\\"Vendor Network Centrality (VNC)\\\", \\\"Product Risk Exposure (PRE)\\\", \\\"Communication Pattern Risk (CPR)\\\", \\\"Transaction Velocity Metric (TVM)\\\", \\\"Market Diversification Score (MDS)\\\", \\\"Operational Security Index (OSI)\\\", \\\"Vendor Relationship Strength (VRS)\\\", \\\"Cross-Platform Risk Amplification (CPRA)\\\", \\\"Money Flow Complexity (MFC)\\\", \\\"Unstable Market\\\", \\\"Market Kingpin\\\", \\\"High-Exposure Product\\\", \\\"Deceptive Communication Pattern\\\", \\\"Flash Transaction Cluster\\\", \\\"Diversified Marketplace\\\", \\\"OpSec Specialist\\\", \\\"Customer Loyalty Network\\\", \\\"Multi-Platform Threat Entity\\\", \\\"Complex Money Laundering Operation\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 17.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_hmw9bh27qkhm",
+              "args": {
+                "knowledge_name": "Market Risk Score (MRS)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_mn36x8h2ezya",
+              "args": {
+                "knowledge_name": "Vendor Trust Index (VTI)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_h7ges8877hmf",
+              "args": {
+                "knowledge_name": "Transaction Anomaly Score (TAS)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_eb7xbhbcab1b",
+              "args": {
+                "knowledge_name": "Communication Security Risk (CSR)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_f8pmbsyy5dd9",
+              "args": {
+                "knowledge_name": "Wallet Risk Index (WRI)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_rfeee1gs6rg1",
+              "args": {
+                "knowledge_name": "Transaction Chain Risk (TCR)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_0nj773p4y51z",
+              "args": {
+                "knowledge_name": "Security Posture Score (SPS)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_zrcj36q7wzb0",
+              "args": {
+                "knowledge_name": "Investigation Priority Score (IPS)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_9rgm82tms58j",
+              "args": {
+                "knowledge_name": "Anonymity Protection Level (APL)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_n1wkvgdamzr1",
+              "args": {
+                "knowledge_name": "Operational Security Index (OSI)"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_hmw9bh27qkhm",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 10,\\n  \\\"knowledge\\\": \\\"Market Risk Score (MRS)\\\",\\n  \\\"description\\\": \\\"Calculates overall risk level of a market based on multiple factors\\\",\\n  \\\"definition\\\": \\\"MRS = \\\\\\\\frac{dlyflow}{1000} + (esccomprate \\\\\\\\times 0.2) + (interscore \\\\\\\\times 0.3) + (vendcount \\\\\\\\times 0.1) - \\\\\\\\frac{mktspan}{100}, \\\\\\\\text{where higher scores indicate greater risk exposure requiring enhanced monitoring.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_mn36x8h2ezya",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 11,\\n  \\\"knowledge\\\": \\\"Vendor Trust Index (VTI)\\\",\\n  \\\"description\\\": \\\"Measures vendor reliability based on transaction history\\\",\\n  \\\"definition\\\": \\\"VTI = \\\\\\\\frac{vendsucccount}{vendtxcount} \\\\\\\\times 100 - \\\\\\\\frac{venddisputecount}{vendtxcount} \\\\\\\\times 50 + (vendrate \\\\\\\\times 5), \\\\\\\\text{where higher scores indicate more trustworthy vendors.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 16.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_h7ges8877hmf",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 12,\\n  \\\"knowledge\\\": \\\"Transaction Anomaly Score (TAS)\\\",\\n  \\\"description\\\": \\\"Detects unusual transactions based on multiple variables\\\",\\n  \\\"definition\\\": \\\"TAS = \\\\\\\\frac{payamtusd}{1000} \\\\\\\\times \\\\\\\\frac{txfinishhrs}{24} \\\\\\\\times \\\\\\\\left(1 + \\\\\\\\frac{escrowhrs}{100}\\\\\\\\right) \\\\\\\\times \\\\\\\\left(1 - \\\\\\\\frac{esccomprate}{100}\\\\\\\\right), \\\\\\\\text{where esccomprate is from the associated market, and higher scores indicate more suspicious transactions.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_eb7xbhbcab1b",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 13,\\n  \\\"knowledge\\\": \\\"Communication Security Risk (CSR)\\\",\\n  \\\"description\\\": \\\"Evaluates the security risk of a communication channel\\\",\\n  \\\"definition\\\": \\\"CSR = (iptally \\\\\\\\times 5) + (tornodecount \\\\\\\\times 2) + (vpnflag\\\\\\\\_numeric \\\\\\\\times 30) + \\\\\\\\frac{brwsrunique}{10} + (susppatscore \\\\\\\\times 3) + (riskindiccount \\\\\\\\times 4), \\\\\\\\text{where vpnflag\\\\\\\\_numeric maps Yes=1, Suspected=0.5, No=0, and higher scores indicate greater security concerns.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 15.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_f8pmbsyy5dd9",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 14,\\n  \\\"knowledge\\\": \\\"Wallet Risk Index (WRI)\\\",\\n  \\\"description\\\": \\\"Assesses the risk level of cryptocurrency wallets\\\",\\n  \\\"definition\\\": \\\"WRI = (fraudprob \\\\\\\\times 100) + (wallrisksc \\\\\\\\times 0.5) - \\\\\\\\frac{wallage}{30} + (wallturnrt \\\\\\\\times 10) + \\\\\\\\frac{txvel}{10}, \\\\\\\\text{where higher scores indicate potentially suspicious wallet activity.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 15.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_rfeee1gs6rg1",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 16,\\n  \\\"knowledge\\\": \\\"Transaction Chain Risk (TCR)\\\",\\n  \\\"description\\\": \\\"Evaluates the risk level of a transaction chain\\\",\\n  \\\"definition\\\": \\\"TCR = (txchainlen \\\\\\\\times 10) + (linkedtxcount \\\\\\\\times 5) + (fraudprob \\\\\\\\times 100) - (profilecomplete \\\\\\\\times 0.5) - (idverifyscore \\\\\\\\times 0.5), \\\\\\\\text{where higher scores indicate higher risk transaction chains.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 14.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_0nj773p4y51z",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 17,\\n  \\\"knowledge\\\": \\\"Security Posture Score (SPS)\\\",\\n  \\\"description\\\": \\\"Evaluates the overall security posture of an entity\\\",\\n  \\\"definition\\\": \\\"SPS = (100 - (vulntally \\\\\\\\times 5)) + (securitymeasurecount \\\\\\\\times 2) + (sessionsecurityscore \\\\\\\\times 0.5) + (privprotscore \\\\\\\\times 0.3) - (fpprob \\\\\\\\times 100), \\\\\\\\text{where higher scores indicate stronger security postures.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_zrcj36q7wzb0",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 18,\\n  \\\"knowledge\\\": \\\"Investigation Priority Score (IPS)\\\",\\n  \\\"description\\\": \\\"Determines how urgently an investigation should be handled\\\",\\n  \\\"definition\\\": \\\"IPS = (lawinterest\\\\\\\\_numeric \\\\\\\\times 30) + (regrisklvl\\\\\\\\_numeric \\\\\\\\times 20) + (fraudprob \\\\\\\\times 100) - (compliancescore \\\\\\\\times 0.5) + (notescount \\\\\\\\times 2), \\\\\\\\text{where lawinterest\\\\\\\\_numeric and regrisklvl\\\\\\\\_numeric map Low=1, Medium=2, High=3, Unknown=2, and higher scores indicate higher priority.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 13.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_9rgm82tms58j",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 19,\\n  \\\"knowledge\\\": \\\"Anonymity Protection Level (APL)\\\",\\n  \\\"description\\\": \\\"Measures how well a user's identity is protected\\\",\\n  \\\"definition\\\": \\\"APL = (vpnflag\\\\\\\\_numeric \\\\\\\\times 30) + (tornodecount \\\\\\\\times 2) + (encryptmethod\\\\\\\\_numeric \\\\\\\\times 15) + (connpatscore \\\\\\\\times 0.2) + \\\\\\\\frac{brwsrunique}{20}, \\\\\\\\text{where vpnflag\\\\\\\\_numeric maps Yes=1, Suspected=0.5, No=0, encryptmethod\\\\\\\\_numeric maps Standard=1, Enhanced=2, Custom=3, else=0 and higher scores indicate stronger anonymity protections.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_n1wkvgdamzr1",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 36,\\n  \\\"knowledge\\\": \\\"Operational Security Index (OSI)\\\",\\n  \\\"description\\\": \\\"Quantifies an entity's operational security practices\\\",\\n  \\\"definition\\\": \\\"OSI = (APL \\\\\\\\times 0.5) + (SPS \\\\\\\\times 0.2) + (tornodecount \\\\\\\\times 2) + (CASE WHEN encryptmethod = 'Standard' THEN 1 WHEN encryptmethod = 'Enhanced' THEN 2 WHEN encryptmethod = 'Custom' THEN 3 ELSE 0 END \\\\\\\\times 5) - (iptally \\\\\\\\times 0.5), \\\\\\\\text{where APL and SPS are defined by the Anonymity Protection Level and Security Posture Score respectively, and higher scores indicate stronger operational security.}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 12.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_bnp3ke187rnc",
+              "args": {
+                "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.iptally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                iptally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, iptally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_bnp3ke187rnc",
+              "response": "{\"result\": \"SQL failed Phase 1. Error executing submitted SQL: column \\\"iptally\\\" does not exist\\nLINE 74:                         secmonregistry, iptally, tornodecoun...\\n                                                 ^\\nHINT:  Perhaps you meant to reference the column \\\"securitymonitoring.inctally\\\".\\n\\nBudget remaining: 9.5 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 9.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_kcnefj3czd55",
+              "args": {
+                "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.inctally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                inctally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, inctally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_kcnefj3czd55",
+              "response": "{\"result\": \"SQL Error: SQL error: column \\\"tornodecount\\\" does not exist\\nLINE 74:                         secmonregistry, inctally, tornodecou...\\n                                                           ^\\n\\n\\n[SYSTEM NOTE: Remaining budget: 8.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-6a173e19-11b3-4fbf-8573-7b872df68b50",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I was unable to complete the request within the allocated budget."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I was unable to complete the request within the allocated budget."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "f8a623f7e99f46c68904383a5fab59d7",
+      "client": "cybermarket_5",
+      "database": "cybermarket",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/6b9aaf41201343d4b40974e07a5f8423/0",
+      "at": 1793835403.0444858,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.0013000028266106,
+      "response_bytes": 19307,
+      "response_digest": "5728055c8248a29e2c28f0a246d7589958406dac81844e2b9b5c3d306df19ef4"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "de9992c0148e487181d480f5c38df596",
+      "client": "cybermarket_5",
+      "database": "cybermarket",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/6b9aaf41201343d4b40974e07a5f8423/0",
+      "at": 1793835465.1022172,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.802899998438079,
+      "response_bytes": 19307,
+      "response_digest": "5728055c8248a29e2c28f0a246d7589958406dac81844e2b9b5c3d306df19ef4"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "56171278b24f4352a4403d8ebd164824",
+      "client": "cybermarket_5",
+      "database": "cybermarket",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/6b9aaf41201343d4b40974e07a5f8423/0",
+      "at": 1793835747.836249,
+      "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.iptally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                iptally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, iptally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 886.677200000122,
+      "response_bytes": 420,
+      "response_digest": "a51579fac56aa7a9869f9c048d6e1fa57911e69431b9dfb45556d2d63958317d"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "949cafb5c9ae44de8d3cc8da1dfc57bc",
+      "client": "cybermarket_5",
+      "database": "cybermarket",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/6b9aaf41201343d4b40974e07a5f8423/1",
+      "at": 1793835815.1917264,
+      "sql": "WITH market_operational_stability AS (\r\n    SELECT \r\n        t1.mktregistry, \r\n        t1.mktdenom, \r\n        t1.mktclass, \r\n        -- Calculate Operational Security Index (OSI)\r\n        (\r\n            (t2.APL * 0.5) + \r\n            (t2.SPS * 0.2) + \r\n            (t2.tornodecount * 2) + \r\n            (\r\n                CASE \r\n                    WHEN t2.encryptmethod = 'Standard' THEN 1 \r\n                    WHEN t2.encryptmethod = 'Enhanced' THEN 2 \r\n                    WHEN t2.encryptmethod = 'Custom' THEN 3 \r\n                    ELSE 0\r\n                END * 5\r\n            ) - \r\n            (t2.inctally * 0.5)\r\n        ) AS operational_stability_score,\r\n        -- Calculate Market Risk Score (MRS)\r\n        (\r\n            (t1.dlyflow / 1000) + \r\n            (t1.esccomprate * 0.2) + \r\n            (t1.interscore * 0.3) + \r\n            (t1.vendcount * 0.1) - \r\n            (t1.mktspan / 100)\r\n        ) AS market_risk_score,\r\n        -- Extract fields from market_status_reputation JSONB column\r\n        (\r\n            market_status_reputation ->> 'status')::text AS status,\r\n        (\r\n            market_status_reputation ->> 'trust_level')::text AS trust_level,\r\n        (\r\n            market_status_reputation ->> 'reputation_score')::numeric AS reputation_score,\r\n        (\r\n            market_status_reputation ->> 'community_trust_score')::numeric AS community_trust_score,\r\n        (\r\n            market_status_reputation ->> 'dispute_resolution_score')::numeric AS dispute_resolution_score,\r\n        -- Set compliance metrics to zero disputes\r\n        jsonb_build_object(\r\n            'rule_break_count', 0,\r\n            'warning_count', 0,\r\n            'penalty_count', 0,\r\n            'restriction_level', 'None'\r\n        ) AS compliance_metrics\r\n    FROM \r\n        markets AS t1\r\n    JOIN \r\n        (\r\n            SELECT \r\n                secmonregistry, \r\n                -- Calculate Anonymity Protection Level (APL)\r\n                (\r\n                    (vpnflag_numeric * 30) + \r\n                    (tornodecount * 2) + \r\n                    (encryptmethod_numeric * 15) + \r\n                    (connpatscore * 0.2) + \r\n                    (brwsrunique / 20)\r\n                ) AS APL,\r\n                -- Calculate Security Posture Score (SPS)\r\n                (\r\n                    (100 - (vulntally * 5)) + \r\n                    (securitymeasurecount * 2) + \r\n                    (sessionsecurityscore * 0.5) + \r\n                    (privprotscore * 0.3) - \r\n                    (fpprob * 100)\r\n                ) AS SPS,\r\n                inctally, tornodecount, encryptmethod, vpnflag_numeric, brwsrunique, connpatscore,\r\n                vulntally, securitymeasurecount, sessionsecurityscore, privprotscore, fpprob\r\n            FROM \r\n                (\r\n                    SELECT \r\n                        secmonregistry, inctally, tornodecount, encryptmethod, vpnflag,\r\n                        brwsrunique, connpatscore, vulntally, securitymeasurecount, sessionsecurityscore,\r\n                        privprotscore, fpprob,\r\n                        -- Map vpnflag to numeric values\r\n                        CASE vpnflag \r\n                            WHEN 'Yes' THEN 1 \r\n                            WHEN 'Suspected' THEN 0.5 \r\n                            ELSE 0 \r\n                        END AS vpnflag_numeric,\r\n                        -- Map encryptmethod to numeric values\r\n                        CASE encryptmethod \r\n                            WHEN 'Standard' THEN 1 \r\n                            WHEN 'Enhanced' THEN 2 \r\n                            WHEN 'Custom' THEN 3 \r\n                            ELSE 0 \r\n                        END AS encryptmethod_numeric\r\n                    FROM \r\n                        securitymonitoring\r\n                ) AS t2\r\n        ) AS t2\r\n    ON \r\n        t1.mktregistry = t2.secmonregistry\r\n),\r\nranked_markets AS (\r\n    SELECT \r\n        mktregistry, \r\n        mktdenom, \r\n        mktclass, \r\n        operational_stability_score, \r\n        market_risk_score, \r\n        status, \r\n        trust_level, \r\n        reputation_score, \r\n        community_trust_score, \r\n        dispute_resolution_score,\r\n        RANK() OVER (\r\n            ORDER BY \r\n                operational_stability_score DESC\r\n        ) AS stability_rank\r\n    FROM \r\n        market_operational_stability\r\n)\r\nSELECT \r\n    mktdenom, \r\n    mktclass, \r\n    operational_stability_score, \r\n    market_risk_score, \r\n    status, \r\n    trust_level, \r\n    reputation_score, \r\n    community_trust_score, \r\n    dispute_resolution_score, \r\n    stability_rank\r\nFROM \r\n    ranked_markets\r\nORDER BY \r\n    stability_rank;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 47.94000000038068,
+      "response_bytes": 227,
+      "response_digest": "67159b70a9aa940b4eb5eabb6355fc89a2929b377bf2486fbc5d93c59acb9fa7",
+      "successful": false
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "wave": 1,
+  "result": {
+    "task_id": "museum_M_2",
+    "instance_id": "museum_M_2",
+    "database": "museum",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 146.31553268432617,
+    "budget_used": 3.0,
+    "budget_remaining": 13.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"artifactscore\" (\nartregistry character NOT NULL,\nartname character varying NOT NULL,\nartdynasty character varying NULL,\nartageyears integer NULL,\nmattype USER-DEFINED NULL,\nconservestatus USER-DEFINED NULL,\n    PRIMARY KEY (artregistry)\n);\n\nFirst 3 rows:\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\n-------------  ----------------  ------------  -------------  ---------  ----------------\nART54317       Culture Painting  Ming                    943  Stone      Good\nART54254       Poor Vase         Song                   2179  Textile    Fair\nART69978       Order Painting    Qing                    366  Bronze     Poor\n...\n\n\nCREATE TABLE \"surfaceandphysicalreadings\" (\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\nenvreadref bigint NOT NULL,\nvibralvlmms2 real NULL,\nnoisedb smallint NULL,\ndustaccummgm2 numeric NULL,\nmicrobialcountcfu integer NULL,\nmoldriskidx numeric NULL,\npestactivitylvl character varying NULL,\npesttrapcount smallint NULL,\npestspeciesdetected text NULL,\nsurfaceph numeric NULL,\nmatmoistcontent numeric NULL,\nsaltcrystalrisk character NULL,\nmetalcorroderate numeric NULL,\norganicdegradidx numeric NULL,\ncolorchangedeltae real NULL,\nsurfacetempc numeric NULL,\nsurfacerh numeric NULL,\ncondenserisk character varying NULL,\nthermalimgstatus character NULL,\nstructstability character varying NULL,\ncrackmonitor text NULL,\ndeformmm numeric NULL,\nwtchangepct numeric NULL,\nsurfdustcoverage smallint NULL,\no2concentration numeric NULL,\nn2concentration numeric NULL,\n    PRIMARY KEY (surfphysregistry),\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\n);\n\nFirst 3 rows:\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegr...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Conservation Priority Index (CPI)\", \"Sensitivity Weight Values\", \"Environmental Risk Factor (ERF)\", \"Artifact Vulnerability Score (AVS)\", \"Display Safety Duration (DSD)\", \"Showcase Environmental Stability Rating (SESR)\", \"Artifact Exhibition Compatibility (AEC)\", \"Material Deterioration Rate (MDR)\", \"Light Exposure Risk (LER)\", \"Conservation Budget Efficiency (CBE)\", \"Visitor Impact Risk (VIR)\", \"High-Value Artifact\", \"Conservation Emergency\", \"Environmental Instability Event\", \"Accelerated Deterioration Scenario\", \"Exhibition Rotation Candidate\", \"Showcase Failure Risk\", \"Conservation Budget Crisis\", \"Dynasty Value Artifact\", \"Visitor Crowd Risk\", \"Organic Material Vulnerability\", \"ArtifactsCore.ConserveStatus\", \"ArtifactRatings.HistSignRating\", \"SensitivityData.LightSensitivity\", \"SensitivityData.HumiditySensitivity\", \"ExhibitionHalls.CCTVCoverage\", \"Showcases.Airtightness\", \"EnvironmentalReadingsCore.TempC\", \"EnvironmentalReadingsCore.RelHumidity\", \"LightAndRadiationReadings.LightLux\", \"AirQualityReadings.PM25Conc\", \"Total Environmental Threat Level (TETL)\", \"Showcase Protection Adequacy (SPA)\", \"Conservation Backlog Risk (CBR)\", \"Visitor Capacity Safety Factor (VCSF)\", \"Exhibition Safety Quotient (ESQ)\", \"Conservation Resource Allocation Efficiency (CRAE)\", \"Material Aging Projection (MAP)\", \"Exhibition Rotation Priority Score (ERPS)\", \"Environmental Compliance Index (ECI)\", \"Security Risk Exposure (SRE)\", \"Critical Conservation Alert\", \"High Deterioration Risk Artifact\", \"Exhibition Rotation Urgency\", \"Showcase Compatibility Issue\", \"Conservation Resource Crisis\", \"Dynasty Artifact at Risk\", \"Environmental Control Failure\", \"High Security Priority Artifact\", \"Visitor Traffic Safety Concern\", \"Organic Material Emergency\", \"High-Value Category\", \"ERPS Decision Threshold\", \"Light Exposure Thresholds\", \"Conservation Environment Chronology (CEC)\", \"Artifact Rarity & Valuation (ARV)\", \"Conservation Priority Level\"]",
+        "cost": 0.5,
+        "budget_before": 15.0,
+        "budget_after": 14.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Conservation Priority Index (CPI)"
+        },
+        "result": "{\n  \"id\": 0,\n  \"knowledge\": \"Conservation Priority Index (CPI)\",\n  \"description\": \"Calculates the overall conservation priority for an artifact based on multiple factors.\",\n  \"definition\": \"CPI = \\\\frac{(HistSignRating + ResearchValRating + CultScore) \\\\times (10 - ConserveStatus)}{30}, \\\\text{where ConserveStatus is numerically mapped: Excellent=1, Good=3, Fair=5, Poor=7, Critical=10}\"\n}",
+        "cost": 0.5,
+        "budget_before": 14.5,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "CREATE OR REPLACE FUNCTION calculate_cpi(\n    HistSignRating SMALLINT,\n    ResearchValRating INTEGER,\n    CultScore SMALLINT,\n    ConserveStatus TEXT\n) RETURNS FLOAT AS $ $\nDECLARE\n    cpi_value FLOAT;\nBEGIN\n    -- Map ConserveStatus to its numerical value\n    IF ConserveStatus = 'Excellent' THEN\n        cpi_value := 1;\n    ELSIF ConserveStatus = 'Good' THEN\n        cpi_value := 3;\n    ELSIF ConserveStatus = 'Fair' THEN\n        cpi_value := 5;\n    ELSIF ConserveStatus = 'Poor' THEN\n        cpi_value := 7;\n    ELSIF ConserveStatus = 'Critical' THEN\n        cpi_value := 10;\n    ELSE\n        RAISE EXCEPTION 'Invalid ConserveStatus value';\n    END IF;\n\n    -- Calculate CPI using the formula\n    cpi_value := (HistSignRating + ResearchValRating + CultScore) * (10 - cpi_value) / 30;\n\n    RETURN cpi_value;\nEND;\n$ $ LANGUAGE plpgsql;"
+        },
+        "result": "SQL Error: Only SELECT queries allowed in execute_sql",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: museum\nTask ID: museum_M_2\n\nUser Query:\nCould you help me create a PL/pgSQL function called 'calculate_cpi' that computes some priority index for artifacts? The function should have some parameters as input and return the corresponding CPI value.\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_wn5424pv0ace",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_h3vxrnhnvbs6",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_wn5424pv0ace",
+              "response": "{\"result\": \"CREATE TABLE \\\"artifactscore\\\" (\\nartregistry character NOT NULL,\\nartname character varying NOT NULL,\\nartdynasty character varying NULL,\\nartageyears integer NULL,\\nmattype USER-DEFINED NULL,\\nconservestatus USER-DEFINED NULL,\\n    PRIMARY KEY (artregistry)\\n);\\n\\nFirst 3 rows:\\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\\n-------------  ----------------  ------------  -------------  ---------  ----------------\\nART54317       Culture Painting  Ming                    943  Stone      Good\\nART54254       Poor Vase         Song                   2179  Textile    Fair\\nART69978       Order Painting    Qing                    366  Bronze     Poor\\n...\\n\\n\\nCREATE TABLE \\\"surfaceandphysicalreadings\\\" (\\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\\nenvreadref bigint NOT NULL,\\nvibralvlmms2 real NULL,\\nnoisedb smallint NULL,\\ndustaccummgm2 numeric NULL,\\nmicrobialcountcfu integer NULL,\\nmoldriskidx numeric NULL,\\npestactivitylvl character varying NULL,\\npesttrapcount smallint NULL,\\npestspeciesdetected text NULL,\\nsurfaceph numeric NULL,\\nmatmoistcontent numeric NULL,\\nsaltcrystalrisk character NULL,\\nmetalcorroderate numeric NULL,\\norganicdegradidx numeric NULL,\\ncolorchangedeltae real NULL,\\nsurfacetempc numeric NULL,\\nsurfacerh numeric NULL,\\ncondenserisk character varying NULL,\\nthermalimgstatus character NULL,\\nstructstability character varying NULL,\\ncrackmonitor text NULL,\\ndeformmm numeric NULL,\\nwtchangepct numeric NULL,\\nsurfdustcoverage smallint NULL,\\no2concentration numeric NULL,\\nn2concentration numeric NULL,\\n    PRIMARY KEY (surfphysregistry),\\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\\n);\\n\\nFirst 3 rows:\\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegradidx    colorchangedeltae    surfacetempc    surfacerh  condenserisk    thermalimgstatus    structstability    crackmonitor           deformmm    wtchangepct    surfdustcoverage    o2concentration    n2concentration\\n------------------  ------------  --------------  ---------  ---------------  -------------------  -------------  -----------------  ---------------  ---------------------  -----------  -----------------  -----------------  ------------------  ------------------  -------------------  --------------  -----------  --------------  ------------------  -----------------  -------------------  ----------  -------------  ------------------  -----------------  -----------------\\n                 1             1           0.461         47             1.74                  234           0.1   Medium                          10                                 6.7               10.3  High                             0.04                0.47                 1.99           19.11         45.5  Medium          Normal              Stable             Significant Changes        0.08         -0.001                   5              20.8               78.75\\n                 2             2           0.053         50             0.39                  450           0.33  Low                              6                                 6.5               11    High                             0.05                0.37                 0.87           20.09         53                    Critical            Stable             Significant Changes        0.07         -0.011                   4              20.53              78.3\\n                 3             3           0.018         42             2.77                  486           0.43  Low                              7  Beetles                        6.6               10.1  Low                              0.02                0.92                 1.48       ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_h3vxrnhnvbs6",
+              "response": "{\"result\": \"[\\\"Conservation Priority Index (CPI)\\\", \\\"Sensitivity Weight Values\\\", \\\"Environmental Risk Factor (ERF)\\\", \\\"Artifact Vulnerability Score (AVS)\\\", \\\"Display Safety Duration (DSD)\\\", \\\"Showcase Environmental Stability Rating (SESR)\\\", \\\"Artifact Exhibition Compatibility (AEC)\\\", \\\"Material Deterioration Rate (MDR)\\\", \\\"Light Exposure Risk (LER)\\\", \\\"Conservation Budget Efficiency (CBE)\\\", \\\"Visitor Impact Risk (VIR)\\\", \\\"High-Value Artifact\\\", \\\"Conservation Emergency\\\", \\\"Environmental Instability Event\\\", \\\"Accelerated Deterioration Scenario\\\", \\\"Exhibition Rotation Candidate\\\", \\\"Showcase Failure Risk\\\", \\\"Conservation Budget Crisis\\\", \\\"Dynasty Value Artifact\\\", \\\"Visitor Crowd Risk\\\", \\\"Organic Material Vulnerability\\\", \\\"ArtifactsCore.ConserveStatus\\\", \\\"ArtifactRatings.HistSignRating\\\", \\\"SensitivityData.LightSensitivity\\\", \\\"SensitivityData.HumiditySensitivity\\\", \\\"ExhibitionHalls.CCTVCoverage\\\", \\\"Showcases.Airtightness\\\", \\\"EnvironmentalReadingsCore.TempC\\\", \\\"EnvironmentalReadingsCore.RelHumidity\\\", \\\"LightAndRadiationReadings.LightLux\\\", \\\"AirQualityReadings.PM25Conc\\\", \\\"Total Environmental Threat Level (TETL)\\\", \\\"Showcase Protection Adequacy (SPA)\\\", \\\"Conservation Backlog Risk (CBR)\\\", \\\"Visitor Capacity Safety Factor (VCSF)\\\", \\\"Exhibition Safety Quotient (ESQ)\\\", \\\"Conservation Resource Allocation Efficiency (CRAE)\\\", \\\"Material Aging Projection (MAP)\\\", \\\"Exhibition Rotation Priority Score (ERPS)\\\", \\\"Environmental Compliance Index (ECI)\\\", \\\"Security Risk Exposure (SRE)\\\", \\\"Critical Conservation Alert\\\", \\\"High Deterioration Risk Artifact\\\", \\\"Exhibition Rotation Urgency\\\", \\\"Showcase Compatibility Issue\\\", \\\"Conservation Resource Crisis\\\", \\\"Dynasty Artifact at Risk\\\", \\\"Environmental Control Failure\\\", \\\"High Security Priority Artifact\\\", \\\"Visitor Traffic Safety Concern\\\", \\\"Organic Material Emergency\\\", \\\"High-Value Category\\\", \\\"ERPS Decision Threshold\\\", \\\"Light Exposure Thresholds\\\", \\\"Conservation Environment Chronology (CEC)\\\", \\\"Artifact Rarity & Valuation (ARV)\\\", \\\"Conservation Priority Level\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 14.5/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_psxr3q4kj1g7",
+              "args": {
+                "knowledge_name": "Conservation Priority Index (CPI)"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_psxr3q4kj1g7",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 0,\\n  \\\"knowledge\\\": \\\"Conservation Priority Index (CPI)\\\",\\n  \\\"description\\\": \\\"Calculates the overall conservation priority for an artifact based on multiple factors.\\\",\\n  \\\"definition\\\": \\\"CPI = \\\\\\\\frac{(HistSignRating + ResearchValRating + CultScore) \\\\\\\\times (10 - ConserveStatus)}{30}, \\\\\\\\text{where ConserveStatus is numerically mapped: Excellent=1, Good=3, Fair=5, Poor=7, Critical=10}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_370zxb85j0nk",
+              "args": {
+                "sql": "CREATE OR REPLACE FUNCTION calculate_cpi(\n    HistSignRating SMALLINT,\n    ResearchValRating INTEGER,\n    CultScore SMALLINT,\n    ConserveStatus TEXT\n) RETURNS FLOAT AS $ $\nDECLARE\n    cpi_value FLOAT;\nBEGIN\n    -- Map ConserveStatus to its numerical value\n    IF ConserveStatus = 'Excellent' THEN\n        cpi_value := 1;\n    ELSIF ConserveStatus = 'Good' THEN\n        cpi_value := 3;\n    ELSIF ConserveStatus = 'Fair' THEN\n        cpi_value := 5;\n    ELSIF ConserveStatus = 'Poor' THEN\n        cpi_value := 7;\n    ELSIF ConserveStatus = 'Critical' THEN\n        cpi_value := 10;\n    ELSE\n        RAISE EXCEPTION 'Invalid ConserveStatus value';\n    END IF;\n\n    -- Calculate CPI using the formula\n    cpi_value := (HistSignRating + ResearchValRating + CultScore) * (10 - cpi_value) / 30;\n\n    RETURN cpi_value;\nEND;\n$ $ LANGUAGE plpgsql;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_370zxb85j0nk",
+              "response": "{\"result\": \"SQL Error: Only SELECT queries allowed in execute_sql\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9f934dba-a80b-4450-93bb-4a3019764cbb",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I am unable to create a PL/pgSQL function called 'calculate_cpi' due to insufficient privileges. However, I can provide you with the code to create the function.\n\n```sql\nCREATE OR REPLACE FUNCTION calculate_cpi(\nHistSignRating SMALLINT,\nResearchValRating INTEGER,\nCultScore SMALLINT,\nConserveStatus TEXT\n) RETURNS FLOAT AS $ $\nDECLARE\ncpi_value FLOAT;\nBEGIN\nIF ConserveStatus = 'Excellent' THEN\ncpi_value := 1;\nELSIF ConserveStatus = 'Good' THEN\ncpi_value := 3;\nELSIF ConserveStatus = 'Fair' THEN\ncpi_value := 5;\nELSIF ConserveStatus = 'Poor' THEN\ncpi_value := 7;\nELSIF ConserveStatus = 'Critical' THEN\ncpi_value := 10;\nELSE\nRAISE EXCEPTION 'Invalid ConserveStatus value';\nEND IF;\n\ncpi_value := (HistSignRating + ResearchValRating + CultScore) * (10 - cpi_value) / 30;\n\nRETURN cpi_value;\nEND;\n$ $ LANGUAGE plpgsql;\n```\n\nThe function takes in historical significance rating, research value rating, cultural score, and conservation status as parameters and returns the corresponding CPI value."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I am unable to create a PL/pgSQL function called 'calculate_cpi' due to insufficient privileges. However, I can provide you with the code to create the function.\n\n```sql\nCREATE OR REPLACE FUNCTION calculate_cpi(\nHistSignRating SMALLINT,\nResearchValRating INTEGER,\nCultScore SMALLINT,\nConserveStatus TEXT\n) RETURNS FLOAT AS $ $\nDECLARE\ncpi_value FLOAT;\nBEGIN\nIF ConserveStatus = 'Excellent' THEN\ncpi_value := 1;\nELSIF ConserveStatus = 'Good' THEN\ncpi_value := 3;\nELSIF ConserveStatus = 'Fair' THEN\ncpi_value := 5;\nELSIF ConserveStatus = 'Poor' THEN\ncpi_value := 7;\nELSIF ConserveStatus = 'Critical' THEN\ncpi_value := 10;\nELSE\nRAISE EXCEPTION 'Invalid ConserveStatus value';\nEND IF;\n\ncpi_value := (HistSignRating + ResearchValRating + CultScore) * (10 - cpi_value) / 30;\n\nRETURN cpi_value;\nEND;\n$ $ LANGUAGE plpgsql;\n```\n\nThe function takes in historical significance rating, research value rating, cultural score, and conservation status as parameters and returns the corresponding CPI value."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "83d9c355d2b74510bc10fb4e394610c3",
+      "client": "museum_M_2",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/f806b702c8084d37855b854dc4fcef2a/0",
+      "at": 1793835391.9161904,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.4819999996689148,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "1d6ebfa2c5434326a11fe4831993616c",
+      "client": "museum_M_2",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/f806b702c8084d37855b854dc4fcef2a/0",
+      "at": 1793835396.8477132,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.740399999107467,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "1d7099cf59f741e48d8cdddb8239be45",
+      "client": "museum_M_2",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/f806b702c8084d37855b854dc4fcef2a/0",
+      "at": 1793835487.2835622,
+      "sql": "CREATE OR REPLACE FUNCTION calculate_cpi(\n    HistSignRating SMALLINT,\n    ResearchValRating INTEGER,\n    CultScore SMALLINT,\n    ConserveStatus TEXT\n) RETURNS FLOAT AS $ $\nDECLARE\n    cpi_value FLOAT;\nBEGIN\n    -- Map ConserveStatus to its numerical value\n    IF ConserveStatus = 'Excellent' THEN\n        cpi_value := 1;\n    ELSIF ConserveStatus = 'Good' THEN\n        cpi_value := 3;\n    ELSIF ConserveStatus = 'Fair' THEN\n        cpi_value := 5;\n    ELSIF ConserveStatus = 'Poor' THEN\n        cpi_value := 7;\n    ELSIF ConserveStatus = 'Critical' THEN\n        cpi_value := 10;\n    ELSE\n        RAISE EXCEPTION 'Invalid ConserveStatus value';\n    END IF;\n\n    -- Calculate CPI using the formula\n    cpi_value := (HistSignRating + ResearchValRating + CultScore) * (10 - cpi_value) / 30;\n\n    RETURN cpi_value;\nEND;\n$ $ LANGUAGE plpgsql;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.5845000014232937,
+      "response_bytes": 82,
+      "response_digest": "aede9b8ea77a5fb18a6af8dd4fb207f1ee0e3c92b09c11fe28826e6750b7e42f",
+      "successful": false
+    }
+  ]
+}

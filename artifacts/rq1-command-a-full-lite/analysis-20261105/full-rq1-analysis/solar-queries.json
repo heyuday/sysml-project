@@ -1,0 +1,2694 @@
+{
+  "version": 2,
+  "database": "solar",
+  "queries": {
+    "c1f7e7678c4be59f5f2f824ce4646d9817c260ddc7fe39cc44e8f1157a92fd8f": {
+      "sql": "SELECT\n    p.growalias AS plant_name,\n    p.gencapmw AS capacity_mw,\n    m.maintcostusd AS total_maintenance_costs,\n    m.revlossusd AS revenue_losses,\n    (m.maintcostusd / m.revlossusd) AS maintenance_cost_efficiency_score,\n    (m.revlossusd / p.gencapmw) AS revenue_loss_rate,\n    (jsonb_extract_path(perf.efficiency_profile, 'current_efficiency', 'curreffpct')::numeric) AS current_efficiency_percentage,\n    (jsonb_extract_path(perf.efficiency_profile, 'current_efficiency', 'efflosspct')::numeric) AS efficiency_loss_percentage\nFROM \n    plant p\nJOIN \n    maintenance m ON p.growregistry = m.powerref\nJOIN \n    performance perf ON m.obsref = perf.perfregistry\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e3eea4614e6bf5fc7d887b9495191598cfae889279c4758a689a6fcaf74b2984",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "capacity_mw",
+          1700,
+          458759
+        ],
+        [
+          "total_maintenance_costs",
+          1700,
+          589830
+        ],
+        [
+          "revenue_losses",
+          1700,
+          458758
+        ],
+        [
+          "maintenance_cost_efficiency_score",
+          1700,
+          -1
+        ],
+        [
+          "revenue_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "current_efficiency_percentage",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_loss_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "44f968d6f71960ab3280c53fe6559b4c18834b2569d9fc80e2a079b1e059c906",
+      "values_digest": "a5cf967588fd916581fbc703d660e632839a69dfb1d0524943f27bb86157b815",
+      "ordered_digest": "b5190ec1181f0e147635252d03e615a52750a619cfed3c5d52ffb912c2ddc7a0"
+    },
+    "3bfaa67933a3354fc23212e99295a6baa315fca460eada038205a354a48ec462": {
+      "sql": "SELECT\n    p.growalias AS site_name,\n    pan.panemark AS panel_id,\n    p.initdate AS start_date,\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate) AS service_years,\n    eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS efficiency_values,\n    eff.efficiency_profile->'degradation'->>'anndegrate' AS annual_degradation_rate,\n    eff.efficiency_profile->'current_efficiency'->>'efflosspct' AS efficiency_loss_metric,\n    -- Calculate NDI using the formula provided\n    (\n        (\n            CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n            -\n            (\n                CAST(eff.efficiency_profile->'degradation'->>'anndegrate' AS DECIMAL)\n                *\n                (\n                    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate)\n                )\n            )\n        )\n        / CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n    ) AS calculated_ndi,\n    -- Categorize panels based on NDI\n    CASE\n        WHEN (\n            (\n                CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n                -\n                (\n                    CAST(eff.efficiency_profile->'degradation'->>'anndegrate' AS DECIMAL)\n                    *\n                    (\n                        EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate)\n                    )\n                )\n            )\n            / CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n        ) > 0.8 THEN 'High'\n        WHEN (\n            (\n                CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n                -\n                (\n                    CAST(eff.efficiency_profile->'degradation'->>'anndegrate' AS DECIMAL)\n                    *\n                    (\n                        EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate)\n                    )\n                )\n            )\n            / CAST(eff.efficiency_profile->'current_efficiency'->>'curreffpct' AS DECIMAL)\n        ) BETWEEN 0.6 AND 0.8 THEN 'Medium'\n        ELSE 'Low'\n    END AS panel_category\nFROM\n    plant p\nJOIN\n    panel pan ON p.growregistry = pan.hubregistry\nJOIN\n    performance eff ON pan.panemark = eff.solmodref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4febd7c5b6174ceee4c7d3b404a36b6057aca6a7def6e616a5f520d4db2cc564",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          1043,
+          104
+        ],
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "start_date",
+          1082,
+          -1
+        ],
+        [
+          "service_years",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_values",
+          25,
+          -1
+        ],
+        [
+          "annual_degradation_rate",
+          25,
+          -1
+        ],
+        [
+          "efficiency_loss_metric",
+          25,
+          -1
+        ],
+        [
+          "calculated_ndi",
+          1700,
+          -1
+        ],
+        [
+          "panel_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "029a37de2f1b0f30bd540386339f2cadc73052c8968f3c2d6eeaf303d6b404e2",
+      "values_digest": "8224b4606c805ef98e7188e1cb025098634a102a6247b041e358b43395f681aa",
+      "ordered_digest": "024a819a884a5864b0be8730f4d92ffbf54250218d91824c02269c4004310c1e"
+    },
+    "8e0ad68b7cbf70bb624224dea26c0c23e994909cc419874a50e52d291474c557": {
+      "sql": "SELECT\n    p.growalias AS site_name,\n    pl.panemark AS panel_id,\n    p.initdate AS start_date,\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate) AS service_years,\n    jsonb_extract_path(perf.efficiency_profile, 'current_efficiency', 'curreffpct')::NUMERIC AS efficiency_values,\n    jsonb_extract_path(perf.efficiency_profile, 'degradation', 'anndegrate')::NUMERIC AS annual_degradation_rate,\n    jsonb_extract_path(perf.efficiency_profile, 'current_efficiency', 'efflosspct')::NUMERIC AS efficiency_loss_metric,\n    (jsonb_extract_path(perf.efficiency_profile, 'degradation', 'anndegrate')::NUMERIC / jsonb_extract_path(perf.efficiency_profile, 'current_efficiency', 'curreffpct')::NUMERIC) AS calculated_NDI,\n    CASE\n        WHEN jsonb_extract_path(perf.efficiency_profile, 'degradation', 'anndegrate')::NUMERIC > 0.5 THEN 'High Degradation'\n        WHEN jsonb_extract_path(perf.efficiency_profile, 'degradation', 'anndegrate')::NUMERIC BETWEEN 0.1 AND 0.5 THEN 'Moderate Degradation'\n        ELSE 'Low Degradation'\n    END AS panel_category\nFROM\n    plant p\nJOIN\n    panel pl ON p.growregistry = pl.hubregistry\nJOIN\n    performance perf ON pl.panemark = perf.solmodref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "773843121f2f1fbfb6722c0b9b413fada1f3998021dac2e4ddee779c25674b13",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          1043,
+          104
+        ],
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "start_date",
+          1082,
+          -1
+        ],
+        [
+          "service_years",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_values",
+          1700,
+          -1
+        ],
+        [
+          "annual_degradation_rate",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_loss_metric",
+          1700,
+          -1
+        ],
+        [
+          "calculated_ndi",
+          1700,
+          -1
+        ],
+        [
+          "panel_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4fdb6ed667e9f5ead7ffce7d66614a13895db13a457d177660eb289607a58e16",
+      "values_digest": "7d2cf695ae2df119bc7bd739f0f3ad20f19bebebeb676c27da6c9d6a4fae5081",
+      "ordered_digest": "1cb20f7527036ba33481f428bbf6bcef66fb3dce33a4111e6feecd30e935d2d5"
+    },
+    "871a54cece6f7bab9b834bb1e7a82f257c0e7eb01b28d6ae35a4eab5e80cd89d": {
+      "sql": "SELECT\n    p.growregistry AS area_id,\n    e.envmoment AS environmental_readings_measurement_time,\n    e.soillosspct AS soiling_loss,\n    e.dustdengm2 AS dust_level,\n    e.irradiance_conditions->>'specmisfac' AS soiling_factor\nFROM\n    environment e\nJOIN\n    plant p ON e.arearegistry = p.growregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fdc7b7bbc32fefd47f77f082efed1baeaa2c5786aab9676aef18581a2079c3dc",
+      "ordered": false,
+      "columns": [
+        [
+          "area_id",
+          2950,
+          -1
+        ],
+        [
+          "environmental_readings_measurement_time",
+          1114,
+          -1
+        ],
+        [
+          "soiling_loss",
+          1700,
+          458759
+        ],
+        [
+          "dust_level",
+          1700,
+          458759
+        ],
+        [
+          "soiling_factor",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "f5a541980802782674d024a1bdb93e32c6616bb76ae57deb679b01fdff14759b",
+      "values_digest": "dc3c2020fb032a29193c851a5c5e700c4e2f6a6ffd4cd38e8eaa9c3b04793529",
+      "ordered_digest": "7b8c2b5a49b97b05ef5c14e0551ffb69fd5b58048b4a640cb7d3912d8cd7b8f2"
+    },
+    "678f8d7e075b6f0a71386043897e3d7d3b4928c6fe65bdb25444e8a4fed91e0a": {
+      "sql": "SELECT\n    p.panemark AS panel_id,\n    p.tempcoef AS coefficient,\n    p.nomtempc AS temperature,\n    jsonb_extract_path(eff.efficiency_profile, 'current_efficiency', 'curreffpct') AS efficiency_metric,\n    jsonb_extract_path(env.irradiance_conditions, 'irradiance_types', '3') AS plane_of_array_irradiance,\n    -- Calculate the adjusted efficiency\n    (jsonb_extract_path(eff.efficiency_profile, 'current_efficiency', 'curreffpct')::numeric -\n    (p.tempcoef * (env.celltempc - p.nomtempc))) AS efficiency_result\nFROM\n    panel AS p\nJOIN\n    performance AS eff ON p.panemark = eff.solmodref\nJOIN\n    environment AS env ON p.hubregistry = env.arearegistry\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "572d0b0cd13b7ec75f2202b5dfda365449cebc05aa19a2c7504c8ecea375dca4",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "coefficient",
+          1700,
+          262151
+        ],
+        [
+          "temperature",
+          1700,
+          458759
+        ],
+        [
+          "efficiency_metric",
+          3802,
+          -1
+        ],
+        [
+          "plane_of_array_irradiance",
+          3802,
+          -1
+        ],
+        [
+          "efficiency_result",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "231947af9b30d757345f914854ff1b1c1dc0def69d60c2a0b68541b04634984c",
+      "values_digest": "19cdc4a49035c440848d5150a11ad2d52a61f11b23154ee1a3ffe73b907e556d",
+      "ordered_digest": "7a955504a7ffa3e4ad8f8b0883e993c01df6e6c9f828a851019a412c115a12d9"
+    },
+    "6cd2dacf7d05ad82dd8cc09d73ba1fa88a078250080f8d4db57e2e82bfeb0985": {
+      "sql": "SELECT\n    p.panemark AS panel_id,\n    p.tempcoef AS coefficient,\n    p.nomtempc AS temperature,\n    p.paneeffpct AS efficiency_metric,\n    e.irradiance_conditions->'irradiance_types' AS plane_of_array_irradiance,\n    p.paneeffpct * (1 + p.tempcoef * (e.celltempc - p.nomtempc)) AS efficiency_result\nFROM\n    panel p\nJOIN\n    environment e ON p.hubregistry = e.arearegistry\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b61e87d63005e901bf6e71226e1d47e08919756a4561d49013e88dd86a33bc04",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "coefficient",
+          1700,
+          262151
+        ],
+        [
+          "temperature",
+          1700,
+          458759
+        ],
+        [
+          "efficiency_metric",
+          1700,
+          458759
+        ],
+        [
+          "plane_of_array_irradiance",
+          3802,
+          -1
+        ],
+        [
+          "efficiency_result",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "e21a2656d1ce2de9567dc58db6be55d536fffa8fc671122166177e20a5ffea9d",
+      "values_digest": "aca0df6160e6c55f4e3ce0be8f7e76b441b6f13d4d50712ece85633f1eb246b0",
+      "ordered_digest": "7563a21f80acab000ad7e574ab0f7053b3c76679d5fce19ae03b21b2f369f6dd"
+    },
+    "1e5e4f9e7c25f9dcad44afed47031c565f1ad3e41d52c0bf6dc53ede35e57e2b": {
+      "sql": "SELECT\n    p.panemark,\n    p.powratew AS power_ratings,\n    perf.measpoww AS current_power,\n    (efficiency_profile->'degradation'->>'cumdegpct')::DECIMAL AS degradation,\n    env.soillosspct AS soiling_loss,\n    (inverter.power_metrics->>'inverteffpct')::DECIMAL AS inverter_losses,\n    (\n        (p.powratew * (efficiency_profile->'degradation'->>'cumdegpct')::DECIMAL / 100)\n        + (perf.measpoww * env.soillosspct / 100)\n        + (inverter.power_metrics->>'inverteffpct')::DECIMAL\n    ) AS total_system_loss\nFROM\n    panel AS p\nJOIN\n    performance AS perf ON p.panemark = perf.solmodref\nJOIN\n    environment AS env ON p.hubregistry = env.arearegistry\nJOIN\n    inverter ON p.hubregistry = inverter.siteref\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a818ccd4f5bf41b0e1a3a3f905a5a74259a5455c3079e536ed4df5c7378a476b",
+      "ordered": false,
+      "columns": [
+        [
+          "panemark",
+          1043,
+          54
+        ],
+        [
+          "power_ratings",
+          21,
+          -1
+        ],
+        [
+          "current_power",
+          1700,
+          589831
+        ],
+        [
+          "degradation",
+          1700,
+          -1
+        ],
+        [
+          "soiling_loss",
+          1700,
+          458759
+        ],
+        [
+          "inverter_losses",
+          1700,
+          -1
+        ],
+        [
+          "total_system_loss",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "673bf70ff64218d46e252e613635e21db8ba1b0b1515c7fb6dfd71355a5e9512",
+      "values_digest": "7f32fb1cb066f9746436328f3221a54572ccf3a35bc442e553065efd9c2d9ef6",
+      "ordered_digest": "53028841168d148c519f1d1d1ae3f341aae2b1362033cf58783033e9024b745d"
+    },
+    "cda389dd149c99e2cd63ee2c2e9b4c3ee473c106d1789f63d39a6f4812763d52": {
+      "sql": "SELECT\n    panetype AS \"Panel Type\",\n    AVG(celltempc) AS \"Average Temperature Impact\"\nFROM\n    panel AS p\nJOIN\n    environment AS e ON p.hubregistry = e.arearegistry\nGROUP BY\n    panetype\nORDER BY\n    \"Average Temperature Impact\" DESC;",
+      "decisions": {
+        "N0": {
+          "key": "5a39fda9b27605575a95faa0ac85768e37e13e9518bd8303617fb7edc7f2ff36",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "47026029f755908caafecfb24e8b7ecd16ddd196937e3971603bf0fe48a76964",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "a19e3c7322ec633d11f3bebecd84a4b1da9c6c5b6b7f4de0e5f8eb0e1b58ec65",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "9a981d38de23dd94acfbdf6c84616e96496f6bc87eb891af9a1696c0f3148955",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "1de55f14aeb1329a5382fcf199eeb4274b0c6a9dcc75e7b162c7265d5afd5d76",
+      "ordered": true,
+      "columns": [
+        [
+          "Panel Type",
+          1043,
+          54
+        ],
+        [
+          "Average Temperature Impact",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "974ecb70c29835f50e1c64ebd1a1bba06335b1b90b205f654945c5b82de9913b",
+      "values_digest": "6c510cd5020031c863c4d6988556be3d73bd6b6aa4a7de3855c0db11272430ce",
+      "ordered_digest": "a52f6705bc57d5f8ae41323f10b11461a8ed7896771444eb1576c724f667ca2f"
+    },
+    "3b6e53912977f8502781ac77f1d9ac4eb3f6e70a87206ae85576d32fd09f1dde": {
+      "sql": "SELECT\r\n    p.panemark AS panel_id,\r\n    p.tempcoef AS coefficient,\r\n    e.celltempc AS temperature,\r\n    jsonb_extract_path(prf.efficiency_profile, 'current_efficiency', 'curreffpct') AS efficiency_metric,\r\n    jsonb_extract_path(e.irradiance_conditions, 'irradiance_types', '3') AS plane_of_array_irradiance\r\nFROM \r\n    panel AS p\r\nJOIN \r\n    environment AS e ON p.hubregistry = e.arearegistry\r\nJOIN \r\n    performance AS prf ON p.panemark = prf.solmodref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5a7686ade8e75a847950720e9ca53f572d956528bef34b509431cd8f563903e0",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "coefficient",
+          1700,
+          262151
+        ],
+        [
+          "temperature",
+          1700,
+          458759
+        ],
+        [
+          "efficiency_metric",
+          3802,
+          -1
+        ],
+        [
+          "plane_of_array_irradiance",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4a0f7e6947a88254eb0459681639dc8ae05669a77f9536eb7aef45d5f1ba82be",
+      "values_digest": "62daab77350731ed535c975b6cbaab398282ec6de31bf31cd71382afaba95c60",
+      "ordered_digest": "894a26618302f8d06bc8907045ccaeeff038b2f1871fc9998164c92f26c904a2"
+    },
+    "055e43745943b7e1ee18ee741d80e41f528caa33b7101c89c1cf29b031a16a74": {
+      "sql": "SELECT\r\n    panetype AS \"Panel Type\",\r\n    AVG(tempcoef) AS \"Average Impact Value\"\r\nFROM\r\n    panel\r\nGROUP BY\r\n    panetype;",
+      "decisions": {
+        "N0": {
+          "key": "d6894403817a393b7406b09a8b6f2e2705e6f61c40e2eaba6f1e7e8b3b0c632b",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "8bc8acc37cc1c26e9d6f60d6d3c999d9cfe717597ba2642e2ce81f125a052de3",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "bebd42985dea236f0f442247e51a5eb840537488c421fd48cff79fc06bf06337",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "31ab7adf86486ecfedf54c21e34466e4a27c741196e73d355e796a0711c4fc2b",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "12bdad1c6d03d364f54d3ff0f0876f2dc5827279ea91edf33f67ad84f94e85a7",
+      "ordered": false,
+      "columns": [
+        [
+          "Panel Type",
+          1043,
+          54
+        ],
+        [
+          "Average Impact Value",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "394bb5a9438dcc6afbc624df39149443dca6fd8e7bdfe2576ec34010c36d5fcf",
+      "values_digest": "01dd2893b543b07c4b63fce824752b5a235b913e2069ef4b5260a92a6fdfcc02",
+      "ordered_digest": "bbd2414bca92739dee78210fc4743b8a4aa1ed6ec9e45e2176d3085a70cb8be9"
+    },
+    "f9d0f725218a9207a025e568b4538e213c989143790af93bad39d6758600baa7": {
+      "sql": "SELECT\r\n    panetype AS panel_type,\r\n    AVG(tempcoef) AS average_impact_value\r\nFROM\r\n    panel\r\nGROUP BY\r\n    panetype;",
+      "decisions": {
+        "N0": {
+          "key": "c1d21b1a054609344220c6d2781b4cce91f9b2b6f4e51824c61e232575164b27",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "32264b0ccfeff491c680fb666ff82b77211367b87fd371b3465e57b6b87d471f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "a4be024c87f27d5da61e2e4a1c03ce96ef3da8aaed718024263effd645779c86",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "dac558a92f202f0501d09624669cceb5e5b30011243ca2c3738c43890e1cde87",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "1b6ea185bcfdd9191dabae5eac7b65066734c615ff2da362215ee3ccc3512867",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_type",
+          1043,
+          54
+        ],
+        [
+          "average_impact_value",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "1bc01ae88159999a3e0a01f09637009e8cf37b339a62dae2e767ed39473a0a72",
+      "values_digest": "01dd2893b543b07c4b63fce824752b5a235b913e2069ef4b5260a92a6fdfcc02",
+      "ordered_digest": "7edbdbac56c1f7bc80ebdb868716c1c4f021889a57dced78e753edf9955a8f6b"
+    },
+    "60b7a20dce35c68dce0472bc508524d63ac99e283e610f8cdfd7e5b9a4e1ca5c": {
+      "sql": "SELECT \n    arearegistry AS area_id,\n    envmoment AS environmental_readings_measurement_time,\n    soillosspct AS soiling_loss,\n    dustdengm2 AS dust_level,\n    irradiance_conditions->>'specmisfac' AS soiling_factor\nFROM \n    environment;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6f9227999e693b3083645aa0b5d553ef8fc1c476438cf359a200c1a568363d39",
+      "ordered": false,
+      "columns": [
+        [
+          "area_id",
+          2950,
+          -1
+        ],
+        [
+          "environmental_readings_measurement_time",
+          1114,
+          -1
+        ],
+        [
+          "soiling_loss",
+          1700,
+          458759
+        ],
+        [
+          "dust_level",
+          1700,
+          458759
+        ],
+        [
+          "soiling_factor",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "f5a541980802782674d024a1bdb93e32c6616bb76ae57deb679b01fdff14759b",
+      "values_digest": "dc3c2020fb032a29193c851a5c5e700c4e2f6a6ffd4cd38e8eaa9c3b04793529",
+      "ordered_digest": "7b8c2b5a49b97b05ef5c14e0551ffb69fd5b58048b4a640cb7d3912d8cd7b8f2"
+    },
+    "8cf74f9ce4016d8c8da1a93801d22b7551adbe58a5607aba7ec2193e3e3a7d72": {
+      "sql": "SELECT \n    maintregistry,\n    (maintcostusd + cleancostusd + replacecostusd) / gencapmw AS mce_score\nFROM \n    maintenance AS m\nJOIN \n    plant AS p ON m.powerref = p.growregistry\nORDER BY \n    mce_score DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ae84dcffbc0cde0ee1c8e1e8b0d7a3b9bd32782bfb6d0643bf34dda162b9f095",
+      "ordered": true,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ],
+        [
+          "mce_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "2e56f459fdae102c7669d136501a0977563c196485d62f6ca796c7e803fb654a",
+      "values_digest": "787aa2f015902493a4c4b99b864834b4b4c966a8c18a83c5fd3599bd92feba10",
+      "ordered_digest": "35b951d010f794d0cf3ff2d9d5f421495c9b90ace168d71d65a0e242cfc76e13"
+    },
+    "c918b049beae8b379fc1c9556c5aae00a7b87946e9d8b9ad01022a87b77c373b": {
+      "sql": "SELECT \n    p.panemark AS panel_id,\n    e.ffactorcurr AS fill_factor,\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM pl.initdate) AS years_since_setup,\n    jsonb_extract_path(perf.efficiency_profile, 'degradation', 'anndegrate')::numeric AS degradation_rate\nFROM \n    panel p\nJOIN \n    electrical e ON p.panemark = e.engyunitref\nJOIN \n    plant pl ON p.hubregistry = pl.growregistry\nJOIN \n    performance perf ON p.panemark = perf.solmodref\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "af629b3acfea5793a45eae02fefd2ec23dd174075ca64c9305d5550c32b6cdca",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "fill_factor",
+          1700,
+          458759
+        ],
+        [
+          "years_since_setup",
+          1700,
+          -1
+        ],
+        [
+          "degradation_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "7eaece4efd143f77260f596ff27135a69a9aee96c76ae836f4eb9b6360b5ea73",
+      "values_digest": "e55cb403d2de734b9bb99b045fb0b82bc6c2753ad555c9fd9bc49f5795322370",
+      "ordered_digest": "a460406152ec5cc0912866b3ecd2622bb0b0d56cc5663b0954302112e82dd1da"
+    },
+    "5e369ecdbbddc5228ae141dc6436130f803992e1232627045da0dcd6dc365c3f": {
+      "sql": "SELECT \n    p.solmodref AS panel_id,\n    e.ffactorcurr AS fill_factor,\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM pl.initdate) AS years_since_setup,\n    (efficiency_profile -> 'degradation' ->> 'anndegrate')::NUMERIC AS degradation_rate\nFROM \n    performance AS p\nJOIN \n    electrical AS e ON p.solmodref = e.engyunitref\nJOIN \n    plant AS pl ON pl.growregistry::TEXT = e.engyunitref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ccf21f47f376422805208db6338992f0b653b322f1ebbf6112105d9942934f81",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "fill_factor",
+          1700,
+          458759
+        ],
+        [
+          "years_since_setup",
+          1700,
+          -1
+        ],
+        [
+          "degradation_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "9578ec2704d6160bf1788c8beaf533e82cb2ff2b5bd2ca5a9a96195850e33dc5",
+      "values_digest": "f857648a3f7b375cb5d509ca48337b5b79ca4852b71e508bc2e35ba1f74983cb",
+      "ordered_digest": "a0126df290d1e0952185721db5b371fc1e8a7c3ccfcceb09312449be14deb051"
+    },
+    "b6069a44b7fde7a4d3f5f70065cb82ee7068a5fa531680453fdbb44b272a475a": {
+      "sql": "SELECT \n    pa.panemark AS panel_id,\n    e.ffactorinit AS fill_factor,\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM pl.initdate) AS years_since_setup,\n    (efficiency_profile->'degradation'->>'anndegrate')::DECIMAL AS degradation_rate\nFROM \n    performance p\nJOIN \n    electrical e ON p.perfregistry = e.efflogref\nJOIN \n    panel pa ON p.solmodref = pa.panemark\nJOIN \n    plant pl ON pa.hubregistry = pl.growregistry\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3f39c13eb1a319fb12587ddd1264d51564df8374fc2cc14b9787d48ccc63f488",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "fill_factor",
+          1700,
+          458759
+        ],
+        [
+          "years_since_setup",
+          1700,
+          -1
+        ],
+        [
+          "degradation_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "79d31a2654c951f1aa4ffb9d6627c99842418bbf509ebabb5873aa2c53778e85",
+      "values_digest": "a6032089c4aa8918199f6a7cbf287e85df0848875f0972a2f166413334ae2d56",
+      "ordered_digest": "3e2182c2c6f3cacf34cd607c29c0196df92b9335b2b15c6e6fcb18c14bb2d989"
+    },
+    "ad2434216342e5ec55337b7df7175c0a4885c597cbd9370440c9155325f9041c": {
+      "sql": "SELECT \n    pl.growalias AS site_name,\n    pn.panemark AS panel_id,\n    pl.initdate AS start_date,\n    pl.gencapmw AS service_years,\n    pn.paneeffpct AS efficiency_values,\n    perf.efficiency_profile->'degradation'->>'anndegrate' AS annual_degradation_rate,\n    perf.efficiency_profile->'current_efficiency'->>'efflosspct' AS efficiency_loss_metric,\n    (perf.efficiency_profile->'degradation'->>'cumdegpct')::NUMERIC * 100 AS calculated_NDI,\n    CASE \n        WHEN pn.panetype ILIKE '%PERC%' THEN 'PERC'\n        WHEN pn.panetype ILIKE '%HJT%' THEN 'HJT'\n        WHEN pn.panetype ILIKE '%Bifacial%' THEN 'Bifacial'\n        ELSE 'Other'\n    END AS panel_category\nFROM \n    plant pl\nJOIN \n    panel pn ON pl.growregistry = pn.hubregistry\nJOIN \n    performance perf ON pn.panemark = perf.solmodref\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5736f2f0613c533a5dd965d7addb22141804ee359593649d560d3b1812556cb1",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          1043,
+          104
+        ],
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "start_date",
+          1082,
+          -1
+        ],
+        [
+          "service_years",
+          1700,
+          458759
+        ],
+        [
+          "efficiency_values",
+          1700,
+          458759
+        ],
+        [
+          "annual_degradation_rate",
+          25,
+          -1
+        ],
+        [
+          "efficiency_loss_metric",
+          25,
+          -1
+        ],
+        [
+          "calculated_ndi",
+          1700,
+          -1
+        ],
+        [
+          "panel_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "b036a9e09bff334c9ec9ea3a6fdbd945f615ab13914456e19166f16416d0c216",
+      "values_digest": "672d3e04cad53f72cdcc5031c5992515744323e44e55570ea37a677dce61c06c",
+      "ordered_digest": "23d89e3389454c1fcf26cf737320658972b4a469b0d3674c92b8906acd525cca"
+    },
+    "0fba5effe78ca185108e25f85016f7f0fc25df38d265753fdf83ba77f2bac416": {
+      "sql": "SELECT \n  arearegistry AS area_id, \n  envmoment AS environmental_readings_measurement_time, \n  soillosspct AS soiling_loss, \n  dustdengm2 AS dust_level, \n  (irradiance_conditions->>'specmisfac')::DECIMAL AS soiling_factor \nFROM \n  environment;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2aa0bc928d82d3d717929e60cdc4dfb2e57106b3d0eb7dc1f9a7f08b068a8139",
+      "ordered": false,
+      "columns": [
+        [
+          "area_id",
+          2950,
+          -1
+        ],
+        [
+          "environmental_readings_measurement_time",
+          1114,
+          -1
+        ],
+        [
+          "soiling_loss",
+          1700,
+          458759
+        ],
+        [
+          "dust_level",
+          1700,
+          458759
+        ],
+        [
+          "soiling_factor",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "f3ced115e29e6a6683cc69ddaa456d791ac4f3dcf40baa9ebc0c4ec212d4d8a6",
+      "values_digest": "dc3c2020fb032a29193c851a5c5e700c4e2f6a6ffd4cd38e8eaa9c3b04793529",
+      "ordered_digest": "8aad38adbe90168b20cd25365db81d850d6c81fdc6d2e4418c2e0ea20be9a1a5"
+    },
+    "8d25fd026e566b060e218a75680e827963cce5ecf0023b007a6b9cadd2324deb": {
+      "sql": "SELECT \n  arearegistry AS area_id, \n  envmoment AS environmental_readings_measurement_time, \n  soillosspct AS soiling_loss, \n  dustdengm2 AS dust_level, \n  (irradiance_conditions::jsonb ->> 'specmisfac')::numeric AS soiling_factor \nFROM \n  environment;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0908c2a22b5864b539f8aeaf42545c4fd8bbe0008fa5ac9005c1dd16b7abd14c",
+      "ordered": false,
+      "columns": [
+        [
+          "area_id",
+          2950,
+          -1
+        ],
+        [
+          "environmental_readings_measurement_time",
+          1114,
+          -1
+        ],
+        [
+          "soiling_loss",
+          1700,
+          458759
+        ],
+        [
+          "dust_level",
+          1700,
+          458759
+        ],
+        [
+          "soiling_factor",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "f3ced115e29e6a6683cc69ddaa456d791ac4f3dcf40baa9ebc0c4ec212d4d8a6",
+      "values_digest": "dc3c2020fb032a29193c851a5c5e700c4e2f6a6ffd4cd38e8eaa9c3b04793529",
+      "ordered_digest": "8aad38adbe90168b20cd25365db81d850d6c81fdc6d2e4418c2e0ea20be9a1a5"
+    },
+    "e2e4b1ecb5233cd17c9f92fdbcf2ddf948bfcf599a0c1ae129a31e7ba557f401": {
+      "sql": "SELECT \r\n    EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.initdate)) AS panel_age,\r\n    AVG(pn.paneeffpct) AS average_efficiency,\r\n    COUNT(pn.panemark) AS number_of_panels\r\nFROM \r\n    plant AS p\r\nJOIN \r\n    panel AS pn ON p.growregistry = pn.hubregistry\r\nGROUP BY \r\n    panel_age\r\nORDER BY \r\n    panel_age;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fe860f505c234d0164ce0b349aed2bf82f01666b6cf34fe0ecba96ef6c478a56",
+      "ordered": true,
+      "columns": [
+        [
+          "panel_age",
+          1700,
+          -1
+        ],
+        [
+          "average_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "number_of_panels",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "9734239d05db4200c991683814da27250fddcbf2f3388951ed5b3c39386137de",
+      "values_digest": "b42b30f15199e1fe14e787429961932a03fd4752b73fa95c40bcf1c4f250e111",
+      "ordered_digest": "ed71d3067b70b05a63274304c0f8bcb140ada3fb068664cf93200eb2c49a0695"
+    },
+    "5cd7c6ce0153c656c94aa8826db41557c5363f03753526b15bbfa0b240cb1936": {
+      "sql": "SELECT \r\n    EXTRACT(YEAR FROM AGE(CURRENT_DATE, pl.initdate)) AS panel_age,\r\n    AVG(p.paneeffpct) AS avg_efficiency,\r\n    COUNT(p.panemark) AS num_panels\r\nFROM \r\n    panel p\r\nJOIN \r\n    plant pl ON p.hubregistry = pl.growregistry\r\nGROUP BY \r\n    panel_age\r\nORDER BY \r\n    panel_age;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c90eedfcc13f1bf8056d891be36afc2e86010aa4c3dd300ad0de1c56b1c2a29d",
+      "ordered": true,
+      "columns": [
+        [
+          "panel_age",
+          1700,
+          -1
+        ],
+        [
+          "avg_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "num_panels",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "d98b04ee90e0d42eab1e350b9e4f47e389326e6df63d8d2b73fcf624d1ed2c44",
+      "values_digest": "b42b30f15199e1fe14e787429961932a03fd4752b73fa95c40bcf1c4f250e111",
+      "ordered_digest": "febf0961535928cc25f57119735a7a388207953ecad2c7f40e89674b6b0ec899"
+    },
+    "1490d34b5e14d96a103513ca2e140562e1b95de83a1822f873bc4bb727ac08e9": {
+      "sql": "SELECT \r\n    EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM p.initdate) AS panel_age,\r\n    AVG(pn.paneeffpct) AS average_efficiency,\r\n    COUNT(pn.panemark) AS number_of_panels\r\nFROM \r\n    panel AS pn\r\nJOIN \r\n    plant AS p ON pn.hubregistry = p.growregistry\r\nGROUP BY \r\n    panel_age\r\nORDER BY \r\n    panel_age;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "1ca353ac50eab17bc0e73c788bdaf85b1debcbedb7686c2ef3b8e8a5dc371fe0",
+      "ordered": true,
+      "columns": [
+        [
+          "panel_age",
+          1700,
+          -1
+        ],
+        [
+          "average_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "number_of_panels",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "861fa6645c2f2a47a1d1649109164b94f602219f126fcd4a6a302d641e6d68fe",
+      "values_digest": "23c4cba87294e2ad946298184d853cd1a62663cf75066d1a72da6d3b31742079",
+      "ordered_digest": "8040f7097cd8a7a8b9eacb493e9eb656238beb30150e11d0d4c0b41473c3cc3b"
+    },
+    "5b14f7cabf093e1811e1e84c1f7537910a60cc21c7a0b2253b8d6092b5a77203": {
+      "sql": "SELECT \r\n    invertregistry AS inverter_unique_identifier,\r\n    (power_metrics->>'inverteffpct')::DECIMAL(7,3) AS quality_score,\r\n    (power_metrics->>'harmdistpct')::DECIMAL(7,3) AS harmonic_distortion_percentage,\r\n    (power_metrics->>'invertpowfac')::NUMERIC(7,3) AS power_factor,\r\n    (\r\n        (gridvolt * gridfreqhz) / (\r\n            (power_metrics->>'inverteffpct')::DECIMAL(7,3) * \r\n            (power_metrics->>'invertpowfac')::NUMERIC(7,3)\r\n        )\r\n    ) AS grid_quality\r\nFROM \r\n    inverter;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0dc7021d79cc61060dcc7e005e16d41f71e3266ebaa9b37b84ec5c2af6ca6fd9",
+      "ordered": false,
+      "columns": [
+        [
+          "inverter_unique_identifier",
+          1043,
+          54
+        ],
+        [
+          "quality_score",
+          1700,
+          458759
+        ],
+        [
+          "harmonic_distortion_percentage",
+          1700,
+          458759
+        ],
+        [
+          "power_factor",
+          1700,
+          458759
+        ],
+        [
+          "grid_quality",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "0b6f06b2447a68978e54ae660615eb122cba165545d3146b22f54cc91a5fcf37",
+      "values_digest": "4d91d3e76c8258646c496edf895320b7921629fe9edce1de5828488d4e9cad43",
+      "ordered_digest": "a9415030e7965686155c00b8b830f345c13fd0d65e2fe4a09bb5b65bf16025f7"
+    },
+    "f31312fbc0ca717321d15203201ccb8fc22b52d17bed2a8d92438441c97bdc87": {
+      "sql": "SELECT \r\n    invertregistry AS inverter_unique_identifier,\r\n    pwrqualidx AS quality_score,\r\n    (power_metrics->>'harmdistpct')::NUMERIC AS harmonic_distortion_percentage,\r\n    (power_metrics->>'invertpowfac')::NUMERIC AS power_factor,\r\n    ROUND(\r\n        pwrqualidx * (\r\n            1 - ((power_metrics->>'harmdistpct')::NUMERIC / 100)\r\n        ) * (power_metrics->>'invertpowfac')::NUMERIC,\r\n        2\r\n    ) AS grid_quality\r\nFROM \r\n    inverter;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "650635e7a21e430cc02e47c3ad2f6dd31ee40595839f6c3267e6cc212e3b8b5c",
+      "ordered": false,
+      "columns": [
+        [
+          "inverter_unique_identifier",
+          1043,
+          54
+        ],
+        [
+          "quality_score",
+          1700,
+          458759
+        ],
+        [
+          "harmonic_distortion_percentage",
+          1700,
+          -1
+        ],
+        [
+          "power_factor",
+          1700,
+          -1
+        ],
+        [
+          "grid_quality",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4b89cc73957d777a52bd6baeef764dc46f17a0002993e24804aeb0aa3d7401af",
+      "values_digest": "ae94fe7fda7a2ea68090b08c00fee825f6cf597479e9a625c7a74ae523034068",
+      "ordered_digest": "3ddc5bcbcab70fe085a4ec79e65194dcd10a3c787eeb4ffc194fbd196bc8474e"
+    },
+    "9cc52c475ece4c44e52c80d606e84bd59c506e230f0290527cec7a9bcc50dfc9": {
+      "sql": "SELECT \r\n    p.panemark AS panel_id,\r\n    p.powratew::float AS power_ratings,\r\n    perf.measpoww::float AS current_power,\r\n    (\r\n        perf.efficiency_profile->'degradation'->>'cumdegpct'\r\n    )::float AS degradation,\r\n    env.soillosspct::float AS soiling_loss,\r\n    (inv.power_metrics->>'inverteffpct')::float AS inverter_losses,\r\n    -- Calculate Total System Loss (TSL) per panel using Inverter Efficiency Loss (IEL)\r\n    (\r\n        (p.powratew::float * (1 - (\r\n            perf.efficiency_profile->'degradation'->>'cumdegpct'\r\n        )::float/100))\r\n        * (1 - env.soillosspct::float/100)\r\n        * (1 - (inv.power_metrics->>'inverteffpct')::float/100)\r\n    ) AS total_system_loss\r\nFROM \r\n    panel p\r\nJOIN \r\n    performance perf ON p.panemark = perf.solmodref\r\nJOIN \r\n    environment env ON p.hubregistry = env.arearegistry\r\nJOIN \r\n    inverter inv ON p.hubregistry = inv.siteref\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a1fee5b16624cdeaf78c81e9250039d0d3e116ca8bc1de30f210535762823109",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "power_ratings",
+          701,
+          -1
+        ],
+        [
+          "current_power",
+          701,
+          -1
+        ],
+        [
+          "degradation",
+          701,
+          -1
+        ],
+        [
+          "soiling_loss",
+          701,
+          -1
+        ],
+        [
+          "inverter_losses",
+          701,
+          -1
+        ],
+        [
+          "total_system_loss",
+          701,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "44387a17e3b2759937e78b02e67627e1b70ba1077b7aff73e4c6fd802e027353",
+      "values_digest": "a97c2d589abc2a821100a57925bf0275fedb9d34e2a1096cf6ab675773eef152",
+      "ordered_digest": "4f3cf91795f306d56785fd30a6b8923817617fff78f5ab6b3d350abc73d55863"
+    },
+    "8cc685dc8f34e81f98112622b8c059590d4c3e3148fa577f3b9e24789974ff0a": {
+      "sql": "SELECT \r\n    p.panemark AS panel_identifier,\r\n    perf.efficiency_profile -> 'current_efficiency' ->> 'curreffpct' AS curreffpct,\r\n    perf.efficiency_profile -> 'current_efficiency' ->> 'efflosspct' AS efflosspct,\r\n    perf.efficiency_profile -> 'degradation' ->> 'anndegrate' AS anndegrate,\r\n    perf.efficiency_profile -> 'degradation' ->> 'cumdegpct' AS cumdegpct\r\nFROM \r\n    panel AS p\r\nJOIN \r\n    performance AS perf\r\n        ON p.panemark = perf.solmodref\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7f0c1ae45c09e49d4749de4672d9676872de72b4091db950570bc420eaf58bbc",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_identifier",
+          1043,
+          54
+        ],
+        [
+          "curreffpct",
+          25,
+          -1
+        ],
+        [
+          "efflosspct",
+          25,
+          -1
+        ],
+        [
+          "anndegrate",
+          25,
+          -1
+        ],
+        [
+          "cumdegpct",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "3621510bb70bb57e7425d89402bcd0194d4b4fc819a03e71f8a55d4e075a5871",
+      "values_digest": "c82365901e3ca7afb00d13a16fcf2028c4e7cd6a9ea6caa5911d17361939b463",
+      "ordered_digest": "4f2ba76e0c42ea6aeb78495c97e8b3802419344e36ee329c091338de99328f75"
+    },
+    "c5c469e53a963289d3caa4406d65000908e5471f84615c76ec7326fcdb2add12": {
+      "sql": "SELECT \r\n    t3.panemark AS panel_id,\r\n    t2.ffactorinit AS fill_factor,\r\n    EXTRACT(YEAR FROM AGE(CURRENT_DATE, t1.initdate)) AS years_since_setup,\r\n    (efficiency_profile -> 'degradation' ->> 'anndegrate')::DECIMAL AS degradation_rate\r\nFROM \r\n    plant AS t1\r\nJOIN \r\n    panel AS t3 ON t1.growregistry = t3.hubregistry\r\nJOIN \r\n    performance AS t4 ON t3.panemark = t4.solmodref\r\nJOIN \r\n    electrical AS t2 ON t4.perfregistry = t2.efflogref\r\nWHERE \r\n    efficiency_profile -> 'degradation' ->> 'anndegrate' IS NOT NULL;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "03e8c8acb36719ea6c867cebb9199dc5aac12a89f027016a116676386b8984fa",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "fill_factor",
+          1700,
+          458759
+        ],
+        [
+          "years_since_setup",
+          1700,
+          -1
+        ],
+        [
+          "degradation_rate",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "0981dce01f732f22551ed02686f522074c637acc63d250f4107cf1d54f923a25",
+      "values_digest": "8024ea2097dd7d23f55f4df0d623eb65a5fbd56342698659fb8ef1ef29e25cd7",
+      "ordered_digest": "6019e5950e58a63d8332e40e7ca6db659b4655761ce35793c68d1f1fef463422"
+    },
+    "b3e826013ffaca41952c9d9bf0f2ba00132a6580b5af193c46829b56cd7b7485": {
+      "sql": "SELECT \r\n  pa.panemark AS panel_id, \r\n  e.ffactorcurr AS fill_factor, \r\n  EXTRACT(\r\n    YEAR \r\n    FROM \r\n      AGE(\r\n        pl.initdate, \r\n        CURRENT_DATE\r\n      )\r\n  ) AS years_since_setup, \r\n  pe.efficiency_profile -> 'degradation' ->> 'anndegrate' AS degradation_rate \r\nFROM \r\n  plant pl \r\n  JOIN panel pa ON pl.growregistry = pa.hubregistry \r\n  JOIN electrical e ON pa.panemark = e.engyunitref \r\n  JOIN performance pe ON e.efflogref = pe.perfregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d216d9e113dc47b582572d77cb7a3fd1185e66f0cd6b53e30f4c4a7a86fa2a61",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "fill_factor",
+          1700,
+          458759
+        ],
+        [
+          "years_since_setup",
+          1700,
+          -1
+        ],
+        [
+          "degradation_rate",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "32f23a097e32fc1f3ef827d5d1dfbed336c11b08074b71aa45a8601625cdbeca",
+      "values_digest": "a9f108284d688059c894a7aa858c2461869676303c60c8cde6f399c5408b5438",
+      "ordered_digest": "fe10fe3d138c94860842363698b54152e08512966638f609c7df7068ce0b69d4"
+    },
+    "1a4aa18483fe4d08f681706520d92c65adac2f26e7f47abe053cac4ae09d9732": {
+      "sql": "SELECT *\nFROM (\n    SELECT \n        *,\n        (maintcostusd + cleancostusd + replacecostusd) / gencapmw AS mce\n    FROM maintenance\n    JOIN plant ON maintenance.powerref = plant.growregistry\n) AS subquery\nORDER BY mce\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f513ffeb5cac1e1706769a66a6a7b0c9a82832025fbd0e292c861655d82106f4",
+      "ordered": true,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ],
+        [
+          "powerref",
+          2950,
+          -1
+        ],
+        [
+          "compref",
+          1043,
+          54
+        ],
+        [
+          "obsref",
+          1043,
+          54
+        ],
+        [
+          "inspectmeth",
+          1043,
+          104
+        ],
+        [
+          "inspectres",
+          1043,
+          154
+        ],
+        [
+          "inspectdate",
+          1082,
+          -1
+        ],
+        [
+          "maintsched",
+          1043,
+          104
+        ],
+        [
+          "wtystatus",
+          1043,
+          54
+        ],
+        [
+          "wtyclaimcnt",
+          21,
+          -1
+        ],
+        [
+          "maintcostusd",
+          1700,
+          589830
+        ],
+        [
+          "cleancostusd",
+          1700,
+          524295
+        ],
+        [
+          "replacecostusd",
+          1700,
+          589831
+        ],
+        [
+          "revlossusd",
+          1700,
+          458758
+        ],
+        [
+          "growregistry",
+          2950,
+          -1
+        ],
+        [
+          "growalias",
+          1043,
+          104
+        ],
+        [
+          "gencapmw",
+          1700,
+          458759
+        ],
+        [
+          "initdate",
+          1082,
+          -1
+        ],
+        [
+          "mce",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "5c2938801fe92fa01885b49051714413183ba9da09feccf3205d883062f574e9",
+      "values_digest": "76923c81a74c62f5552b752e1c8fcd146b1b3696d652868e806e5993a7605cc0",
+      "ordered_digest": "f4ae8da3dd792437f9bf7450bc87798ea8d3c3df8732602aa5c7d12c38fcfc29"
+    },
+    "4cac2bdeaa28c670458514ad2aa4d3f16766619c76e7ab5a539fffc366640b99": {
+      "sql": "SELECT efficiency_profile -> 'current_efficiency' ->> 'curreffpct' AS current_efficiency_percent,\r\nefficiency_profile -> 'current_efficiency' ->> 'efflosspct' AS efficiency_loss_percent,\r\nefficiency_profile -> 'degradation' ->> 'anndegrate' AS annual_degradation_rate_percent,\r\nefficiency_profile -> 'degradation' ->> 'cumdegpct' AS cumulative_degradation_percent\r\nFROM performance\r\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "eaee0be8d3e73c539b651163ea870a734feabf7297441fb13cbc3a42e292ade2",
+      "ordered": false,
+      "columns": [
+        [
+          "current_efficiency_percent",
+          25,
+          -1
+        ],
+        [
+          "efficiency_loss_percent",
+          25,
+          -1
+        ],
+        [
+          "annual_degradation_rate_percent",
+          25,
+          -1
+        ],
+        [
+          "cumulative_degradation_percent",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "1df9c8e0487cd4b42213951025e524ea860376d22c9f0b31eaea8a980c80c866",
+      "values_digest": "aa860d7e98225f54e80017e6a1ac184211fb70e6c86af26f8bd3c2b3121c540d",
+      "ordered_digest": "1df9c8e0487cd4b42213951025e524ea860376d22c9f0b31eaea8a980c80c866"
+    },
+    "e136c4d6af22ffadf67b7cdc281c609e41047bb49ff1763d3f132f38d0ecbae8": {
+      "sql": "SELECT efficiency_profile FROM performance LIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fd2132962ce5876e03f814725e72e7b56ba30ce577d58665988ac23bed7c9e51",
+      "ordered": false,
+      "columns": [
+        [
+          "efficiency_profile",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "3702d2caa2efb951344d984aa87208c18f6950094cb07f7c39ac803571009636",
+      "values_digest": "8204efedad928704d76ae8ec06200e4d187a3688cec25c560c4c7dc498fcfbb0",
+      "ordered_digest": "3702d2caa2efb951344d984aa87208c18f6950094cb07f7c39ac803571009636"
+    },
+    "1fa1795323175885a1bd6ea39977c797450c2a5983d23d0e7cc6a3b21a3418ef": {
+      "sql": "SELECT jsonb_typeof(efficiency_profile) AS efficiency_profile_type\r\nFROM performance\r\nLIMIT 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5c2e2e27cc2523b12ac74903b7d05fe20a7177f3791a792f98f3fcdeb745d6b2",
+      "ordered": false,
+      "columns": [
+        [
+          "efficiency_profile_type",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "5e6dc50ea91aa4ae44dd9a2696e5518fd17ae040d00641e2769f981eff20022b",
+      "values_digest": "14886ce4d9c24b1c41062f916a4f038a7138b5cb7d226084bcab65a4b3476896",
+      "ordered_digest": "5e6dc50ea91aa4ae44dd9a2696e5518fd17ae040d00641e2769f981eff20022b"
+    },
+    "694ce483193b1298c657664f5db7df75d8a39eddcbabd039473348956f26fbfe": {
+      "sql": "WITH MaintenanceCostEfficiency AS (\r\n    SELECT \r\n        m.maintregistry, \r\n        (m.maintcostusd + m.cleancostusd + m.replacecostusd) / p.gencapmw AS mce\r\n    FROM \r\n        maintenance AS m\r\n    JOIN \r\n        plant AS p ON m.powerref = p.growregistry\r\n)\r\nSELECT \r\n    maintregistry\r\nFROM \r\n    MaintenanceCostEfficiency\r\nORDER BY \r\n    mce DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e60c96b0026cd62b156252a1e3fb6ed86e5f5dc2b83cfeb0dbf31ea627ed380b",
+      "ordered": true,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "1bd5173d99cbb7b0290c0ad4c18a6a78adc06edebd6c1a1aac2d123db2bed1cf",
+      "values_digest": "aa1f87cc328007127be9d7c563fb36cfa6cc6aab71fb855b12795a774f5580b8",
+      "ordered_digest": "1a8aaca24c6b7d0d1fa4ced3a69dd62fc3516856b0f432c1af85c2f074061678"
+    },
+    "3b7ba78b111d2c1d548612f10d81de037ab3eac5d12764ab40821563c45a8cf4": {
+      "sql": "WITH maintenance_metrics AS (\n    SELECT\n        p.growalias AS plant_name,\n        p.gencapmw AS capacity_mw,\n        m.maintcostusd AS total_maintenance_costs,\n        m.revlossusd AS revenue_losses,\n        (m.maintcostusd / m.revlossusd) AS maintenance_cost_efficiency_score,\n        (m.revlossusd / p.gencapmw) AS revenue_loss_rate,\n        (m.maintcostusd + m.cleancostusd + m.replacecostusd) / p.gencapmw AS maintenance_cost_efficiency,\n        (m.revlossusd / p.gencapmw) / ((m.maintcostusd + m.cleancostusd + m.replacecostusd) / p.gencapmw) AS mroi\n    FROM \n        plant p\n    JOIN \n        maintenance m ON p.growregistry = m.powerref\n),\npriority_levels AS (\n    SELECT\n        plant_name,\n        capacity_mw,\n        total_maintenance_costs,\n        revenue_losses,\n        maintenance_cost_efficiency_score,\n        revenue_loss_rate,\n        maintenance_cost_efficiency,\n        mroi,\n        CASE\n            WHEN mroi > 1 THEN 'URGENT'\n            WHEN mroi BETWEEN 0.5 AND 1 THEN 'HIGH'\n            WHEN mroi BETWEEN 0.3 AND 0.5 THEN 'MEDIUM'\n            ELSE 'LOW'\n        END AS priority_level\n    FROM \n        maintenance_metrics\n)\nSELECT * FROM priority_levels;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "09832614ea97db135cfda2660f97a8258ba405546cb1ad20122a068ca7bab8fe",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "capacity_mw",
+          1700,
+          458759
+        ],
+        [
+          "total_maintenance_costs",
+          1700,
+          589830
+        ],
+        [
+          "revenue_losses",
+          1700,
+          458758
+        ],
+        [
+          "maintenance_cost_efficiency_score",
+          1700,
+          -1
+        ],
+        [
+          "revenue_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "maintenance_cost_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "mroi",
+          1700,
+          -1
+        ],
+        [
+          "priority_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "65a74efe44679c5bde3247b83eb3694996e19e4147fb66573026e3868116f678",
+      "values_digest": "8a8036edb898b7199c429a5f0ae3ae55104fa1742b380a5f45fe5c0eed1b2337",
+      "ordered_digest": "06aa67dae4cfe39d91baaa2300bd2231c1f2a145183f6dbc4d82244814c9a8d6"
+    },
+    "2755697eb8ebc85de96620f4b3e87e485b04d653f11de23d731abfddf3c2b705": {
+      "sql": "WITH maintenance_metrics AS (\n    SELECT \n        p.growalias AS plant_name,\n        p.gencapmw AS capacity_mw,\n        m.maintcostusd AS total_maintenance_costs,\n        m.revlossusd AS revenue_losses,\n        (m.maintcostusd / p.gencapmw) AS maintenance_cost_efficiency_score,\n        (m.revlossusd / p.gencapmw) AS revenue_loss_rate,\n        (m.revlossusd / m.maintcostusd) AS mroi_value,\n        CASE \n            WHEN (m.revlossusd / m.maintcostusd) < 0.5 THEN 'URGENT'\n            WHEN (m.revlossusd / m.maintcostusd) BETWEEN 0.5 AND 0.7 THEN 'HIGH'\n            WHEN (m.revlossusd / m.maintcostusd) BETWEEN 0.7 AND 0.9 THEN 'MEDIUM'\n            ELSE 'LOW'\n        END AS final_priority_level\n    FROM \n        plant p\n    JOIN \n        maintenance m ON p.growregistry = m.powerref\n)\nSELECT \n    plant_name,\n    capacity_mw,\n    total_maintenance_costs,\n    revenue_losses,\n    maintenance_cost_efficiency_score,\n    revenue_loss_rate,\n    mroi_value,\n    final_priority_level\nFROM \n    maintenance_metrics;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "47b5f6a482fb62bbbabd6a4126ce781b8221ebbad7a3a6787d3a869a3137b7c3",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "capacity_mw",
+          1700,
+          458759
+        ],
+        [
+          "total_maintenance_costs",
+          1700,
+          589830
+        ],
+        [
+          "revenue_losses",
+          1700,
+          458758
+        ],
+        [
+          "maintenance_cost_efficiency_score",
+          1700,
+          -1
+        ],
+        [
+          "revenue_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "mroi_value",
+          1700,
+          -1
+        ],
+        [
+          "final_priority_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "8be0b3e3ec3572456b3696f055f4ea80d10b75ddfde2747065f2cf3d3fec1250",
+      "values_digest": "cb6b073a2084571ab6c3d46ef8e26d61aa91aa88bd1508235880aaae772794b9",
+      "ordered_digest": "8a2ebd047dfc5a70edc960426425603865968937fbcd9086e03fb4a2f127c0fe"
+    },
+    "382d1f6316a80af6c0eeeaedee2bbb3565147fa7a2d2201f72d115c63ac41f08": {
+      "sql": "WITH maintenance_metrics AS (\r\n    SELECT \r\n        p.growalias AS plant_name,\r\n        p.gencapmw AS capacity_mw,\r\n        SUM(m.maintcostusd) AS total_maintenance_cost,\r\n        SUM(m.revlossusd) AS total_revenue_loss,\r\n        (SUM(m.maintcostusd) / p.gencapmw) AS maintenance_cost_efficiency,\r\n        (SUM(m.revlossusd) / p.gencapmw) AS revenue_loss_rate,\r\n        ((SUM(m.revlossusd) / p.gencapmw) / (SUM(m.maintcostusd) / p.gencapmw)) AS mroi\r\n    FROM \r\n        plant p\r\n    JOIN \r\n        maintenance m ON p.growregistry = m.powerref\r\n    GROUP BY \r\n        p.growalias, p.gencapmw\r\n)\r\nSELECT \r\n    plant_name,\r\n    capacity_mw,\r\n    total_maintenance_cost,\r\n    total_revenue_loss,\r\n    maintenance_cost_efficiency,\r\n    revenue_loss_rate,\r\n    mroi,\r\n    CASE \r\n        WHEN mroi > 1.5 THEN 'URGENT'\r\n        WHEN mroi BETWEEN 1 AND 1.5 THEN 'HIGH'\r\n        WHEN mroi BETWEEN 0.5 AND 1 THEN 'MEDIUM'\r\n        ELSE 'LOW'\r\n    END AS priority_level\r\nFROM \r\n    maintenance_metrics;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cbbae56a850cf5d0c4dc8a3c7a914549eb3430a2e521aa9d5bf1477e60fe97f0",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "capacity_mw",
+          1700,
+          458759
+        ],
+        [
+          "total_maintenance_cost",
+          1700,
+          -1
+        ],
+        [
+          "total_revenue_loss",
+          1700,
+          -1
+        ],
+        [
+          "maintenance_cost_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "revenue_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "mroi",
+          1700,
+          -1
+        ],
+        [
+          "priority_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "c663e3f4243b3168fdd21d8d4cd6fc206f2b0e16c1b256470dd112db903d1f33",
+      "values_digest": "215f986a88eaafcdeaf8dd8ad24246df6711566308e61b462920055e286f10c0",
+      "ordered_digest": "ebf85b47f82293e688661e7ab0ab5e0a7bacf0b4e8169659e5446fbc39e91d63"
+    },
+    "077ad7e72404d63c029f8289ef08cef93fde2a553aff50695520c0c377f80d46": {
+      "sql": "WITH maintenance_metrics AS (\r\n    SELECT \r\n        t1.growalias AS plant_name,\r\n        t1.gencapmw AS capacity_mw,\r\n        SUM(t2.maintcostusd) AS total_maintenance_costs,\r\n        SUM(t2.revlossusd) AS revenue_losses,\r\n        (SUM(t2.maintcostusd) + SUM(t2.cleancostusd) + SUM(t2.replacecostusd)) / t1.gencapmw AS maintenance_cost_efficiency,\r\n        SUM(t2.revlossusd) / SUM(t2.maintcostusd) AS revenue_loss_rate,\r\n        (SUM(t2.revlossusd) / SUM(t2.maintcostusd)) / ((SUM(t2.maintcostusd) + SUM(t2.cleancostusd) + SUM(t2.replacecostusd)) / t1.gencapmw) AS mroi\r\n    FROM \r\n        plant AS t1\r\n    JOIN \r\n        maintenance AS t2 ON t1.growregistry = t2.powerref\r\n    GROUP BY \r\n        t1.growalias, t1.gencapmw\r\n),\r\npriority_levels AS (\r\n    SELECT \r\n        plant_name,\r\n        capacity_mw,\r\n        total_maintenance_costs,\r\n        revenue_losses,\r\n        maintenance_cost_efficiency,\r\n        revenue_loss_rate,\r\n        mroi,\r\n        CASE \r\n            WHEN mroi > 1.5 THEN 'URGENT'\r\n            WHEN mroi BETWEEN 1 AND 1.5 THEN 'HIGH'\r\n            WHEN mroi BETWEEN 0.5 AND 1 THEN 'MEDIUM'\r\n            ELSE 'LOW'\r\n        END AS priority_level\r\n    FROM \r\n        maintenance_metrics\r\n)\r\nSELECT \r\n    plant_name,\r\n    capacity_mw,\r\n    total_maintenance_costs,\r\n    revenue_losses,\r\n    maintenance_cost_efficiency,\r\n    revenue_loss_rate,\r\n    mroi,\r\n    priority_level\r\nFROM \r\n    priority_levels;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "19e3eb3d6a8ada41a88823909e41ac9d77f4be51051e9a7206761a2dbdfc93ba",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "capacity_mw",
+          1700,
+          458759
+        ],
+        [
+          "total_maintenance_costs",
+          1700,
+          -1
+        ],
+        [
+          "revenue_losses",
+          1700,
+          -1
+        ],
+        [
+          "maintenance_cost_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "revenue_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "mroi",
+          1700,
+          -1
+        ],
+        [
+          "priority_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "a89e00f3288d0175d3804dedbb7fd8a70dddf5a1605157e7047f4d51313e15a0",
+      "values_digest": "f7589df68ef20c84e456725414b3e59beca1b187f222e23aee76b53a313662b8",
+      "ordered_digest": "b1b983c930d1815e3ce91a223981463ab95aee0a19aac90fc448b0463d28e899"
+    },
+    "0c0d82aec7e61d460b1f01a0b4fa801bdd952d3b5986c1f49b22be3d348e91ff": {
+      "sql": "WITH mce AS (\r\n  SELECT \r\n    m.maintregistry, \r\n    (m.maintcostusd + m.cleancostusd + m.replacecostusd) / p.gencapmw AS mce_score\r\n  FROM \r\n    maintenance AS m\r\n    JOIN plant AS p ON m.powerref = p.growregistry\r\n)\r\nSELECT \r\n  maintregistry\r\nFROM \r\n  mce\r\nWHERE \r\n  mce_score IS NOT NULL\r\nORDER BY \r\n  mce_score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0314c7e367ae74bf4769de42f0b6bb4427dd113adf9f825e0605f107f182a45d",
+      "ordered": true,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "769e85c9388cc9abf128a23b926d0970df2a8e5bec1ee8cc67bfa04e2b80c371",
+      "values_digest": "c88a2923c74069e13f93ea445d9ad9c92db6ff05618e8fb38ab84f230296fe2b",
+      "ordered_digest": "7f96c53bba5a0ec507b953e2dada000c7a5f8489afb9a750ed6c8fb061138798"
+    },
+    "d2f22140442190bdcf25e0a0a3de4fbe15b7c6049d9dbfac0178fbcff96ca0a9": {
+      "sql": "WITH mce AS (\r\n  SELECT \r\n    m.maintregistry, \r\n    (m.maintcostusd + m.cleancostusd + m.replacecostusd) / p.gencapmw AS mce_score \r\n  FROM \r\n    maintenance AS m \r\n    JOIN plant AS p ON m.powerref = p.growregistry \r\n) \r\nSELECT \r\n  maintregistry \r\nFROM \r\n  mce \r\nORDER BY \r\n  mce_score DESC \r\nLIMIT \r\n  10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3b3c41f2c004a2ef411ea21eb87a0e4139f44a6ffeb85bf9f414e3a7826b7db2",
+      "ordered": true,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "1bd5173d99cbb7b0290c0ad4c18a6a78adc06edebd6c1a1aac2d123db2bed1cf",
+      "values_digest": "aa1f87cc328007127be9d7c563fb36cfa6cc6aab71fb855b12795a774f5580b8",
+      "ordered_digest": "1a8aaca24c6b7d0d1fa4ced3a69dd62fc3516856b0f432c1af85c2f074061678"
+    },
+    "aabd654c4eb36414cc2e35af802f0a73c7804517307fbd69319db5ec0fc27cf3": {
+      "sql": "WITH mce_cte AS (\r\n    SELECT \r\n        maintregistry,\r\n        (maintcostusd + cleancostusd + replacecostusd) / p.gencapmw AS mce\r\n    FROM maintenance m\r\n    JOIN plant p ON m.powerref = p.growregistry\r\n),\r\navg_mce AS (\r\n    SELECT AVG(mce) AS average_mce \r\n    FROM mce_cte\r\n)\r\nSELECT mce_cte.maintregistry\r\nFROM mce_cte\r\nJOIN avg_mce\r\nON 1=1 \r\nWHERE mce_cte.mce > avg_mce.average_mce;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cafb8800599388f9351c7d30f921fd1665a03ab777795d1d4d88ec40acac89c7",
+      "ordered": false,
+      "columns": [
+        [
+          "maintregistry",
+          1043,
+          54
+        ]
+      ],
+      "rows": 172,
+      "bag_digest": "682c9aa77bf05ecb498298d656a092a28147bc4eb379e33dc2444e2cc71f4b97",
+      "values_digest": "8caf2691df5e61c2256c02c132872ba407f98bcf92cbdec93405dffab9585400",
+      "ordered_digest": "0357f98ca08ef19076379b9956028af74eecb57a8849cac85f93f9e032358022"
+    },
+    "6f6680b3b44b80b8a09349ef940eafa003ea6003059b808a03bcdfc4f6f16aaa": {
+      "sql": "WITH panel_age AS (\n    SELECT \n        DATE_PART('year', AGE(CURRENT_DATE, initdate)) AS age,\n        COUNT(*) AS panel_count\n    FROM \n        plant\n    GROUP BY \n        age\n),\nperformance_metrics AS (\n    SELECT \n        DATE_PART('year', AGE(CURRENT_DATE, pl.initdate)) AS age,\n        AVG((efficiency_profile -> 'current_efficiency' ->> 'curreffpct')::NUMERIC) AS avg_efficiency\n    FROM \n        performance AS pe\n    JOIN \n        panel AS p ON pe.solmodref = p.panemark\n    JOIN \n        plant AS pl ON p.hubregistry = pl.growregistry\n    GROUP BY \n        age\n)\nSELECT \n    pa.age AS panel_age,\n    pm.avg_efficiency,\n    pa.panel_count\nFROM \n    panel_age AS pa\nJOIN \n    performance_metrics AS pm ON pa.age = pm.age\nORDER BY \n    pa.age;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "458cd74056c8d2426977b59e507b2288c1c0e9351752a80a329d33a3de32013e",
+      "ordered": true,
+      "columns": [
+        [
+          "panel_age",
+          701,
+          -1
+        ],
+        [
+          "avg_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "panel_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "6941c70ac9417c4a48bcd21d28d777a0429a6a8a65d0661f9660e047cf7b83a4",
+      "values_digest": "d273bc55fd0df3e2f916ee3be34c32758a95bde0f6c7f1f33c146658ba92f9bf",
+      "ordered_digest": "1452698445c66b4970a9e817b1f54dba3f1df0d3d1edf9b62f44e1af1de375a5"
+    },
+    "d69854a188d6d5e7a3fcc2ef30babcd0bae4b0dc435f1d9c6b35c8ede35d1803": {
+      "sql": "WITH panel_age AS (\r\n    SELECT \r\n        DATE_PART('year', AGE(CURRENT_DATE, initdate)) AS age_years,\r\n        COUNT(*) AS num_panels\r\n    FROM \r\n        plant\r\n    GROUP BY \r\n        age_years\r\n),\r\naverage_efficiency AS (\r\n    SELECT \r\n        DATE_PART('year', AGE(CURRENT_DATE, pl.initdate)) AS age_years,\r\n        AVG((efficiency_profile -> 'current_efficiency' ->> 'curreffpct')::NUMERIC) AS avg_efficiency\r\n    FROM \r\n        performance AS pe\r\n    JOIN \r\n        panel AS p ON pe.solmodref = p.panemark\r\n    JOIN \r\n        plant AS pl ON p.hubregistry = pl.growregistry\r\n    GROUP BY \r\n        age_years\r\n)\r\nSELECT \r\n    pa.age_years AS panel_age,\r\n    ae.avg_efficiency AS average_metric,\r\n    pa.num_panels\r\nFROM \r\n    panel_age AS pa\r\nJOIN \r\n    average_efficiency AS ae ON pa.age_years = ae.age_years\r\nORDER BY \r\n    pa.age_years;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "40a0aeb36bdf45e3fdff75378ffe7c6f2eeb0d001ffa303d41435b2e9a40ebbe",
+      "ordered": true,
+      "columns": [
+        [
+          "panel_age",
+          701,
+          -1
+        ],
+        [
+          "average_metric",
+          1700,
+          -1
+        ],
+        [
+          "num_panels",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "60f5b7328b89b1bfec3c4628513bde5d304d2779734fc325cf61b30bfffd0c98",
+      "values_digest": "d273bc55fd0df3e2f916ee3be34c32758a95bde0f6c7f1f33c146658ba92f9bf",
+      "ordered_digest": "168b7cd840140b0f4aea873e84782ee7c7bf10f1f7a1e876a66508f7485168e7"
+    },
+    "e704a841ef52a4da35d09788291445356e867b4b62bb821e26a36df7c3d55292": {
+      "sql": "WITH panel_age AS (\r\n    SELECT \r\n        panemark,\r\n        EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM pl.initdate) AS age\r\n    FROM \r\n        panel p\r\n    JOIN \r\n        plant pl ON p.hubregistry = pl.growregistry\r\n),\r\nage_ranges AS (\r\n    SELECT \r\n        panemark, \r\n        CASE \r\n            WHEN age < 5 THEN '0-5' \r\n            WHEN age >= 5 AND age < 10 THEN '5-10' \r\n            WHEN age >= 10 AND age < 15 THEN '10-15' \r\n            ELSE '15+' \r\n        END AS age_range, \r\n        age\r\n    FROM \r\n        panel_age\r\n),\r\nperformance_metrics AS (\r\n    SELECT \r\n        solmodref AS panemark, \r\n        JSONB_EXTRACT_PATH_TEXT(efficiency_profile, 'current_efficiency', 'curreffpct')::NUMERIC AS curreffpct\r\n    FROM \r\n        performance\r\n),\r\npanel_performance AS (\r\n    SELECT \r\n        ar.panemark, \r\n        ar.age_range, \r\n        ar.age,\r\n        pm.curreffpct\r\n    FROM \r\n        age_ranges ar\r\n    JOIN \r\n        performance_metrics pm ON ar.panemark = pm.panemark\r\n)\r\nSELECT \r\n    age_range, \r\n    AVG(curreffpct) AS avg_curreffpct, \r\n    COUNT(DISTINCT panemark) AS num_panels\r\nFROM \r\n    panel_performance\r\nGROUP BY \r\n    age_range\r\nORDER BY \r\n    age_range;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "de8d94bfd9bba69e15fba7fca94c529a7f51b02a1ba36b2896ed248847b82069",
+      "ordered": true,
+      "columns": [
+        [
+          "age_range",
+          25,
+          -1
+        ],
+        [
+          "avg_curreffpct",
+          1700,
+          -1
+        ],
+        [
+          "num_panels",
+          20,
+          -1
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "e6d76b16e8141fa610029717501b1c8162eb259406092ebe8d16f488616e0e94",
+      "values_digest": "45ef4566572d057acb637d0400890ba13d441720722cf6bbf0fd4775ffabb229",
+      "ordered_digest": "e6d76b16e8141fa610029717501b1c8162eb259406092ebe8d16f488616e0e94"
+    },
+    "8ae2e04c976ee28eb9a0ad8b5071c904ac4d6f11583109ad96eba426ce22745f": {
+      "sql": "WITH plant_info AS (\n    SELECT \n        growregistry AS plant_id,\n        growalias AS plant_name,\n        gencapmw AS gen_cap_mw,\n        initdate AS installation_date\n    FROM plant\n),\nmaintenance_cost_efficiency AS (\n    SELECT \n        powerref AS plant_id,\n        (maintcostusd + cleancostusd + replacecostusd) / revlossusd AS maintenance_cost_efficiency\n    FROM maintenance\n),\ndowntime_loss_rate AS (\n    SELECT \n        powerref AS plant_id,\n        revlossusd / gen_cap_mw AS downtime_loss_rate\n    FROM maintenance m\n    JOIN plant_info p ON m.powerref = p.plant_id\n),\nreturn_score AS (\n    SELECT \n        d.plant_id,\n        downtime_loss_rate / maintenance_cost_efficiency AS return_score\n    FROM downtime_loss_rate d\n    JOIN maintenance_cost_efficiency m ON d.plant_id = m.plant_id\n)\nSELECT \n    pi.plant_name,\n    maintenance_cost_efficiency,\n    downtime_loss_rate,\n    return_score\nFROM plant_info pi\nJOIN maintenance_cost_efficiency mce ON pi.plant_id = mce.plant_id\nJOIN downtime_loss_rate dlr ON pi.plant_id = dlr.plant_id\nJOIN return_score rs ON pi.plant_id = rs.plant_id;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5e40cdd1fee414ec9dfe78539eb8786015576c4abb2a8540862da4dc378b8c30",
+      "ordered": false,
+      "columns": [
+        [
+          "plant_name",
+          1043,
+          104
+        ],
+        [
+          "maintenance_cost_efficiency",
+          1700,
+          -1
+        ],
+        [
+          "downtime_loss_rate",
+          1700,
+          -1
+        ],
+        [
+          "return_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ca48086a13e13cf4576f212dc2de8c1b54fdb2b787657dbf7809f385dbd65fa2",
+      "values_digest": "a482857db58de24369404b1c816b035f00c1c91c7ed0358c6188099707abf926",
+      "ordered_digest": "c44a17bbc76cf36dd3fd093728932b79478ceb2512577fb6266a33c9c4c493d7"
+    },
+    "a644002c4af452732e2d50bc1dd0e339f8097a53bd3281c35a16139d1567e947": {
+      "sql": "WITH tsl_cte AS (\r\n    SELECT \r\n        p.panemark AS panel_id,\r\n        p.powratew AS power_rated_w,\r\n        pe.measpoww AS measured_power_w,\r\n        e.soillosspct AS soiling_loss_pct,\r\n        CAST(i.power_metrics->>'inverteffpct' AS NUMERIC) AS inverter_efficiency_pct,\r\n        CAST(pe.efficiency_profile->'degradation'->>'cumdegpct' AS NUMERIC) AS cum_deg_pct\r\n    FROM \r\n        panel p\r\n    JOIN \r\n        performance pe ON p.panemark = pe.solmodref\r\n    JOIN \r\n        environment e ON p.hubregistry = e.arearegistry\r\n    JOIN \r\n        inverter i ON p.hubregistry = i.siteref\r\n)\r\nSELECT \r\n    panel_id,\r\n    power_rated_w,\r\n    measured_power_w,\r\n    soiling_loss_pct,\r\n    inverter_efficiency_pct,\r\n    cum_deg_pct,\r\n    (\r\n        (power_rated_w * cum_deg_pct / 100) + \r\n        (measured_power_w * soiling_loss_pct / 100) + \r\n        (measured_power_w * (1 - inverter_efficiency_pct / 100))\r\n    ) AS total_system_loss\r\nFROM \r\n    tsl_cte;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c83f5b59b459c707eece9b0c71f05e769607df9dbcee5e68142892982b400700",
+      "ordered": false,
+      "columns": [
+        [
+          "panel_id",
+          1043,
+          54
+        ],
+        [
+          "power_rated_w",
+          21,
+          -1
+        ],
+        [
+          "measured_power_w",
+          1700,
+          589831
+        ],
+        [
+          "soiling_loss_pct",
+          1700,
+          458759
+        ],
+        [
+          "inverter_efficiency_pct",
+          1700,
+          -1
+        ],
+        [
+          "cum_deg_pct",
+          1700,
+          -1
+        ],
+        [
+          "total_system_loss",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "fb2ecf67e01f9d96291d74aac9e14e2b0282ed2d6418a3647c84355f564d879f",
+      "values_digest": "5bc3a78a14a97521e7ef5948cdc3560b7884abaab1251256a6afbe0b36b2bfb6",
+      "ordered_digest": "72132f11e5b11a6cad797303449becac25d0de029c65dd15f452ad096bea3d2d"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "plant": {
+      "growregistry": "uuid",
+      "growalias": "varchar",
+      "gencapmw": "numeric",
+      "initdate": "date"
+    },
+    "inverter": {
+      "invertregistry": "varchar",
+      "siteref": "uuid",
+      "invertmoment": "timestamp",
+      "inverttempc": "numeric",
+      "gridvolt": "numeric",
+      "gridfreqhz": "numeric",
+      "pwrqualidx": "numeric",
+      "power_metrics": "jsonb"
+    },
+    "panel": {
+      "panemark": "varchar",
+      "hubregistry": "uuid",
+      "panemfr": "varchar",
+      "paneline": "varchar",
+      "panetype": "varchar",
+      "powratew": "int2",
+      "paneeffpct": "numeric",
+      "nomtempc": "numeric",
+      "tempcoef": "numeric"
+    },
+    "alerts": {
+      "alertreg": "varchar",
+      "compreg": "uuid",
+      "deviceref": "varchar",
+      "incidentref": "varchar",
+      "alertmoment": "timestamp",
+      "alertstat": "varchar",
+      "alertcnt": "int2",
+      "maintprior": "varchar",
+      "replaceprior": "varchar",
+      "optpotential": "varchar"
+    },
+    "performance": {
+      "perfregistry": "varchar",
+      "solmodref": "varchar",
+      "perfmoment": "timestamp",
+      "measpoww": "numeric",
+      "powlossw": "numeric",
+      "efficiency_profile": "jsonb"
+    },
+    "electrical": {
+      "elecregistry": "varchar",
+      "engyunitref": "varchar",
+      "efflogref": "varchar",
+      "iscinita": "numeric",
+      "isccurra": "numeric",
+      "vocinitv": "numeric",
+      "voccurrv": "numeric",
+      "impinita": "numeric",
+      "impcurra": "numeric",
+      "vmpinitv": "numeric",
+      "vmpcurrv": "numeric",
+      "ffactorinit": "numeric",
+      "ffactorcurr": "numeric",
+      "seriesresohm": "numeric",
+      "shuntresohm": "numeric"
+    },
+    "environment": {
+      "envregistry": "varchar",
+      "arearegistry": "uuid",
+      "envmoment": "timestamp",
+      "celltempc": "numeric",
+      "ambtempc": "numeric",
+      "soillosspct": "numeric",
+      "dustdengm2": "numeric",
+      "cleancycledays": "int2",
+      "lastcleandt": "date",
+      "relhumpct": "numeric",
+      "windspdms": "numeric",
+      "winddirdeg": "numeric",
+      "preciptmm": "numeric",
+      "airpresshpa": "numeric",
+      "uv_idx": "numeric",
+      "cloudcovpct": "numeric",
+      "snowcovpct": "numeric",
+      "irradiance_conditions": "jsonb"
+    },
+    "maintenance": {
+      "maintregistry": "varchar",
+      "powerref": "uuid",
+      "compref": "varchar",
+      "obsref": "varchar",
+      "inspectmeth": "varchar",
+      "inspectres": "varchar",
+      "inspectdate": "date",
+      "maintsched": "varchar",
+      "wtystatus": "varchar",
+      "wtyclaimcnt": "int2",
+      "maintcostusd": "numeric",
+      "cleancostusd": "numeric",
+      "replacecostusd": "numeric",
+      "revlossusd": "numeric"
+    }
+  }
+}

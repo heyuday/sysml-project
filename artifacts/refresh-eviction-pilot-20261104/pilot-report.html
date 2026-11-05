@@ -1,0 +1,121 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CH refresh and eviction pilots</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;color:#1c2938;max-width:1120px;margin:40px auto;padding:0 20px}h1,h2,h3{line-height:1.15}h1{font-size:34px}h2{margin:38px 0 10px}p{max-width:92ch}table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px;width:100%;margin:16px 0}th,td{text-align:right;padding:7px 9px;border-bottom:1px solid #d5dee6}th{background:#e9f1f7}th:first-child,td:first-child{text-align:left}summary{cursor:pointer;font-weight:600}.scroll{overflow-x:auto}.meta{color:#465c70}</style>
+<h1>CH-benCHmark refresh and eviction pilots</h1><p class="meta">4 November 2026 · one warehouse · eight clients · seed 11 · 240 operations per trace</p>
+<p>90 refresh configurations and 280 eviction configurations used PostgreSQL-calibrated discrete-event replay. Seven representative configurations were subsequently timed through the actual PostgreSQL/Redis broker. Treat the live and replay measurements separately.</p>
+<h2>Live broker measurements</h2>
+<p>Refresh runs used the stationary mixed trace (228 reads, 12 writes). Eviction runs used the read-only shift trace (240 reads) and a shared 1,207-byte payload limit. SQL identity N2, table-level invalidation I1, a fresh database clone and fresh cache per trial. The p95 is request-send to response-decoded for reads; scheduled p95 also includes queueing from the scheduled arrival. DB work sums client-observed PostgreSQL read execution and proactive refresh execution; writes are excluded.</p>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Trace</th><th>Read hits</th><th>Refreshes</th><th>Evictions</th><th>Read p95 (ms)</th><th>Scheduled p95 (ms)</th><th>DB work (ms)</th><th>Checked digests</th></tr></thead><tbody>
+<tr><td>E1 · LRU</td><td>shift_ro</td><td>142/240</td><td>0</td><td>44</td><td>49.5</td><td>50.0</td><td>1203</td><td>240</td></tr>
+<tr><td>E2 · LFU</td><td>shift_ro</td><td>135/240</td><td>0</td><td>50</td><td>49.1</td><td>50.3</td><td>1285</td><td>240</td></tr>
+<tr><td>E6 · GDSF</td><td>shift_ro</td><td>136/240</td><td>0</td><td>48</td><td>50.5</td><td>51.3</td><td>1198</td><td>240</td></tr>
+<tr><td>E8 · Combined</td><td>shift_ro</td><td>142/240</td><td>0</td><td>42</td><td>49.9</td><td>50.2</td><td>1215</td><td>240</td></tr>
+<tr><td>R0 · Lazy</td><td>stable</td><td>116/228</td><td>0</td><td>0</td><td>26.0</td><td>26.4</td><td>595</td><td>228</td></tr>
+<tr><td>R1 · All / tied priority</td><td>stable</td><td>138/228</td><td>140</td><td>0</td><td>40.4</td><td>41.0</td><td>1198</td><td>228</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>stable</td><td>134/228</td><td>46</td><td>0</td><td>31.7</td><td>32.2</td><td>739</td><td>228</td></tr>
+</tbody></table></div>
+<p>For mutable reads we compared against independently calibrated digests at the corresponding committed state when available. Read-only runs compared every read. No digest mismatch occurred in these checks. An initial instrumentation pass used a coarse Windows clock; all live numbers in this report use the repeated high-resolution pass with client connections opened before the schedule starts.</p>
+<h2>RQ2B/C · Prioritizing refresh after a write</h2>
+<p>The four-entry budget limits each write, not the total number of refreshes in flight. R0 waits for demand; uncapped R1 refreshes every invalidated resident entry. R2–R7 rank entries. Decay time was fixed at 2 s and prediction horizon at 3 s for these short traces. Unlimited value capacity isolates refresh from eviction. Modeled foreground wait sums only waiting for demand SQL or an in-flight fill; it excludes Python normalization overhead and live contention. Used means subsequently consumed; unused at the trace boundary is reported separately.</p>
+<h3>Stationary popularity</h3>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Budget</th><th>Writes with &gt;4 candidates</th><th>Hits</th><th>Refreshes</th><th>Used</th><th>Wasted</th><th>Unresolved</th><th>Demand wait (ms)</th><th>DB work (ms)</th></tr></thead><tbody>
+<tr><td>R0 · Lazy</td><td>off</td><td>7/12</td><td>116</td><td>0</td><td>0</td><td>0</td><td>0</td><td>466</td><td>466</td></tr>
+<tr><td>R1 · All / tied priority</td><td>4</td><td>10/12</td><td>120</td><td>48</td><td>4</td><td>40</td><td>4</td><td>460</td><td>540</td></tr>
+<tr><td>R1 · All / tied priority</td><td>all</td><td>12/12</td><td>162</td><td>392</td><td>47</td><td>316</td><td>29</td><td>344</td><td>1379</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>4</td><td>10/12</td><td>136</td><td>48</td><td>20</td><td>24</td><td>4</td><td>404</td><td>564</td></tr>
+<tr><td>R3 · Execution cost</td><td>4</td><td>10/12</td><td>124</td><td>48</td><td>8</td><td>36</td><td>4</td><td>410</td><td>786</td></tr>
+<tr><td>R4 · Recency</td><td>4</td><td>10/12</td><td>130</td><td>48</td><td>14</td><td>31</td><td>3</td><td>433</td><td>557</td></tr>
+<tr><td>R5 · Decayed frequency</td><td>4</td><td>9/12</td><td>133</td><td>48</td><td>17</td><td>27</td><td>4</td><td>415</td><td>565</td></tr>
+<tr><td>R6 · Reuse before invalidation</td><td>4</td><td>9/12</td><td>134</td><td>48</td><td>18</td><td>27</td><td>3</td><td>419</td><td>553</td></tr>
+<tr><td>R7 · Combined</td><td>4</td><td>9/12</td><td>133</td><td>48</td><td>17</td><td>27</td><td>4</td><td>414</td><td>560</td></tr>
+</tbody></table></div>
+<details><summary>shift</summary>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Budget</th><th>Writes with &gt;4 candidates</th><th>Hits</th><th>Refreshes</th><th>Used</th><th>Wasted</th><th>Unresolved</th><th>Demand wait (ms)</th><th>DB work (ms)</th></tr></thead><tbody>
+<tr><td>R0 · Lazy</td><td>off</td><td>7/12</td><td>116</td><td>0</td><td>0</td><td>0</td><td>0</td><td>455</td><td>455</td></tr>
+<tr><td>R1 · All / tied priority</td><td>4</td><td>10/12</td><td>119</td><td>48</td><td>3</td><td>41</td><td>4</td><td>435</td><td>550</td></tr>
+<tr><td>R1 · All / tied priority</td><td>all</td><td>12/12</td><td>158</td><td>442</td><td>42</td><td>368</td><td>32</td><td>346</td><td>1429</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>4</td><td>10/12</td><td>125</td><td>48</td><td>9</td><td>35</td><td>4</td><td>434</td><td>561</td></tr>
+<tr><td>R3 · Execution cost</td><td>4</td><td>10/12</td><td>120</td><td>48</td><td>4</td><td>40</td><td>4</td><td>429</td><td>783</td></tr>
+<tr><td>R4 · Recency</td><td>4</td><td>10/12</td><td>130</td><td>48</td><td>14</td><td>31</td><td>3</td><td>420</td><td>537</td></tr>
+<tr><td>R5 · Decayed frequency</td><td>4</td><td>9/12</td><td>127</td><td>48</td><td>11</td><td>33</td><td>4</td><td>431</td><td>564</td></tr>
+<tr><td>R6 · Reuse before invalidation</td><td>4</td><td>9/12</td><td>129</td><td>48</td><td>13</td><td>32</td><td>3</td><td>428</td><td>543</td></tr>
+<tr><td>R7 · Combined</td><td>4</td><td>9/12</td><td>128</td><td>48</td><td>12</td><td>32</td><td>4</td><td>430</td><td>551</td></tr>
+</tbody></table></div>
+</details>
+<details><summary>hotwrites</summary>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Budget</th><th>Writes with &gt;4 candidates</th><th>Hits</th><th>Refreshes</th><th>Used</th><th>Wasted</th><th>Unresolved</th><th>Demand wait (ms)</th><th>DB work (ms)</th></tr></thead><tbody>
+<tr><td>R0 · Lazy</td><td>off</td><td>13/48</td><td>61</td><td>0</td><td>0</td><td>0</td><td>0</td><td>478</td><td>478</td></tr>
+<tr><td>R1 · All / tied priority</td><td>4</td><td>28/48</td><td>69</td><td>190</td><td>8</td><td>178</td><td>4</td><td>466</td><td>721</td></tr>
+<tr><td>R1 · All / tied priority</td><td>all</td><td>43/48</td><td>130</td><td>1101</td><td>70</td><td>999</td><td>32</td><td>346</td><td>2613</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>4</td><td>24/48</td><td>107</td><td>190</td><td>46</td><td>140</td><td>4</td><td>407</td><td>698</td></tr>
+<tr><td>R3 · Execution cost</td><td>4</td><td>29/48</td><td>77</td><td>190</td><td>16</td><td>170</td><td>4</td><td>372</td><td>1586</td></tr>
+<tr><td>R4 · Recency</td><td>4</td><td>26/48</td><td>93</td><td>190</td><td>32</td><td>154</td><td>4</td><td>410</td><td>825</td></tr>
+<tr><td>R5 · Decayed frequency</td><td>4</td><td>25/48</td><td>104</td><td>190</td><td>43</td><td>143</td><td>4</td><td>412</td><td>742</td></tr>
+<tr><td>R6 · Reuse before invalidation</td><td>4</td><td>27/48</td><td>101</td><td>190</td><td>40</td><td>146</td><td>4</td><td>416</td><td>707</td></tr>
+<tr><td>R7 · Combined</td><td>4</td><td>25/48</td><td>105</td><td>190</td><td>44</td><td>142</td><td>4</td><td>410</td><td>705</td></tr>
+</tbody></table></div>
+</details>
+<details><summary>burst</summary>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Budget</th><th>Writes with &gt;4 candidates</th><th>Hits</th><th>Refreshes</th><th>Used</th><th>Wasted</th><th>Unresolved</th><th>Demand wait (ms)</th><th>DB work (ms)</th></tr></thead><tbody>
+<tr><td>R0 · Lazy</td><td>off</td><td>6/12</td><td>119</td><td>0</td><td>0</td><td>0</td><td>0</td><td>536</td><td>531</td></tr>
+<tr><td>R1 · All / tied priority</td><td>4</td><td>11/12</td><td>126</td><td>44</td><td>8</td><td>33</td><td>3</td><td>525</td><td>589</td></tr>
+<tr><td>R1 · All / tied priority</td><td>all</td><td>11/12</td><td>158</td><td>329</td><td>43</td><td>254</td><td>32</td><td>467</td><td>1345</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>4</td><td>10/12</td><td>140</td><td>44</td><td>22</td><td>22</td><td>0</td><td>482</td><td>588</td></tr>
+<tr><td>R3 · Execution cost</td><td>4</td><td>11/12</td><td>128</td><td>44</td><td>9</td><td>32</td><td>3</td><td>475</td><td>816</td></tr>
+<tr><td>R4 · Recency</td><td>4</td><td>11/12</td><td>134</td><td>44</td><td>17</td><td>26</td><td>1</td><td>502</td><td>594</td></tr>
+<tr><td>R5 · Decayed frequency</td><td>4</td><td>10/12</td><td>139</td><td>44</td><td>21</td><td>22</td><td>1</td><td>484</td><td>589</td></tr>
+<tr><td>R6 · Reuse before invalidation</td><td>4</td><td>10/12</td><td>138</td><td>44</td><td>20</td><td>22</td><td>2</td><td>491</td><td>575</td></tr>
+<tr><td>R7 · Combined</td><td>4</td><td>10/12</td><td>138</td><td>44</td><td>20</td><td>22</td><td>2</td><td>490</td><td>581</td></tr>
+</tbody></table></div>
+</details>
+<details><summary>rare</summary>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Budget</th><th>Writes with &gt;4 candidates</th><th>Hits</th><th>Refreshes</th><th>Used</th><th>Wasted</th><th>Unresolved</th><th>Demand wait (ms)</th><th>DB work (ms)</th></tr></thead><tbody>
+<tr><td>R0 · Lazy</td><td>off</td><td>7/12</td><td>171</td><td>0</td><td>0</td><td>0</td><td>0</td><td>183</td><td>183</td></tr>
+<tr><td>R1 · All / tied priority</td><td>4</td><td>9/12</td><td>178</td><td>40</td><td>7</td><td>29</td><td>4</td><td>163</td><td>379</td></tr>
+<tr><td>R1 · All / tied priority</td><td>all</td><td>9/12</td><td>201</td><td>106</td><td>30</td><td>71</td><td>5</td><td>137</td><td>636</td></tr>
+<tr><td>R2 · Lifetime frequency</td><td>4</td><td>9/12</td><td>198</td><td>47</td><td>27</td><td>17</td><td>3</td><td>170</td><td>194</td></tr>
+<tr><td>R3 · Execution cost</td><td>4</td><td>9/12</td><td>178</td><td>39</td><td>7</td><td>29</td><td>3</td><td>157</td><td>427</td></tr>
+<tr><td>R4 · Recency</td><td>4</td><td>9/12</td><td>196</td><td>47</td><td>25</td><td>19</td><td>3</td><td>171</td><td>221</td></tr>
+<tr><td>R5 · Decayed frequency</td><td>4</td><td>9/12</td><td>197</td><td>47</td><td>26</td><td>18</td><td>3</td><td>171</td><td>194</td></tr>
+<tr><td>R6 · Reuse before invalidation</td><td>4</td><td>9/12</td><td>196</td><td>47</td><td>25</td><td>19</td><td>3</td><td>171</td><td>212</td></tr>
+<tr><td>R7 · Combined</td><td>4</td><td>9/12</td><td>195</td><td>45</td><td>24</td><td>18</td><td>3</td><td>171</td><td>230</td></tr>
+</tbody></table></div>
+</details>
+<p>On stable demand the four-candidate cap bound on 10/12 writes for R2. On bursty demand R2 used 22/44 refreshes; cost-only used 9/44. On the frequent-write trace cost-only used 16/190 and incurred much more database work than lifetime frequency. Candidate counts differ because a policy changes which results are resident at the next write. Without a binding budget R2–R6 all select the whole candidate set; ranking alone cannot separate their selection behavior.</p>
+<h2>RQ3A/B/C · Eviction under finite byte budgets</h2>
+<p>At 25% of each trace’s unlimited peak, the table shows cumulative modeled database milliseconds (lower is better). All nine policies were tested at unlimited, 50%, 25%, 10%, 5% and 1%. All used lazy fills and the same absolute byte budget within a trace. The stable arm included 12 writes; the remaining four arms were read-only.</p>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>stable</th><th>skew_ro</th><th>uniform_ro</th><th>shift_ro</th><th>rare_ro</th></tr></thead><tbody>
+<tr><td>E0 · FIFO</td><td>1096</td><td>1085</td><td>1212</td><td>1149</td><td>185</td></tr>
+<tr><td>E1 · LRU</td><td>1071</td><td>1057</td><td>1188</td><td>1109</td><td>181</td></tr>
+<tr><td>E2 · LFU</td><td>1065</td><td>992</td><td>1162</td><td>1136</td><td>170</td></tr>
+<tr><td>E3 · Decayed LFU</td><td>1077</td><td>1023</td><td>1173</td><td>1117</td><td>169</td></tr>
+<tr><td>E4 · Cost</td><td>1047</td><td>990</td><td>1159</td><td>1096</td><td>176</td></tr>
+<tr><td>E5 · Frequency × cost</td><td>1045</td><td>983</td><td>1159</td><td>1114</td><td>168</td></tr>
+<tr><td>E6 · GDSF</td><td>1045</td><td>984</td><td>1177</td><td>1115</td><td>180</td></tr>
+<tr><td>E7 · Reuse-aware</td><td>1077</td><td>1023</td><td>1173</td><td>1117</td><td>169</td></tr>
+<tr><td>E8 · Combined</td><td>1044</td><td>1013</td><td>1177</td><td>1101</td><td>172</td></tr>
+</tbody></table></div>
+<div class="scroll"><table><thead><tr><th>Trace</th><th>25% budget (bytes)</th><th>LRU evictions</th><th>GDSF evictions</th><th>Combined evictions</th><th>1% budget (bytes)</th><th>1% LRU peak (bytes)</th></tr></thead><tbody>
+<tr><td>stable</td><td>839</td><td>27</td><td>21</td><td>21</td><td>33</td><td>0</td></tr>
+<tr><td>skew_ro</td><td>1117</td><td>46</td><td>36</td><td>39</td><td>44</td><td>0</td></tr>
+<tr><td>uniform_ro</td><td>1496</td><td>103</td><td>105</td><td>101</td><td>59</td><td>55</td></tr>
+<tr><td>shift_ro</td><td>1207</td><td>44</td><td>48</td><td>43</td><td>48</td><td>0</td></tr>
+<tr><td>rare_ro</td><td>157</td><td>106</td><td>106</td><td>86</td><td>6</td><td>0</td></tr>
+</tbody></table></div>
+<p>Four of five traces admitted no results at 1%. Those cells measure admission failure rather than replacement quality. In the read-only cost/popularity disagreement trace, five cheap query identities accounted for 224 reads; seven expensive identities accounted for 16. The median calibrated cost was about 0.43 ms versus 8.61 ms respectively.</p>
+<h3>Immediately around the shift</h3>
+<p>Hit rates use 30 requests before the shift, the next 30 after the shift, and the final 30. The cache remains warm across the transition. These windows expose the short-term adaptation behavior that an aggregate can conceal.</p>
+<div class="scroll"><table><thead><tr><th>Policy</th><th>Before</th><th>Immediately after</th><th>Final 30</th></tr></thead><tbody>
+<tr><td>E0 · FIFO</td><td>63.3%</td><td>40.0%</td><td>56.7%</td></tr>
+<tr><td>E1 · LRU</td><td>60.0%</td><td>50.0%</td><td>60.0%</td></tr>
+<tr><td>E2 · LFU</td><td>60.0%</td><td>50.0%</td><td>53.3%</td></tr>
+<tr><td>E3 · Decayed LFU</td><td>60.0%</td><td>50.0%</td><td>60.0%</td></tr>
+<tr><td>E4 · Cost</td><td>66.7%</td><td>53.3%</td><td>60.0%</td></tr>
+<tr><td>E5 · Frequency × cost</td><td>60.0%</td><td>53.3%</td><td>56.7%</td></tr>
+<tr><td>E6 · GDSF</td><td>60.0%</td><td>43.3%</td><td>56.7%</td></tr>
+<tr><td>E7 · Reuse-aware</td><td>60.0%</td><td>50.0%</td><td>60.0%</td></tr>
+<tr><td>E8 · Combined</td><td>60.0%</td><td>50.0%</td><td>60.0%</td></tr>
+</tbody></table></div>
+<h2>Scope and reproducibility</h2>
+<p>The stable mutable arm reused the calibrated quantity-write trace from the RQ2A pilot. Other arms used the preserved CH warehouse and new calibration. RQ2 hot writes were 20%; the other mutable traces used 5%. The rare-expensive template deliberately uses recurrent stock aggregates so it can be reused and invalidated. The same generated arrivals, SQL, parameters and calibrated costs were replayed within each scenario. All modeled valid cache hits were checked against recorded read digests; stale hit count was zero. A single seed, one order of live trials, one warehouse and short traces provide pilot evidence rather than confidence intervals.</p>
+<p>The evidence archive includes the input and calibrated traces, configuration and per-write decisions, full replay summaries, fresh live broker logs, and pilot drivers. decision and result data include R0 drop/reconsider and individual feature ablations. The high-resolution live run is the reported run.</p>
+</html>

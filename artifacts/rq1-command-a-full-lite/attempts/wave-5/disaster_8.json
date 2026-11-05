@@ -1,0 +1,205 @@
+{
+  "wave": 5,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "disaster_8",
+    "instance_id": "disaster_8",
+    "database": "disaster",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 411.70879578590393,
+    "budget_used": 3.0,
+    "budget_remaining": 15.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"beneficiariesandassessments\" (\nbeneregistry character varying NOT NULL,\nbenedistref character varying NULL,\nbeneopsref character varying NULL,\nbeneregister USER-DEFINED NULL,\nvulnerabilityreview USER-DEFINED NULL,\nneedsassessstatus USER-DEFINED NULL,\ndistequityidx numeric NULL,\nbenefeedbackscore numeric NULL,\ncommengagelvl USER-DEFINED NULL,\nlocalcapacitygrowth USER-DEFINED NULL,\n    PRIMARY KEY (beneregistry),\n    FOREIGN KEY (benedistref) REFERENCES disasterevents(distregistry),\n    FOREIGN KEY (beneopsref) REFERENCES operations(opsregistry)\n);\n\nFirst 3 rows:\nbeneregistry    benedistref    beneopsref    beneregister    vulnerabilityreview    needsassessstatus      distequityidx    benefeedbackscore  commengagelvl    localcapacitygrowth\n--------------  -------------  ------------  --------------  ---------------------  -------------------  ---------------  -------------------  ---------------  ---------------------\nBENE_4NZJ       DIST_SB6K7     OPS_76ZOW     Complete        Complete               Due                             0.54                  2.3  High             Limited\nBENE_FJSN       DIST_PGACZ     OPS_QXWBZ     Pending         Complete               Overdue                         0.87                  1.3  Low              Limited\nBENE_RCD9       DIST_HJ1BQ     OPS_GGBVJ     Complete        Pending                Overdue                         0.88                  1.5  Medium           Active\n...\n\n\nCREATE TABLE \"disasterevents\" (\ndistregistry character varying NOT NULL,\ntimemark timestamp without time zone NOT NULL,\nhaztype USER-DEFINED NOT NULL,\nhazlevel USER-DEFINED NULL,\naffectedarea character varying NULL,\nregiontag character NULL,\nlatcoord numeric NULL,\nloncoord numeric NULL,\nimpactmetrics jsonb NULL,\n    PRIMARY KEY (distregistry)\n);\n\nFirst 3 rows:\ndistregistry    timemark                    haztype     hazlevel    affectedarea      regiontag      latcoord    loncoord  impactmetrics\n--------------  --------------------------  ---...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"disaster|disasterevents|distregistry\": \"A VARCHAR(20) primary key uniquely identifying each disaster record (e.g., 'DIST0001').\",\n  \"disaster|disasterevents|timemark\": \"A TIMESTAMP indicating when this disaster event record was created (e.g., '2025-04-15 10:30:00').\",\n  \"disaster|disasterevents|haztype\": \"An enum (HazType_enum) describing the primary hazard type; possible values include 'Wildfire', 'Earthquake', 'Tsunami', 'Flood', 'Hurricane'.\",\n  \"disaster|disasterevents|hazlevel\": \"An enum (HazLevel_enum) specifying the hazard\\u2019s severity level; possible values include 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'.\",\n  \"disaster|disasterevents|affectedarea\": \"A VARCHAR(100) naming the geographic area impacted by the disaster (e.g., 'Coastal Region').\",\n  \"disaster|disasterevents|regiontag\": \"A CHAR(10) tagging the region code (e.g., 'REG001').\",\n  \"disaster|disasterevents|latcoord\": \"A NUMERIC(9,6) capturing the latitude coordinate of the affected area (e.g., 34.052235).\",\n  \"disaster|disasterevents|loncoord\": \"A DECIMAL(10,7) capturing the longitude coordinate (e.g., -118.243683).\",\n  \"disaster|distributionhubs|hubregistry\": \"A VARCHAR(20) primary key identifying each distribution hub record (e.g., 'HUB0001').\",\n  \"disaster|distributionhubs|disteventref\": \"A VARCHAR(20) referencing DisasterEvents(DistRegistry), linking this hub to a specific disaster event (e.g., 'DIST0001').\",\n  \"disaster|distributionhubs|hubcaptons\": \"A DECIMAL(11,2) for the hub\\u2019s maximum capacity in tons (e.g., 350.00).\",\n  \"disaster|distributionhubs|hubutilpct\": \"A DECIMAL(7,3) showing the percentage of hub capacity currently utilized (e.g., 85.300).\",\n  \"disaster|distributionhubs|storecapm3\": \"A NUMERIC(9,2) representing total storage capacity in cubic meters (e.g., 2000.00).\",\n  \"disaster|distributionhubs|storeavailm3\": \"A DECIMAL(8,3) specifying how many cubic meters of storage remain available (e.g., 450.750).\",\n  \"disaster|distributionhubs|coldstorecapm3\": \"A DECIM...<truncated>",
+        "cost": 1.0,
+        "budget_before": 17.0,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n  financeregistry AS registry_id,\n  CASE \n    WHEN fundingstate = 'Critical' THEN 'Financial Crisis Risk'\n    ELSE 'Financially Stable'\n  END AS status\nFROM \n  financials\nORDER BY \n  financeregistry ASC;"
+        },
+        "result": "registry_id | status\n--------------------\nFIN_01BX | Financially Stable\nFIN_01DF | Financially Stable\nFIN_08AB | Financially Stable\nFIN_08EX | Financially Stable\nFIN_091I | Financially Stable\nFIN_0AOR | Financial Crisis Risk\nFIN_0DZA | Financial Crisis Risk\nFIN_0FET | Financially Stable\nFIN_0GTR | Financially Stable\nFIN_0HX4 | Financial Crisis Risk\nFIN_0I1Y | Financially Stable\nFIN_0JFT | Financially Stable\nFIN_0KAL | Financially Stable\nFIN_0OKE | Financial Crisis Risk\nFIN_0OKR | Financial Crisis Risk\nFIN_0R1D | Financially Stable\nFIN_0RWX | Financially Stable\nFIN_0SI5 | Financially Stable\nFIN_0V86 | Financially Stable\nFIN_0WDE | Financially Stable\nFIN_0XCN | Financial Crisis Risk\nFIN_0YZ5 | Financially Stable\nFIN_0ZTR | Financially Stable\nFIN_13IK | Financially Stable\nFIN_13SD | Financially Stable\nFIN_14QA | Financially Stable\nFIN_16T1 | Financially Stable\nFIN_19VH | Financial Crisis Risk\nFIN_1AFV | Financially Stable\nFIN_1AHB | Financially Stable\nFIN_1DIE | Financially Stable\nFIN_1EEJ | Financial Crisis Risk\nFIN_1GTI | Financial Crisis Risk\nFIN_1I2Z | Financially Stable\nFIN_1IA1 | Financially Stable\nFIN_1IN3 | Financial Crisis Risk\nFIN_1LB1 | Financially Stable\nFIN_1NZL | Financially Stable\nFIN_1O5Y | Financially Stable\nFIN_1QWL | Financially Stable\nFIN_1SF9 | Financially Stable\nFIN_1TX6 | Financially Stable\nFIN_1UT9 | Financial Crisis Risk\nFIN_1VER | Financially Stable\nFIN_1VYH | Financial Crisis Risk\nFIN_1XZ6 | Financial Crisis Risk\nFIN_1Z8O | Financially Stable\nFIN_203R | Financially Stable\nFIN_203X | Financially Stable\nFIN_29IU | Financially Stable\nFIN_2DVG | Financially Stable\nFIN_2E73 | Financial Crisis Risk\nFIN_2FIE | Financially Stable\nFIN_2GNY | Financial Crisis Risk\nFIN_2I64 | Financially Stable\nFIN_2I6T | Financially Stable\nFIN_2K3R | Financially Stable\nFIN_2KG4 | Financially Stable\nFIN_2KIC | Financial Crisis Risk\nFIN_2OVP | Financially Stable\nFIN_2OYX | Financial Crisis Risk\nFIN_2RUF | Financially Stable\nFIN_2S3B | Financially Stable\nFIN_2SH9 | Financ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: disaster\nTask ID: disaster_8\n\nUser Query:\nLet me see the related registry ID next to each Financial Health Index , and determine its status: label as 'Financial Crisis Risk' if a Financial Crisis Risk is detected, otherwise label as 'Financially Stable'. Rank everything from lowest to highest.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-0fb8a5b2-6f4b-4106-bdc8-ce1596d1b65c",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_q24qk1j4vpta",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_vv1j4zp0xsjk",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-0fb8a5b2-6f4b-4106-bdc8-ce1596d1b65c",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_q24qk1j4vpta",
+              "response": "{\"result\": \"CREATE TABLE \\\"beneficiariesandassessments\\\" (\\nbeneregistry character varying NOT NULL,\\nbenedistref character varying NULL,\\nbeneopsref character varying NULL,\\nbeneregister USER-DEFINED NULL,\\nvulnerabilityreview USER-DEFINED NULL,\\nneedsassessstatus USER-DEFINED NULL,\\ndistequityidx numeric NULL,\\nbenefeedbackscore numeric NULL,\\ncommengagelvl USER-DEFINED NULL,\\nlocalcapacitygrowth USER-DEFINED NULL,\\n    PRIMARY KEY (beneregistry),\\n    FOREIGN KEY (benedistref) REFERENCES disasterevents(distregistry),\\n    FOREIGN KEY (beneopsref) REFERENCES operations(opsregistry)\\n);\\n\\nFirst 3 rows:\\nbeneregistry    benedistref    beneopsref    beneregister    vulnerabilityreview    needsassessstatus      distequityidx    benefeedbackscore  commengagelvl    localcapacitygrowth\\n--------------  -------------  ------------  --------------  ---------------------  -------------------  ---------------  -------------------  ---------------  ---------------------\\nBENE_4NZJ       DIST_SB6K7     OPS_76ZOW     Complete        Complete               Due                             0.54                  2.3  High             Limited\\nBENE_FJSN       DIST_PGACZ     OPS_QXWBZ     Pending         Complete               Overdue                         0.87                  1.3  Low              Limited\\nBENE_RCD9       DIST_HJ1BQ     OPS_GGBVJ     Complete        Pending                Overdue                         0.88                  1.5  Medium           Active\\n...\\n\\n\\nCREATE TABLE \\\"disasterevents\\\" (\\ndistregistry character varying NOT NULL,\\ntimemark timestamp without time zone NOT NULL,\\nhaztype USER-DEFINED NOT NULL,\\nhazlevel USER-DEFINED NULL,\\naffectedarea character varying NULL,\\nregiontag character NULL,\\nlatcoord numeric NULL,\\nloncoord numeric NULL,\\nimpactmetrics jsonb NULL,\\n    PRIMARY KEY (distregistry)\\n);\\n\\nFirst 3 rows:\\ndistregistry    timemark                    haztype     hazlevel    affectedarea      regiontag      latcoord    loncoord  impactmetrics\\n--------------  --------------------------  ----------  ----------  ----------------  -----------  ----------  ----------  ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nDIST_SB6K7      2024-12-21 19:49:09.720370  Wildfire    Level 3     East Jeremy       RC7250          51.2036     36.2211  {'population': {'injured': 4524, 'missing': 212, 'affected': 228943, 'displaced': 38806, 'casualties': 174}, 'damage_level': 'Severe', 'communication': 'Limited', 'infrastructure': {'damage_percent': 19.0, 'power_outage_percent': 93.2, 'water_damage_percent': 77}, 'transportation': 'Full'}\\nDIST_PGACZ      2024-03-13 16:56:26.720370  Earthquake  Level 5     Lake Mariah       RC2170         -89.8906     62.0815  {'population': {'injured': 4304, 'missing': 363, 'affected': 241273, 'displaced': 31578, 'casualties': 8}, 'damage_level': 'Moderate', 'communication': 'Operational', 'infrastructure': {'damage_percent': 68.9, 'power_outage_percent': 22.5, 'water_damage_percent': 40}, 'transportation': 'Full'}\\nDIST_HJ1BQ      2024-12-08 06:09:09.720370  Earthquake  Level 5     New Kellychester  RC8678          80.0269   -146.007   {'population': {'injured': 4333, 'missing': 222, 'affected': 389569, 'displaced': 66484, 'casualties': 355}, 'damage_level': 'Minor', 'communication': 'Limited', 'infrastructure': {'damage_percent': 79.7, 'power_outage_percent': 83.8, 'water_damage_percent': 27}, 'transportation': 'Limited'}\\n...\\n\\n\\nCREATE TABLE \\\"distributionhubs\\\" (\\nhubregistry character varying NOT NULL,\\ndisteventref character varying NULL,\\nhubcaptons numeric NULL,\\nhubutilpct numeric NULL,\\nstorecapm3 numeric NULL,\\nstoreavailm3 numeric NULL,\\ncoldstorecapm3 numeric NULL,\\ncoldstoretempc numeric NULL,\\nwarehousestate USER-DEFINED NU...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_vv1j4zp0xsjk",
+              "response": "{\"result\": \"{\\n  \\\"disaster|disasterevents|distregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each disaster record (e.g., 'DIST0001').\\\",\\n  \\\"disaster|disasterevents|timemark\\\": \\\"A TIMESTAMP indicating when this disaster event record was created (e.g., '2025-04-15 10:30:00').\\\",\\n  \\\"disaster|disasterevents|haztype\\\": \\\"An enum (HazType_enum) describing the primary hazard type; possible values include 'Wildfire', 'Earthquake', 'Tsunami', 'Flood', 'Hurricane'.\\\",\\n  \\\"disaster|disasterevents|hazlevel\\\": \\\"An enum (HazLevel_enum) specifying the hazard\\\\u2019s severity level; possible values include 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'.\\\",\\n  \\\"disaster|disasterevents|affectedarea\\\": \\\"A VARCHAR(100) naming the geographic area impacted by the disaster (e.g., 'Coastal Region').\\\",\\n  \\\"disaster|disasterevents|regiontag\\\": \\\"A CHAR(10) tagging the region code (e.g., 'REG001').\\\",\\n  \\\"disaster|disasterevents|latcoord\\\": \\\"A NUMERIC(9,6) capturing the latitude coordinate of the affected area (e.g., 34.052235).\\\",\\n  \\\"disaster|disasterevents|loncoord\\\": \\\"A DECIMAL(10,7) capturing the longitude coordinate (e.g., -118.243683).\\\",\\n  \\\"disaster|distributionhubs|hubregistry\\\": \\\"A VARCHAR(20) primary key identifying each distribution hub record (e.g., 'HUB0001').\\\",\\n  \\\"disaster|distributionhubs|disteventref\\\": \\\"A VARCHAR(20) referencing DisasterEvents(DistRegistry), linking this hub to a specific disaster event (e.g., 'DIST0001').\\\",\\n  \\\"disaster|distributionhubs|hubcaptons\\\": \\\"A DECIMAL(11,2) for the hub\\\\u2019s maximum capacity in tons (e.g., 350.00).\\\",\\n  \\\"disaster|distributionhubs|hubutilpct\\\": \\\"A DECIMAL(7,3) showing the percentage of hub capacity currently utilized (e.g., 85.300).\\\",\\n  \\\"disaster|distributionhubs|storecapm3\\\": \\\"A NUMERIC(9,2) representing total storage capacity in cubic meters (e.g., 2000.00).\\\",\\n  \\\"disaster|distributionhubs|storeavailm3\\\": \\\"A DECIMAL(8,3) specifying how many cubic meters of storage remain available (e.g., 450.750).\\\",\\n  \\\"disaster|distributionhubs|coldstorecapm3\\\": \\\"A DECIMAL(10,3) indicating cold-storage capacity in cubic meters (e.g., 150.300).\\\",\\n  \\\"disaster|distributionhubs|coldstoretempc\\\": \\\"A NUMERIC(4,1) for the temperature in the cold storage facility (e.g., -5.0).\\\",\\n  \\\"disaster|distributionhubs|warehousestate\\\": \\\"An enum (WarehouseState_enum) describing the warehouse\\\\u2019s condition; values: 'Fair', 'Excellent', 'Good', 'Poor'.\\\",\\n  \\\"disaster|distributionhubs|invaccpct\\\": \\\"A DECIMAL(5,2) representing inventory accuracy as a percentage (e.g., 98.50).\\\",\\n  \\\"disaster|distributionhubs|stockturnrate\\\": \\\"A DECIMAL(5,2) measuring how often inventory is turned over during a specific period (e.g., 5.20).\\\",\\n  \\\"disaster|operations|opsregistry\\\": \\\"A VARCHAR(20) primary key for each operations record (e.g., 'OPS0001').\\\",\\n  \\\"disaster|operations|opsdistref\\\": \\\"A VARCHAR(20) referencing DisasterEvents(DistRegistry), tying these operations to a disaster (e.g., 'DIST0001').\\\",\\n  \\\"disaster|operations|opshubref\\\": \\\"A VARCHAR(20) referencing DistributionHubs(HubRegistry), associating operations with a particular hub (e.g., 'HUB0001').\\\",\\n  \\\"disaster|operations|emerglevel\\\": \\\"An enum (EmergLevel_enum) labeling the emergency level; possible values: 'Black', 'Orange', 'Red', 'Yellow'.\\\",\\n  \\\"disaster|operations|respphase\\\": \\\"An enum (RespPhase_enum) for the disaster response phase; possible values: 'Reconstruction', 'Recovery', 'Emergency', 'Initial'.\\\",\\n  \\\"disaster|operations|opsstatus\\\": \\\"An enum (OpsStatus_enum) showing the operation\\\\u2019s status; values: 'Completed', 'Scaling Down', 'Active', 'Planning'.\\\",\\n  \\\"disaster|operations|coordcenter\\\": \\\"A VARCHAR(80) describing the coordination center or command location (e.g., 'Central Ops HQ').\\\",\\n  \\\"disaster|operations|opsstartdate\\\": \\\"A DATE indicating when operations began (e.g., '2025-04-01').\\\",\\n  \\\"disaster|operations|estdurationdays\\\": \\\"An INT estimating how many d...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-0fb8a5b2-6f4b-4106-bdc8-ce1596d1b65c",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_6ytbmdx2v7a6",
+              "args": {
+                "sql": "SELECT \n  financeregistry AS registry_id,\n  CASE \n    WHEN fundingstate = 'Critical' THEN 'Financial Crisis Risk'\n    ELSE 'Financially Stable'\n  END AS status\nFROM \n  financials\nORDER BY \n  financeregistry ASC;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-0fb8a5b2-6f4b-4106-bdc8-ce1596d1b65c",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_6ytbmdx2v7a6",
+              "response": "{\"result\": \"registry_id | status\\n--------------------\\nFIN_01BX | Financially Stable\\nFIN_01DF | Financially Stable\\nFIN_08AB | Financially Stable\\nFIN_08EX | Financially Stable\\nFIN_091I | Financially Stable\\nFIN_0AOR | Financial Crisis Risk\\nFIN_0DZA | Financial Crisis Risk\\nFIN_0FET | Financially Stable\\nFIN_0GTR | Financially Stable\\nFIN_0HX4 | Financial Crisis Risk\\nFIN_0I1Y | Financially Stable\\nFIN_0JFT | Financially Stable\\nFIN_0KAL | Financially Stable\\nFIN_0OKE | Financial Crisis Risk\\nFIN_0OKR | Financial Crisis Risk\\nFIN_0R1D | Financially Stable\\nFIN_0RWX | Financially Stable\\nFIN_0SI5 | Financially Stable\\nFIN_0V86 | Financially Stable\\nFIN_0WDE | Financially Stable\\nFIN_0XCN | Financial Crisis Risk\\nFIN_0YZ5 | Financially Stable\\nFIN_0ZTR | Financially Stable\\nFIN_13IK | Financially Stable\\nFIN_13SD | Financially Stable\\nFIN_14QA | Financially Stable\\nFIN_16T1 | Financially Stable\\nFIN_19VH | Financial Crisis Risk\\nFIN_1AFV | Financially Stable\\nFIN_1AHB | Financially Stable\\nFIN_1DIE | Financially Stable\\nFIN_1EEJ | Financial Crisis Risk\\nFIN_1GTI | Financial Crisis Risk\\nFIN_1I2Z | Financially Stable\\nFIN_1IA1 | Financially Stable\\nFIN_1IN3 | Financial Crisis Risk\\nFIN_1LB1 | Financially Stable\\nFIN_1NZL | Financially Stable\\nFIN_1O5Y | Financially Stable\\nFIN_1QWL | Financially Stable\\nFIN_1SF9 | Financially Stable\\nFIN_1TX6 | Financially Stable\\nFIN_1UT9 | Financial Crisis Risk\\nFIN_1VER | Financially Stable\\nFIN_1VYH | Financial Crisis Risk\\nFIN_1XZ6 | Financial Crisis Risk\\nFIN_1Z8O | Financially Stable\\nFIN_203R | Financially Stable\\nFIN_203X | Financially Stable\\nFIN_29IU | Financially Stable\\nFIN_2DVG | Financially Stable\\nFIN_2E73 | Financial Crisis Risk\\nFIN_2FIE | Financially Stable\\nFIN_2GNY | Financial Crisis Risk\\nFIN_2I64 | Financially Stable\\nFIN_2I6T | Financially Stable\\nFIN_2K3R | Financially Stable\\nFIN_2KG4 | Financially Stable\\nFIN_2KIC | Financial Crisis Risk\\nFIN_2OVP | Financially Stable\\nFIN_2OYX | Financial Crisis Risk\\nFIN_2RUF | Financially Stable\\nFIN_2S3B | Financially Stable\\nFIN_2SH9 | Financially Stable\\nFIN_2VUG | Financial Crisis Risk\\nFIN_2WKL | Financially Stable\\nFIN_30FK | Financial Crisis Risk\\nFIN_33C9 | Financially Stable\\nFIN_369T | Financially Stable\\nFIN_37QB | Financial Crisis Risk\\nFIN_3B80 | Financially Stable\\nFIN_3CYX | Financially Stable\\nFIN_3EG2 | Financial Crisis Risk\\nFIN_3ERS | Financial Crisis Risk\\nFIN_3HBK | Financial Crisis Risk\\nFIN_3HF4 | Financial Crisis Risk\\nFIN_3HKL | Financially Stable\\nFIN_3HP0 | Financially Stable\\nFIN_3ICA | Financial Crisis Risk\\nFIN_3ITX | Financial Crisis Risk\\nFIN_3JA7 | Financially Stable\\nFIN_3KR0 | Financially Stable\\nFIN_3MAV | Financial Crisis Risk\\nFIN_3NES | Financially Stable\\nFIN_3NVL | Financially Stable\\nFIN_3T4U | Financial Crisis Risk\\nFIN_3TG7 | Financial Crisis Risk\\nFIN_3U6S | Financially Stable\\nFIN_3XBX | Financially Stable\\nFIN_3Z58 | Financially Stable\\nFIN_41G1 | Financial Crisis Risk\\nFIN_422M | Financial Crisis Risk\\nFIN_44TX | Financial Crisis Risk\\nFIN_45AO | Financially Stable\\nFIN_47MP | Financially Stable\\nFIN_47YL | Financially Stable\\nFIN_4BMY | Financial Crisis Risk\\nFIN_4EVG | Financially Stable\\nFIN_4F72 | Financially Stable\\nFIN_4IWH | Financially Stable\\n\\n[SYSTEM NOTE: Remaining budget: 15.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-0fb8a5b2-6f4b-4106-bdc8-ce1596d1b65c",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is a table with the related registry ID next to each Financial Health Index, with its status:\n\n| Registry ID | Status |\n|---|---|\n| FIN_01BX | Financially Stable |\n| FIN_01DF | Financially Stable |\n| FIN_08AB | Financially Stable |\n| FIN_08EX | Financially Stable |\n| FIN_091I | Financially Stable |\n| FIN_0AOR | Financial Crisis Risk |\n| FIN_0DZA | Financial Crisis Risk |\n| FIN_0FET | Financially Stable |\n| FIN_0GTR | Financially Stable |\n| FIN_0HX4 | Financial Crisis Risk |\n| FIN_0I1Y | Financially Stable |\n| FIN_0JFT | Financially Stable |\n| FIN_0KAL | Financially Stable |\n| FIN_0OKE | Financial Crisis Risk |\n| FIN_0OKR | Financial Crisis Risk |\n| FIN_0R1D | Financially Stable |\n| FIN_0RWX | Financially Stable |\n| FIN_0SI5 | Financially Stable |\n| FIN_0V86 | Financially Stable |\n| FIN_0WDE | Financially Stable |\n| FIN_0XCN | Financial Crisis Risk |\n| FIN_0YZ5 | Financially Stable |\n| FIN_0ZTR | Financially Stable |\n| FIN_13IK | Financially Stable |\n| FIN_13SD | Financially Stable |\n| FIN_14QA | Financially Stable |\n| FIN_16T1 | Financially Stable |\n| FIN_19VH | Financial Crisis Risk |\n| FIN_1AFV | Financially Stable |\n| FIN_1AHB | Financially Stable |\n| FIN_1DIE | Financially Stable |\n| FIN_1EEJ | Financial Crisis Risk |\n| FIN_1GTI | Financial Crisis Risk |\n| FIN_1I2Z | Financially Stable |\n| FIN_1IA1 | Financially Stable |\n| FIN_1IN3 | Financial Crisis Risk |\n| FIN_1LB1 | Financially Stable |\n| FIN_1NZL | Financially Stable |\n| FIN_1O5Y | Financially Stable |\n| FIN_1QWL | Financially Stable |\n| FIN_1SF9 | Financially Stable |\n| FIN_1TX6 | Financially Stable |\n| FIN_1UT9 | Financial Crisis Risk |\n| FIN_1VER | Financially Stable |\n| FIN_1VYH | Financial Crisis Risk |\n| FIN_1XZ6 | Financial Crisis Risk |\n| FIN_1Z8O | Financially Stable |\n| FIN_203R | Financially Stable |\n| FIN_203X | Financially Stable |\n| FIN_29IU | Financially Stable |\n| FIN_2DVG | Financially Stable |\n| FIN_2E73 | Financial Crisis Risk |\n| FIN_2FIE | Financially Stable |\n| FIN_2GNY | Financial Crisis Risk |\n| FIN_2I64 | Financially Stable |\n| FIN_2I6T | Financially Stable |\n| FIN_2K3R | Financially Stable |\n| FIN_2KG4 | Financially Stable |\n| FIN_2KIC | Financial Crisis Risk |\n| FIN_2OVP | Financially Stable |\n| FIN_2OYX | Financial Crisis Risk |\n| FIN_2RUF | Financially Stable |\n| FIN_2S3B | Financially Stable |\n| FIN_2SH9 | Financially Stable |\n| FIN_2VUG | Financial Crisis Risk |\n| FIN_2WKL | Financially Stable |\n| FIN_30FK | Financial Crisis Risk |\n| FIN_33C9 | Financially Stable |\n| FIN_369T | Financially Stable |\n| FIN_37QB | Financial Crisis Risk |\n| FIN_3B80 | Financially Stable |\n| FIN_3CYX | Financially Stable |\n| FIN_3EG2 | Financial Crisis Risk |\n| FIN_3ERS | Financial Crisis Risk |\n| FIN_3HBK | Financial Crisis Risk |\n| FIN_3HF4 | Financial Crisis Risk |\n| FIN_3HKL | Financially Stable |\n| FIN_3HP0 | Financially Stable |\n| FIN_3ICA | Financial Crisis Risk |\n| FIN_3ITX | Financial Crisis Risk |\n| FIN_3JA7 | Financially Stable |\n| FIN_3KR0 | Financially Stable |\n| FIN_3MAV | Financial Crisis Risk |\n| FIN_3NES | Financially Stable |\n| FIN_3NVL | Financially Stable |\n| FIN_3T4U | Financial Crisis Risk |\n| FIN_3TG7 | Financial Crisis Risk |\n| FIN_3U6S | Financially Stable |\n| FIN_3XBX | Financially Stable |\n| FIN_3Z58 | Financially Stable |\n| FIN_41G1 | Financial Crisis Risk |\n| FIN_422M | Financial Crisis Risk |\n| FIN_44TX | Financial Crisis Risk |\n| FIN_45AO | Financially Stable |\n| FIN_47MP | Financially Stable |\n| FIN_47YL | Financially Stable |\n| FIN_4BMY | Financial Crisis Risk |\n| FIN_4EVG | Financially Stable |\n| FIN_4F72 | Financially Stable |\n| FIN_4IWH | Financially Stable |\n\nThe status is determined by the 'fundingstate' column in the 'financials' table. If the value is 'Critical', then the status is 'Financial Crisis Risk', otherwise it is 'Financially Stable'. The results are ordered by registry ID in ascending order."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is a table with the related registry ID next to each Financial Health Index, with its status:\n\n| Registry ID | Status |\n|---|---|\n| FIN_01BX | Financially Stable |\n| FIN_01DF | Financially Stable |\n| FIN_08AB | Financially Stable |\n| FIN_08EX | Financially Stable |\n| FIN_091I | Financially Stable |\n| FIN_0AOR | Financial Crisis Risk |\n| FIN_0DZA | Financial Crisis Risk |\n| FIN_0FET | Financially Stable |\n| FIN_0GTR | Financially Stable |\n| FIN_0HX4 | Financial Crisis Risk |\n| FIN_0I1Y | Financially Stable |\n| FIN_0JFT | Financially Stable |\n| FIN_0KAL | Financially Stable |\n| FIN_0OKE | Financial Crisis Risk |\n| FIN_0OKR | Financial Crisis Risk |\n| FIN_0R1D | Financially Stable |\n| FIN_0RWX | Financially Stable |\n| FIN_0SI5 | Financially Stable |\n| FIN_0V86 | Financially Stable |\n| FIN_0WDE | Financially Stable |\n| FIN_0XCN | Financial Crisis Risk |\n| FIN_0YZ5 | Financially Stable |\n| FIN_0ZTR | Financially Stable |\n| FIN_13IK | Financially Stable |\n| FIN_13SD | Financially Stable |\n| FIN_14QA | Financially Stable |\n| FIN_16T1 | Financially Stable |\n| FIN_19VH | Financial Crisis Risk |\n| FIN_1AFV | Financially Stable |\n| FIN_1AHB | Financially Stable |\n| FIN_1DIE | Financially Stable |\n| FIN_1EEJ | Financial Crisis Risk |\n| FIN_1GTI | Financial Crisis Risk |\n| FIN_1I2Z | Financially Stable |\n| FIN_1IA1 | Financially Stable |\n| FIN_1IN3 | Financial Crisis Risk |\n| FIN_1LB1 | Financially Stable |\n| FIN_1NZL | Financially Stable |\n| FIN_1O5Y | Financially Stable |\n| FIN_1QWL | Financially Stable |\n| FIN_1SF9 | Financially Stable |\n| FIN_1TX6 | Financially Stable |\n| FIN_1UT9 | Financial Crisis Risk |\n| FIN_1VER | Financially Stable |\n| FIN_1VYH | Financial Crisis Risk |\n| FIN_1XZ6 | Financial Crisis Risk |\n| FIN_1Z8O | Financially Stable |\n| FIN_203R | Financially Stable |\n| FIN_203X | Financially Stable |\n| FIN_29IU | Financially Stable |\n| FIN_2DVG | Financially Stable |\n| FIN_2E73 | Financial Crisis Risk |\n| FIN_2FIE | Financially Stable |\n| FIN_2GNY | Financial Crisis Risk |\n| FIN_2I64 | Financially Stable |\n| FIN_2I6T | Financially Stable |\n| FIN_2K3R | Financially Stable |\n| FIN_2KG4 | Financially Stable |\n| FIN_2KIC | Financial Crisis Risk |\n| FIN_2OVP | Financially Stable |\n| FIN_2OYX | Financial Crisis Risk |\n| FIN_2RUF | Financially Stable |\n| FIN_2S3B | Financially Stable |\n| FIN_2SH9 | Financially Stable |\n| FIN_2VUG | Financial Crisis Risk |\n| FIN_2WKL | Financially Stable |\n| FIN_30FK | Financial Crisis Risk |\n| FIN_33C9 | Financially Stable |\n| FIN_369T | Financially Stable |\n| FIN_37QB | Financial Crisis Risk |\n| FIN_3B80 | Financially Stable |\n| FIN_3CYX | Financially Stable |\n| FIN_3EG2 | Financial Crisis Risk |\n| FIN_3ERS | Financial Crisis Risk |\n| FIN_3HBK | Financial Crisis Risk |\n| FIN_3HF4 | Financial Crisis Risk |\n| FIN_3HKL | Financially Stable |\n| FIN_3HP0 | Financially Stable |\n| FIN_3ICA | Financial Crisis Risk |\n| FIN_3ITX | Financial Crisis Risk |\n| FIN_3JA7 | Financially Stable |\n| FIN_3KR0 | Financially Stable |\n| FIN_3MAV | Financial Crisis Risk |\n| FIN_3NES | Financially Stable |\n| FIN_3NVL | Financially Stable |\n| FIN_3T4U | Financial Crisis Risk |\n| FIN_3TG7 | Financial Crisis Risk |\n| FIN_3U6S | Financially Stable |\n| FIN_3XBX | Financially Stable |\n| FIN_3Z58 | Financially Stable |\n| FIN_41G1 | Financial Crisis Risk |\n| FIN_422M | Financial Crisis Risk |\n| FIN_44TX | Financial Crisis Risk |\n| FIN_45AO | Financially Stable |\n| FIN_47MP | Financially Stable |\n| FIN_47YL | Financially Stable |\n| FIN_4BMY | Financial Crisis Risk |\n| FIN_4EVG | Financially Stable |\n| FIN_4F72 | Financially Stable |\n| FIN_4IWH | Financially Stable |\n\nThe status is determined by the 'fundingstate' column in the 'financials' table. If the value is 'Critical', then the status is 'Financial Crisis Risk', otherwise it is 'Financially Stable'. The results are ordered by registry ID in ascending order."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "c30c777e7522499a947f8cb1202db34e",
+      "client": "disaster_8",
+      "database": "disaster",
+      "scope": "bbcefac208b54e959c4153106e599f9c/b5d99a361d4e430c9c6bab7fff30a90a/0",
+      "at": 1793861254.5629156,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.0567000028677285,
+      "response_bytes": 20150,
+      "response_digest": "c62be15b6e43de501e945b9dc6549714d879912843c5828cffedf6dee201ca5f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "6d9200a66c4d43c4b170f4ec51786bf2",
+      "client": "disaster_8",
+      "database": "disaster",
+      "scope": "bbcefac208b54e959c4153106e599f9c/b5d99a361d4e430c9c6bab7fff30a90a/0",
+      "at": 1793861355.0366695,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.592600001662504,
+      "response_bytes": 20150,
+      "response_digest": "c62be15b6e43de501e945b9dc6549714d879912843c5828cffedf6dee201ca5f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "3015608f7e6b4f2c988018793a179d85",
+      "client": "disaster_8",
+      "database": "disaster",
+      "scope": "bbcefac208b54e959c4153106e599f9c/b5d99a361d4e430c9c6bab7fff30a90a/0",
+      "at": 1793861449.7570055,
+      "sql": "SELECT \n  financeregistry AS registry_id,\n  CASE \n    WHEN fundingstate = 'Critical' THEN 'Financial Crisis Risk'\n    ELSE 'Financially Stable'\n  END AS status\nFROM \n  financials\nORDER BY \n  financeregistry ASC;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 27.288299999781884,
+      "response_bytes": 3282,
+      "response_digest": "c569fa5fa91f42ce959a464e7bee984d21e50d983a95a02a9ca5d54c353ffdc1",
+      "successful": true
+    }
+  ]
+}

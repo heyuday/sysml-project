@@ -1,0 +1,1631 @@
+{
+  "version": 2,
+  "database": "museum",
+  "queries": {
+    "d7672c66aec768048ceecf973123171c6f7c52370cfc852ad48f64b0f3e29f43": {
+      "sql": "SELECT\n    t1.artregistry AS artifact_id,\n    t1.artname AS artifact_name,\n    t4.insvalueusd AS insured_value,\n    CAST(t1.conservestatus AS TEXT) AS conservation_status,\n    t3.researchvalrating AS value_category\nFROM\n    artifactscore AS t1\nJOIN\n    artifactsecurityaccess AS t4\n        ON t1.artregistry = t4.artref\nJOIN\n    artifactratings AS t3\n        ON t1.artregistry = t3.artref\nJOIN\n    riskassessments AS t5\n        ON t1.artregistry = t5.artrefconcerned\nWHERE\n    t5.emergresponseplan ILIKE '%emergency%'\n    AND CAST(t1.conservestatus AS TEXT) ILIKE '%serious%'\n\n\n",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b0493a8afb35ae7fdfd0e5364436b6b48391874350846c8650dbcdf0d7b77220",
+      "ordered": false,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "insured_value",
+          1700,
+          983046
+        ],
+        [
+          "conservation_status",
+          25,
+          -1
+        ],
+        [
+          "value_category",
+          23,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "ab0e043d4ecb8584faa5f1fcd3920d8cc392cd987295a86648afaa105b53252f",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "ab0e043d4ecb8584faa5f1fcd3920d8cc392cd987295a86648afaa105b53252f"
+    },
+    "925bc6e586d29dfaff43e813cb85b5d3f79e3c1eba16d9280ff25727c64bbef5": {
+      "sql": "SELECT \n    a.artregistry AS artifact_id,\n    a.artname AS artifact_name,\n    s.showcasematerial, \n    s.sealcondition, \n    s.maintstatus, \n    s.filterstatus, \n    s.silicagelstatus, \n    s.silicagelchangedate, \n    s.humiditybuffercap, \n    s.pollutantabsorbcap, \n    s.leakrate, \n    s.pressurepa, \n    s.inertgassysstatus, \n    s.firesuppresssys, \n    s.empowerstatus, \n    s.backupsysstatus,\n    COUNT(sd.sensitivityregistry) AS sensitive_factors,\n    CASE \n        WHEN a.artregistry IN (\n            SELECT artref \n            FROM artifactratings \n            WHERE deteriorrate = 'Rapid'\n        ) THEN 'Yes' \n        ELSE 'No' \n    END AS accelerated_deterioration\nFROM \n    artifactscore a\nJOIN \n    artifactratings ar ON a.artregistry = ar.artref\nJOIN \n    sensitivitydata sd ON a.artregistry = sd.artref\nJOIN \n    usagerecords ur ON a.artregistry = ur.artrefused\nJOIN \n    conditionassessments ca ON a.artregistry = ca.artrefexamined\nJOIN \n    showcases s ON ca.showcaserefexamined = s.showcasereg\nWHERE \n    ar.deteriorrate = 'Rapid'\nGROUP BY \n    a.artregistry, a.artname, s.showcasematerial, s.sealcondition, s.maintstatus, s.filterstatus, s.silicagelstatus, s.silicagelchangedate, s.humiditybuffercap, s.pollutantabsorbcap, s.leakrate, s.pressurepa, s.inertgassysstatus, s.firesuppresssys, s.empowerstatus, s.backupsysstatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ca851a6b14ece0c6931e9f1629e720fadc1e70978e94ce5ecfbdbdcbfbc53c0d",
+      "ordered": false,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "showcasematerial",
+          1043,
+          84
+        ],
+        [
+          "sealcondition",
+          1043,
+          34
+        ],
+        [
+          "maintstatus",
+          1042,
+          29
+        ],
+        [
+          "filterstatus",
+          25,
+          -1
+        ],
+        [
+          "silicagelstatus",
+          1042,
+          24
+        ],
+        [
+          "silicagelchangedate",
+          1082,
+          -1
+        ],
+        [
+          "humiditybuffercap",
+          21,
+          -1
+        ],
+        [
+          "pollutantabsorbcap",
+          1700,
+          327686
+        ],
+        [
+          "leakrate",
+          700,
+          -1
+        ],
+        [
+          "pressurepa",
+          20,
+          -1
+        ],
+        [
+          "inertgassysstatus",
+          1043,
+          54
+        ],
+        [
+          "firesuppresssys",
+          1043,
+          54
+        ],
+        [
+          "empowerstatus",
+          1042,
+          14
+        ],
+        [
+          "backupsysstatus",
+          25,
+          -1
+        ],
+        [
+          "sensitive_factors",
+          20,
+          -1
+        ],
+        [
+          "accelerated_deterioration",
+          25,
+          -1
+        ]
+      ],
+      "rows": 286,
+      "bag_digest": "5df1a5a42e70795bd39003284e5f7fcc335f1decdeeff5afffefee7ba85a68fd",
+      "values_digest": "9fe2e7e1482068ac60eb7397b81690cd5b38e6b04e91233c94e74f622e80c21f",
+      "ordered_digest": "1b8b1e2732754ceb244160fc6a055f6ead7e0eae798435a528c716f4e8ec7992"
+    },
+    "415628abf33b8d0d8fcf01bcd330265799d477066c71358e41182bf7df2f4dcb": {
+      "sql": "SELECT \n  artrefconcerned AS collection_piece_id, \n  conservepriorityscore AS TETL_score \nFROM \n  riskassessments \nORDER BY \n  conservepriorityscore DESC \nLIMIT \n  10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e7ecbbd484989f745aca4e6d05f40bb790970fab57ed3f2cdce6d5da1b6d974f",
+      "ordered": true,
+      "columns": [
+        [
+          "collection_piece_id",
+          1042,
+          14
+        ],
+        [
+          "tetl_score",
+          21,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "55a2b467fd025df1bdb427eef0ac1ad8ee19ab171f2c59d2312e7b72a579d6ba",
+      "values_digest": "a02dccd4e7a159dee70e467179dbc190ad1fb4ea2f80e67d8d3cca9ee838ad28",
+      "ordered_digest": "56f0faf53193a3e40731b905d2dabe396455d88f755e88b742c64459bc7c5670"
+    },
+    "833dbfe99213743338ca7c87d3a25a093b530fcbef6133a65dfd3a4dfa832469": {
+      "sql": "SELECT \n  artrefconcerned AS collection_piece_id, \n  conservepriorityscore AS tetl_score \nFROM \n  riskassessments \nORDER BY \n  conservepriorityscore DESC \nLIMIT \n  10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e7ecbbd484989f745aca4e6d05f40bb790970fab57ed3f2cdce6d5da1b6d974f",
+      "ordered": true,
+      "columns": [
+        [
+          "collection_piece_id",
+          1042,
+          14
+        ],
+        [
+          "tetl_score",
+          21,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "55a2b467fd025df1bdb427eef0ac1ad8ee19ab171f2c59d2312e7b72a579d6ba",
+      "values_digest": "a02dccd4e7a159dee70e467179dbc190ad1fb4ea2f80e67d8d3cca9ee838ad28",
+      "ordered_digest": "56f0faf53193a3e40731b905d2dabe396455d88f755e88b742c64459bc7c5670"
+    },
+    "0eb540c120b72798617db486f5e1452d86e32d6dc025921ce5389e0d39424813": {
+      "sql": "SELECT \r\n    MAX(lightlux) AS max_safe_light_level\r\nFROM \r\n    lightandradiationreadings;",
+      "decisions": {
+        "N0": {
+          "key": "59149e578283ec54348f05f148a9f9065cb6cd68f70216ab7f57b9764fbbb08d",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "078d0289812ea246b86fbb73cdffc0684019a5e88bce58a1036de03d614a81d7",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "d36d8f35224913b8a75c6084d6027d81e11a760063cf83efb7310b7a006ff4e8",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "36a18115586a8b601e72b1594eb9ed93ad63323dce58d4ad979c3cfa7d7207a5",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "233f4c57c32f28c6d1898cd2e1b704ea0057494ee1dc90e4e7f1ede885ca402a",
+      "ordered": false,
+      "columns": [
+        [
+          "max_safe_light_level",
+          23,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "68c20e095338987b944ef6c57a071125189b5a7175bce5bf17ddd35cfd64045b",
+      "values_digest": "3b5db4144be95c43420de7447db80acfe429879434a416b46312c2ec2ae0b730",
+      "ordered_digest": "68c20e095338987b944ef6c57a071125189b5a7175bce5bf17ddd35cfd64045b"
+    },
+    "d85acf1058d06d0aa87ab93c7bd6ba710773ef4749870ac78e5a8bce2ce31aa3": {
+      "sql": "SELECT \r\n    a.artregistry AS \"Artifact ID\",\r\n    a.artname AS Name,\r\n    a.artdynasty AS \"Historical Era\",\r\n    r.conservepriorityscore AS Score\r\nFROM \r\n    artifactscore a\r\nJOIN \r\n    riskassessments r ON a.artregistry = r.artrefconcerned\r\nORDER BY \r\n    r.conservepriorityscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "286aea8314dfb0019e13a10a3c13ac78c30ca937c4195d881b3bc7aa9c0b4228",
+      "ordered": true,
+      "columns": [
+        [
+          "Artifact ID",
+          1042,
+          14
+        ],
+        [
+          "name",
+          1043,
+          259
+        ],
+        [
+          "Historical Era",
+          1043,
+          54
+        ],
+        [
+          "score",
+          21,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "75a2891d6c07f7ed6d7a820c438f018b3ae651d3fe29609e4c25542418c4289c",
+      "values_digest": "66b9b1933e6f65d4f9fbf15a386bf0eb041e9437d6ec2ee91988abeebf66d95d",
+      "ordered_digest": "89451025875fc947e6858b87aed1bfda193ec2d29cf58b30653bb40f1c24c65a"
+    },
+    "aae2564e405f3b1ca5c17868c8127e064a8b534b0f59de17755d3f546913aca0": {
+      "sql": "SELECT \r\n    a.artregistry AS \"Artifact ID\", \r\n    a.artname AS \"Artifact Name\", \r\n    a.artdynasty AS \"Historical Era\", \r\n    r.conservepriorityscore AS \"Conservation Priority Score\", \r\n    RANK() OVER (ORDER BY r.conservepriorityscore DESC) AS \"Rank\" \r\nFROM \r\n    artifactscore a \r\nJOIN \r\n    riskassessments r ON a.artregistry = r.artrefconcerned \r\nORDER BY \r\n    \"Rank\";",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "deb44b007f7851834d351a0342755b5cd73d4dcb1183992d4eb79864b07dbc1c",
+      "ordered": true,
+      "columns": [
+        [
+          "Artifact ID",
+          1042,
+          14
+        ],
+        [
+          "Artifact Name",
+          1043,
+          259
+        ],
+        [
+          "Historical Era",
+          1043,
+          54
+        ],
+        [
+          "Conservation Priority Score",
+          21,
+          -1
+        ],
+        [
+          "Rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "d2f1db4a1cc78e1750548803b5b25c154c3f093977a607913ea2d5f9cc4b3f58",
+      "values_digest": "b6f3a5423200fe3c0ad0ac4629e5254aaa28970cec7a2787058abdcbd7dd18e1",
+      "ordered_digest": "ccfee91ae917167ef1cc0c6b195490c5113c0708b818362c71894f805d976553"
+    },
+    "d20926b1ee5ccc1297f57bb2a46d1ea27813613d6014bc7d85d994acc5cd6ab1": {
+      "sql": "SELECT \r\n    a.artregistry AS \"Artifact ID\", \r\n    a.artname AS Name, \r\n    a.artdynasty AS \"Historical Era\", \r\n    ra.conservepriorityscore AS Score \r\nFROM \r\n    artifactscore AS a \r\nJOIN \r\n    riskassessments AS ra ON a.artregistry = ra.artrefconcerned \r\nORDER BY \r\n    ra.conservepriorityscore DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2b0ea57d5be0dc14cf252f9e9d70cfb6e05c2f819f39fb1e39da2433314ff9dc",
+      "ordered": true,
+      "columns": [
+        [
+          "Artifact ID",
+          1042,
+          14
+        ],
+        [
+          "name",
+          1043,
+          259
+        ],
+        [
+          "Historical Era",
+          1043,
+          54
+        ],
+        [
+          "score",
+          21,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "75a2891d6c07f7ed6d7a820c438f018b3ae651d3fe29609e4c25542418c4289c",
+      "values_digest": "66b9b1933e6f65d4f9fbf15a386bf0eb041e9437d6ec2ee91988abeebf66d95d",
+      "ordered_digest": "89451025875fc947e6858b87aed1bfda193ec2d29cf58b30653bb40f1c24c65a"
+    },
+    "f736f66a8f0ef789946b30660d85a75b86d0ea9fa2ead92c035f7015945f62dc": {
+      "sql": "SELECT \r\n    a.artregistry AS artifact_id,\r\n    a.artname AS artifact_name,\r\n    a.artdynasty AS historical_era,\r\n    ca.condassessscore AS score\r\nFROM \r\n    ArtifactScore AS a\r\nJOIN \r\n    ConditionAssessments AS ca ON a.artregistry = ca.artrefexamined\r\nORDER BY \r\n    score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "475acb1bba6f958fac71e2ffef88fe51f25335f82ef092e21faf20e0d7ada90b",
+      "ordered": true,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "historical_era",
+          1043,
+          54
+        ],
+        [
+          "score",
+          23,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "dbb98543a43d5f34a3acf36f21ea6203799586baaa51043fdd563d600ddb32e0",
+      "values_digest": "8345a280098db1e5bff55b48fa29d64a320a0a438c72008962b7f3fcf988072c",
+      "ordered_digest": "de7185a0df255f54a4c4cbf28d8e3d4f6df0926a50e7e4dd349421fc59a626a0"
+    },
+    "ab16d30e529dddcfe0c78699ffff031327559beb35662d9f6605e310d1a5168f": {
+      "sql": "SELECT \r\n    ar.artregistry AS artifact_id,\r\n    ar.artname AS artifact_name,\r\n    ar.conservestatus AS conservation_status,\r\n    at.deteriorrate AS deterioration_rate,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        SELECT COUNT(*)\r\n        FROM sensitivitydata sd\r\n        WHERE sd.artref = ar.artregistry\r\n        AND (\r\n            sd.envsensitivity IS NOT NULL\r\n            OR sd.lightsensitivity IS NOT NULL\r\n            OR sd.tempsensitivity IS NOT NULL\r\n            OR sd.humiditysensitivity IS NOT NULL\r\n            OR sd.vibrasensitivity IS NOT NULL\r\n            OR sd.pollutantsensitivity IS NOT NULL\r\n            OR sd.pestsensitivity IS NOT NULL\r\n            OR sd.handlesensitivity IS NOT NULL\r\n            OR sd.transportsensitivity IS NOT NULL\r\n            OR sd.displaysensitivity IS NOT NULL\r\n            OR sd.storagesensitivity IS NOT NULL\r\n        )\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN at.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration\r\nFROM \r\n    artifactscore ar\r\nJOIN \r\n    artifactratings at ON ar.artregistry = at.artref\r\nJOIN \r\n    usagerecords ur ON ar.artregistry = ur.artrefused\r\nJOIN \r\n    showcases sc ON ur.showcaserefused = sc.showcasereg;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "719b89970adc3c308302c629486a0dd0939529f9cf6cfe8a3bab27bf73fa830a",
+      "ordered": false,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "conservation_status",
+          17778,
+          -1
+        ],
+        [
+          "deterioration_rate",
+          25,
+          -1
+        ],
+        [
+          "display_case_material",
+          1043,
+          84
+        ],
+        [
+          "seal_condition",
+          1043,
+          34
+        ],
+        [
+          "maintenance_status",
+          1042,
+          29
+        ],
+        [
+          "filter_status",
+          25,
+          -1
+        ],
+        [
+          "silica_gel_status",
+          1042,
+          24
+        ],
+        [
+          "silica_gel_change_date",
+          1082,
+          -1
+        ],
+        [
+          "humidity_buffer_capacity",
+          21,
+          -1
+        ],
+        [
+          "pollutant_absorb_capacity",
+          1700,
+          327686
+        ],
+        [
+          "leak_rate",
+          700,
+          -1
+        ],
+        [
+          "pressure",
+          20,
+          -1
+        ],
+        [
+          "inert_gas_system_status",
+          1043,
+          54
+        ],
+        [
+          "fire_suppression_system",
+          1043,
+          54
+        ],
+        [
+          "emergency_power_status",
+          1042,
+          14
+        ],
+        [
+          "backup_system_status",
+          25,
+          -1
+        ],
+        [
+          "sensitive_factors_count",
+          20,
+          -1
+        ],
+        [
+          "accelerated_deterioration",
+          25,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "25a066db791ba7e637e057cc1cd51da8c4c0869dffb563cc1483172d3a7cbd31",
+      "values_digest": "59f4829bf048ab7eee5ecd2fd33444696868f4ca511ba6a6bc9b3950cd1be667",
+      "ordered_digest": "599ec0c49d940a0919b7b41dd884e85d7fca185fe4f87fc550245bfdde11bcd0"
+    },
+    "5e69462ef914a2aa18466c7e075a9fbb223f69942b931ce886bf914aefc8b4b1": {
+      "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sc.showcasematerial AS display_case_material,\r\n    sc.sealcondition AS seal_condition,\r\n    sc.maintstatus AS maintenance_status,\r\n    sc.filterstatus AS filter_status,\r\n    sc.silicagelstatus AS silica_gel_status,\r\n    sc.silicagelchangedate AS silica_gel_change_date,\r\n    sc.humiditybuffercap AS humidity_buffer_capacity,\r\n    sc.pollutantabsorbcap AS pollutant_absorb_capacity,\r\n    sc.leakrate AS leak_rate,\r\n    sc.pressurepa AS pressure,\r\n    sc.inertgassysstatus AS inert_gas_system_status,\r\n    sc.firesuppresssys AS fire_suppression_system,\r\n    sc.empowerstatus AS emergency_power_status,\r\n    sc.backupsysstatus AS backup_system_status,\r\n    (\r\n        CASE WHEN sd.envsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.lightsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.tempsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.humiditysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.vibrasensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pollutantsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.pestsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.handlesensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.transportsensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.displaysensitivity = 'High' THEN 1 ELSE 0 END +\r\n        CASE WHEN sd.storagesensitivity = 'High' THEN 1 ELSE 0 END\r\n    ) AS sensitive_factors_count,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS accelerated_deterioration_criteria\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    showcases AS sc ON ur.showcaserefused = sc.showcasereg\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4b583105feb940a31b8e87dc3bdef3bb13d53831a9619e74596e0e6412154427",
+      "ordered": false,
+      "columns": [
+        [
+          "rapid_deterioration",
+          25,
+          -1
+        ],
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "display_case_material",
+          1043,
+          84
+        ],
+        [
+          "seal_condition",
+          1043,
+          34
+        ],
+        [
+          "maintenance_status",
+          1042,
+          29
+        ],
+        [
+          "filter_status",
+          25,
+          -1
+        ],
+        [
+          "silica_gel_status",
+          1042,
+          24
+        ],
+        [
+          "silica_gel_change_date",
+          1082,
+          -1
+        ],
+        [
+          "humidity_buffer_capacity",
+          21,
+          -1
+        ],
+        [
+          "pollutant_absorb_capacity",
+          1700,
+          327686
+        ],
+        [
+          "leak_rate",
+          700,
+          -1
+        ],
+        [
+          "pressure",
+          20,
+          -1
+        ],
+        [
+          "inert_gas_system_status",
+          1043,
+          54
+        ],
+        [
+          "fire_suppression_system",
+          1043,
+          54
+        ],
+        [
+          "emergency_power_status",
+          1042,
+          14
+        ],
+        [
+          "backup_system_status",
+          25,
+          -1
+        ],
+        [
+          "sensitive_factors_count",
+          23,
+          -1
+        ],
+        [
+          "accelerated_deterioration_criteria",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "0b2311769fd6a309f4f07b8635632c70309c0a01daa7c07fe5323d53733956ad",
+      "values_digest": "8c2742f3f7686c215d546cd271afe2698a1e60ab1a63aeba97add39ddf21886c",
+      "ordered_digest": "87ad1205cb7f79676987db43324526f8bc675f4f9e76796c4cadf06f4260287d"
+    },
+    "d1f42e32a64eb0f89aa130aa1e0f11b1c7b55dad7ac4a0ac98c18bfda2196d03": {
+      "sql": "SELECT \r\n    ar.deteriorrate AS rapid_deterioration,\r\n    ac.artregistry AS artifact_id,\r\n    ac.artname AS artifact_name,\r\n    sh.showcasematerial, sh.sealcondition, sh.maintstatus, sh.filterstatus, sh.silicagelstatus, sh.silicagelchangedate, sh.humiditybuffercap, sh.pollutantabsorbcap, sh.leakrate, sh.pressurepa, sh.inertgassysstatus, sh.firesuppresssys, sh.empowerstatus, sh.backupsysstatus AS display_case_conditions,\r\n    COUNT(sd.sensitivityregistry) AS sensitive_factors,\r\n    CASE \r\n        WHEN ar.deteriorrate = 'Rapid' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS meets_accelerated_deterioration\r\nFROM \r\n    artifactscore AS ac\r\nJOIN \r\n    artifactratings AS ar ON ac.artregistry = ar.artref\r\nJOIN \r\n    sensitivitydata AS sd ON ac.artregistry = sd.artref\r\nJOIN \r\n    usagerecords AS ur ON ac.artregistry = ur.artrefused\r\nJOIN \r\n    conditionassessments AS ca ON ac.artregistry = ca.artrefexamined\r\nJOIN \r\n    showcases AS sh ON ca.showcaserefexamined = sh.showcasereg\r\nGROUP BY \r\n    ar.deteriorrate, ac.artregistry, ac.artname, sh.showcasematerial, sh.sealcondition, sh.maintstatus, sh.filterstatus, sh.silicagelstatus, sh.silicagelchangedate, sh.humiditybuffercap, sh.pollutantabsorbcap, sh.leakrate, sh.pressurepa, sh.inertgassysstatus, sh.firesuppresssys, sh.empowerstatus, sh.backupsysstatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fa7f4932eedc828d925274d23bcaa96d92b17bfb264e3ed57668ef91d54161fe",
+      "ordered": false,
+      "columns": [
+        [
+          "rapid_deterioration",
+          25,
+          -1
+        ],
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "showcasematerial",
+          1043,
+          84
+        ],
+        [
+          "sealcondition",
+          1043,
+          34
+        ],
+        [
+          "maintstatus",
+          1042,
+          29
+        ],
+        [
+          "filterstatus",
+          25,
+          -1
+        ],
+        [
+          "silicagelstatus",
+          1042,
+          24
+        ],
+        [
+          "silicagelchangedate",
+          1082,
+          -1
+        ],
+        [
+          "humiditybuffercap",
+          21,
+          -1
+        ],
+        [
+          "pollutantabsorbcap",
+          1700,
+          327686
+        ],
+        [
+          "leakrate",
+          700,
+          -1
+        ],
+        [
+          "pressurepa",
+          20,
+          -1
+        ],
+        [
+          "inertgassysstatus",
+          1043,
+          54
+        ],
+        [
+          "firesuppresssys",
+          1043,
+          54
+        ],
+        [
+          "empowerstatus",
+          1042,
+          14
+        ],
+        [
+          "display_case_conditions",
+          25,
+          -1
+        ],
+        [
+          "sensitive_factors",
+          20,
+          -1
+        ],
+        [
+          "meets_accelerated_deterioration",
+          25,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "a667305fc57253bc720aae6f6043a6d70be35efcb67c250761bfaad26e293260",
+      "values_digest": "d0997b53d6b9ac9b36a7d2b55be8867ad4c1a05a641a0fab4c1e5d004d7b42cd",
+      "ordered_digest": "cbbaed6c63c7b9ae34c434ee8c31ecc5e80d44ac33cc8186c76a8e62090c2631"
+    },
+    "67f99ccc3f09dbeb6c0c37770cfc6162b4900791ab51833d2c411e79a402bc8a": {
+      "sql": "SELECT \r\n    ra.artrefconcerned AS artifact_id,\r\n    TETL.tetl_score\r\nFROM \r\n    riskassessments ra\r\nJOIN (\r\n    SELECT \r\n        artrefconcerned,\r\n        SUM(\r\n            conservepriorityscore * \r\n            CASE \r\n                WHEN riskassesslevel = 'High' THEN 3\r\n                WHEN riskassesslevel = 'Medium' THEN 2\r\n                WHEN riskassesslevel = 'Low' THEN 1\r\n            END\r\n        ) AS tetl_score\r\n    FROM \r\n        riskassessments\r\n    GROUP BY \r\n        artrefconcerned\r\n) AS TETL ON ra.artrefconcerned = TETL.artrefconcerned\r\nORDER BY \r\n    tetl_score DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e9b939654e92cb27255a9261d8bc8252706bd3453e127303e83b71dd5a5bf501",
+      "ordered": true,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "tetl_score",
+          20,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "2a03ed63ad896777dccf2ba31fae02750750afc8b79ab90b3cdfadb06e4acd25",
+      "values_digest": "21662ce5b1a250c9b8aca0b7b94bd61e4a0f09e44ec9e784474cf9b1aa103800",
+      "ordered_digest": "ac4d913224de44439468db450fa1281aee98333fc910ecc064af6132116eb04f"
+    },
+    "752916c06ec20bf8ebd6a770f1a75d0cb153628aeba7f12f8bf6051bdc3b613c": {
+      "sql": "SELECT COUNT(*)\r\nFROM artifactsecurityaccess\r\nWHERE loanstatus = 'Not Available'\r\n  AND insvalueusd > (\r\n    SELECT AVG(insvalueusd)\r\n    FROM artifactsecurityaccess\r\n  );",
+      "decisions": {
+        "N0": {
+          "key": "e1bcaa13b1190d9513770ca33d1a6e1bb04eb053ba188025808826d41b8a3024",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "b43dba79a743b277b4e7650fb634500e79da8c57429a38531d11f48f3a4efcf0",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "e23ee62f0515fee8b664110d5bc33164e02595a4aae49d232fb040e22086b839",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "711cbfee78f27279779162dd1f51eb616f329294092262ad71f9b59328489bb1",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "f6812814ac0a3df44a3ad6ccc5a078bbfd83055d53645699879f2b1f8c0cca68",
+      "ordered": false,
+      "columns": [
+        [
+          "count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "4abbe935ceb58b81d90cc50d27480a5385ea53f97768b8f07d17db29a3b45c4d",
+      "values_digest": "648f96f6e845700d82b38d9c1edb20e87b7d8c31a0e109db35e8a3828afdef34",
+      "ordered_digest": "4abbe935ceb58b81d90cc50d27480a5385ea53f97768b8f07d17db29a3b45c4d"
+    },
+    "ddf94473ac64fcc1608433b65da7353b663bdb4f7c3a0b5a01f481182143ba35": {
+      "sql": "SELECT DISTINCT ratingrecordregistry\nFROM artifactratings\nWHERE matstability = 'Unstable';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e4f1f07c0519d0f6f5a58678e5ec243023a23e15c684fdafb842063ec6daf621",
+      "ordered": false,
+      "columns": [
+        [
+          "ratingrecordregistry",
+          20,
+          -1
+        ]
+      ],
+      "rows": 323,
+      "bag_digest": "b8be70ab67bdc4ee1ee3694cf8c8bd7e27bcc2b871cd136dce77decaa865d0de",
+      "values_digest": "7b467353b9cdf2b785caf3b4b975bacccc10504a2b4e923c530e20cadd557c7f",
+      "ordered_digest": "00989c0e0b9e3be385ee190e20bc829d68752d15033bc5675efb5aed90892c08"
+    },
+    "c935cb514e1219dbae28a43648b4be5085a20d39adf7c9bce1df023942479784": {
+      "sql": "SELECT DISTINCT showcaseReg\nFROM showcases\nWHERE (sealCondition = 'Poor' OR maintStatus = 'Overdue' OR filterStatus = 'Replace Now' OR silicaGelStatus = 'Replace Now')\nAND (sealCondition = 'Poor' OR maintStatus = 'Overdue' OR filterStatus = 'Replace Now' OR silicaGelStatus = 'Replace Now')\nAND (sealCondition = 'Poor' OR maintStatus = 'Overdue' OR filterStatus = 'Replace Now' OR silicaGelStatus = 'Replace Now')\nAND (sealCondition = 'Poor' OR maintStatus = 'Overdue' OR filterStatus = 'Replace Now' OR silicaGelStatus = 'Replace Now');",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ed3950287050acda94c399d40cb8827da63ca04c9334e35f3bd366a7ab1ad3e9",
+      "ordered": false,
+      "columns": [
+        [
+          "showcasereg",
+          1042,
+          16
+        ]
+      ],
+      "rows": 740,
+      "bag_digest": "559c2f2906554df43a03b93f87533e063afdb7c2eb44a111cd88eb9ac4efcdb5",
+      "values_digest": "587fe63c96ad5bb825680e8fe3052ecb6e14a5b2d0a98b7ee413a5b3a87962d0",
+      "ordered_digest": "b37a6737faf6455ed1a91761229fdeab9819f9ceeae3fcb1e910c29c29362722"
+    },
+    "ba8ea10b7b09c04486f971e6ca1ce7ce79b867ed88f2a6b908b8fced590c80f8": {
+      "sql": "SELECT showcasereg\nFROM showcases\nWHERE (\n    sealcondition = 'Poor'\n    OR maintstatus = 'Overdue'\n    OR filterstatus = 'Replace Now'\n    OR silicagelstatus = 'Replace Now'\n)\nLIMIT 3;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "relative temporal input",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8ce0063e52cac601c19100ffc3607eac57e172d73488a9eaad998f2f5ed3087e",
+      "ordered": false,
+      "columns": [
+        [
+          "showcasereg",
+          1042,
+          16
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "2f613a9839bd429ef708508b308140bbce626a6a6427c7932444d034534675fc",
+      "values_digest": "ce9f966bca9286531497b9b5b12d35558fa8308079844cc86c0965defce66893",
+      "ordered_digest": "7ba96fb4ae918756aa134f899f64d49b3fc966417fc4e404a5ac1b05d5dc070b"
+    },
+    "9f5fda39595bbde756e8293eb8ad5fe243efd1c4697d9138e069b1e2215c9fac": {
+      "sql": "WITH ArtifactRiskFactors AS (\n    SELECT\n        artregistry AS artifact_id,\n        artname AS artifact_name,\n        ARRAY[\n            envsensitivity,\n            lightsensitivity,\n            tempsensitivity,\n            humiditysensitivity,\n            vibrasensitivity,\n            pollutantsensitivity,\n            pestsensitivity,\n            handlesensitivity,\n            transportsensitivity,\n            displaysensitivity,\n            storagesensitivity\n        ] AS sensitivities,\n        (\n            SUM(\n                CASE\n                    WHEN envsensitivity = 'Low' THEN 1\n                    WHEN envsensitivity = 'Medium' THEN 2\n                    WHEN envsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN lightsensitivity = 'Low' THEN 1\n                    WHEN lightsensitivity = 'Medium' THEN 2\n                    WHEN lightsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN tempsensitivity = 'Low' THEN 1\n                    WHEN tempsensitivity = 'Medium' THEN 2\n                    WHEN tempsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN humiditysensitivity = 'Low' THEN 1\n                    WHEN humiditysensitivity = 'Medium' THEN 2\n                    WHEN humiditysensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN vibrasensitivity = 'Low' THEN 1\n                    WHEN vibrasensitivity = 'Medium' THEN 2\n                    WHEN vibrasensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN pollutantsensitivity = 'Low' THEN 1\n                    WHEN pollutantsensitivity = 'Medium' THEN 2\n                    WHEN pollutantsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN pestsensitivity = 'Low' THEN 1\n                    WHEN pestsensitivity = 'Medium' THEN 2\n                    WHEN pestsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN handlesensitivity = 'Low' THEN 1\n                    WHEN handlesensitivity = 'Medium' THEN 2\n                    WHEN handlesensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN transportsensitivity = 'Low' THEN 1\n                    WHEN transportsensitivity = 'Medium' THEN 2\n                    WHEN transportsensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN displaysensitivity = 'Low' THEN 1\n                    WHEN displaysensitivity = 'Medium' THEN 2\n                    WHEN displaysensitivity = 'High' THEN 3\n                    ELSE 0\n                END +\n                CASE\n                    WHEN storagesensitivity = 'Low' THEN 1\n                    WHEN storagesensitivity = 'Medium' THEN 2\n                    WHEN storagesensitivity = 'High' THEN 3\n                    ELSE 0\n                END\n            ) / 11\n        ) AS risk_factor\n    FROM\n        sensitivitydata\n        JOIN artifactscore ON sensitivitydata.artref = artifactscore.artregistry\n    GROUP BY\n        artregistry,\n        artname,\n        envsensitivity,\n        lightsensitivity,\n        tempsensitivity,\n        humiditysensitivity,\n        vibrasensitivity,\n        pollutantsensitivity,\n        pestsensitivity,\n        handlesensitivity,\n        transportsensitivity,\n        displaysensitivity,\n        storagesensitivity\n)\nSELECT\n    artifact_id,\n    artifact_name,\n    risk_factor,\n    json_agg(sensitivities) AS sensitivity_ratings\nFROM\n    ArtifactRiskFactors\nWHERE\n    risk_factor > 7\nGROUP BY\n    artifact_id,\n    artifact_name,\n    risk_factor\nORDER BY\n    risk_factor DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "33286e8cdcf94d9226fe19a5c62377e6f522436c71af71c9800b831553594f26",
+      "ordered": true,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "risk_factor",
+          20,
+          -1
+        ],
+        [
+          "sensitivity_ratings",
+          114,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "45fa25d09e3c8388dfeb3f6a1dcd3fbf80de6547c5848fe9c86ab4b192b9ad3b",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "45fa25d09e3c8388dfeb3f6a1dcd3fbf80de6547c5848fe9c86ab4b192b9ad3b"
+    },
+    "77d9d32c3f3c3740eae0bd7ec733bbb8fed8ee0be9d9524b21fcc0140ecfc017": {
+      "sql": "WITH DynastyArtifactInfo AS (\n    SELECT \n        a.artdynasty AS Dynasty,\n        a.artregistry AS ArtifactID,\n        a.conservestatus AS ConservationStatus,\n        cm.budgetallocstatus AS BudgetAllocStatus,\n        cm.maintbudgetstatus AS MaintenanceBudgetStatus,\n        ra.conservepriorityscore AS PriorityScore,\n        ar.conservediff AS ConservationDifficulty\n    FROM \n        artifactscore a\n    LEFT JOIN \n        conservationandmaintenance cm ON a.artregistry = cm.artrefmaintained\n    LEFT JOIN \n        riskassessments ra ON a.artregistry = ra.artrefconcerned\n    LEFT JOIN \n        artifactratings ar ON a.artregistry = ar.artref\n),\nDynastySummary AS (\n    SELECT \n        Dynasty,\n        SUM(PriorityScore) AS TotalPriorityScore,\n        SUM(CASE WHEN BudgetAllocStatus ILIKE '%adequate%' THEN 1 ELSE 0 END) AS AdequateFundingCount,\n        SUM(CASE WHEN BudgetAllocStatus ILIKE '%insufficient%' THEN 1 ELSE 0 END) AS InsufficientFundingCount,\n        -- Assuming BudgetEfficiencyValue is derived from MaintenanceBudgetStatus\n        CASE \n            WHEN MAX(MaintenanceBudgetStatus) ILIKE '%limited%' THEN 0.6\n            WHEN MAX(MaintenanceBudgetStatus) ILIKE '%depleted%' THEN 0.3\n            ELSE 1.0\n        END AS BudgetEfficiencyValue,\n        CASE \n            WHEN MAX(MaintenanceBudgetStatus) ILIKE '%depleted%' AND MAX(BudgetAllocStatus) ILIKE '%insufficient%' THEN 'Budget Crisis'\n            ELSE 'Within Budget'\n        END AS BudgetStatus\n    FROM \n        DynastyArtifactInfo\n    GROUP BY \n        Dynasty\n),\nAllDynastiesSummary AS (\n    SELECT \n        'ALL DYNASTIES' AS Dynasty,\n        SUM(TotalPriorityScore) AS TotalPriorityScore,\n        SUM(AdequateFundingCount) AS AdequateFundingCount,\n        SUM(InsufficientFundingCount) AS InsufficientFundingCount,\n        AVG(BudgetEfficiencyValue) AS BudgetEfficiencyValue,\n        MAX(CASE WHEN BudgetStatus = 'Budget Crisis' THEN 'Budget Crisis' ELSE 'Within Budget' END) AS BudgetStatus\n    FROM \n        DynastySummary\n)\nSELECT \n    ds.Dynasty, \n    ds.TotalPriorityScore, \n    ds.AdequateFundingCount AS \"Artifacts with Adequate Funding\", \n    ds.InsufficientFundingCount AS \"Artifacts with Insufficient Funding\", \n    ds.BudgetEfficiencyValue, \n    ds.BudgetStatus\nFROM \n    DynastySummary ds\nUNION ALL\nSELECT \n    ads.Dynasty, \n    ads.TotalPriorityScore, \n    ads.AdequateFundingCount AS \"Artifacts with Adequate Funding\", \n    ads.InsufficientFundingCount AS \"Artifacts with Insufficient Funding\", \n    ads.BudgetEfficiencyValue, \n    ads.BudgetStatus\nFROM \n    AllDynastiesSummary ads;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "291da7f7d5eefa2fc778c264f4f18c4dd1c91a794ab9a6bd9d5c0e5a4bbd8c78",
+      "ordered": false,
+      "columns": [
+        [
+          "dynasty",
+          1043,
+          -1
+        ],
+        [
+          "totalpriorityscore",
+          1700,
+          -1
+        ],
+        [
+          "Artifacts with Adequate Funding",
+          1700,
+          -1
+        ],
+        [
+          "Artifacts with Insufficient Funding",
+          1700,
+          -1
+        ],
+        [
+          "budgetefficiencyvalue",
+          1700,
+          -1
+        ],
+        [
+          "budgetstatus",
+          25,
+          -1
+        ]
+      ],
+      "rows": 7,
+      "bag_digest": "e475d02e06685eeada1f8755374831051e782c7ee7cf50cf43d436a659bf43c0",
+      "values_digest": "12c187f44d94c133fdcccb2233580a0ab0bb4feaad1cd726748678c425e87691",
+      "ordered_digest": "aa9b4bcee3fc30923310c88db39ce7634b92cef780191915d77451a21c792b8a"
+    },
+    "54816e4905d31361798d199e64b015397bd3b43ba6d4f9ad9d68be23c61329b1": {
+      "sql": "WITH DynastyBudget AS (\r\n    SELECT \r\n        a.artdynasty AS DynastyName,\r\n        SUM(r.conservepriorityscore) AS TotalConservationPriorityIndex,\r\n        COUNT(CASE WHEN c.maintbudgetstatus = 'Available' THEN 1 END) AS AdequateFundingCount,\r\n        COUNT(CASE WHEN c.maintbudgetstatus != 'Available' THEN 1 END) AS InsufficientFundingCount,\r\n        CASE \r\n            WHEN COUNT(CASE WHEN c.maintbudgetstatus = 'Available' THEN 1 END) < COUNT(CASE WHEN c.maintbudgetstatus != 'Available' THEN 1 END) \r\n            THEN 'Budget Crisis' \r\n            ELSE 'Within Budget' \r\n        END AS BudgetStatus\r\n    FROM \r\n        artifactscore a\r\n    JOIN \r\n        riskassessments r ON a.artregistry = r.artrefconcerned\r\n    JOIN \r\n        conservationandmaintenance c ON a.artregistry = c.artrefmaintained\r\n    GROUP BY \r\n        a.artdynasty\r\n),\r\nSummaryBudget AS (\r\n    SELECT \r\n        'ALL DYNASTIES' AS DynastyName,\r\n        SUM(TotalConservationPriorityIndex) AS TotalConservationPriorityIndex,\r\n        SUM(AdequateFundingCount) AS AdequateFundingCount,\r\n        SUM(InsufficientFundingCount) AS InsufficientFundingCount,\r\n        CASE \r\n            WHEN SUM(AdequateFundingCount) < SUM(InsufficientFundingCount) \r\n            THEN 'Budget Crisis' \r\n            ELSE 'Within Budget' \r\n        END AS BudgetStatus\r\n    FROM \r\n        DynastyBudget\r\n)\r\n\r\nSELECT * FROM DynastyBudget\r\nUNION ALL\r\nSELECT * FROM SummaryBudget;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3b2b248687bc5651e5a3e9bad60dff9fa46f85d79812af8449493f049442fe9f",
+      "ordered": false,
+      "columns": [
+        [
+          "dynastyname",
+          1043,
+          -1
+        ],
+        [
+          "totalconservationpriorityindex",
+          1700,
+          -1
+        ],
+        [
+          "adequatefundingcount",
+          1700,
+          -1
+        ],
+        [
+          "insufficientfundingcount",
+          1700,
+          -1
+        ],
+        [
+          "budgetstatus",
+          25,
+          -1
+        ]
+      ],
+      "rows": 7,
+      "bag_digest": "87a2f5b4db1ddf46c10d0c65982e8e316ce7d415fca1c580a5bfd24cfab17012",
+      "values_digest": "8f45383f715e96c1572a5c789b3853e3a9a4298a68c89855cdd0ed4c1b283910",
+      "ordered_digest": "3a8ca88f9f7665e488a0c9529f6503b7c7465113eb0271f102d675475abdea6b"
+    },
+    "3bd54f4001b74bd93539ba5b1433a5517fec5b7fd181ae21d92d642ab66caca9": {
+      "sql": "WITH SensitiveArtifacts AS (\r\n    SELECT \r\n        t1.artregistry, \r\n        t1.artname, \r\n        t1.mattype, \r\n        t2.lightsensitivity, \r\n        t3.lightlux\r\n    FROM \r\n        artifactscore AS t1\r\n    JOIN \r\n        sensitivitydata AS t2 ON t1.artregistry = t2.artref\r\n    JOIN \r\n        conditionassessments AS t4 ON t1.artregistry = t4.artrefexamined\r\n    JOIN \r\n        lightandradiationreadings AS t3 ON t4.lightreadrefobserved = t3.lightradregistry\r\n    WHERE \r\n        t2.lightsensitivity ILIKE '%sensitive%'\r\n),\r\nLightExposureStatus AS (\r\n    SELECT \r\n        artregistry, \r\n        artname, \r\n        mattype, \r\n        lightsensitivity,\r\n        lightlux,\r\n        CASE \r\n            WHEN lightlux > 200 THEN 'Over Exposure' \r\n            ELSE 'Within Limits' \r\n        END AS exposure_status\r\n    FROM \r\n        SensitiveArtifacts\r\n)\r\nSELECT \r\n    artregistry AS registry_number,\r\n    artname AS name,\r\n    mattype AS material_type,\r\n    lightsensitivity AS light_sensitivity,\r\n    exposure_status AS current_status\r\nFROM \r\n    LightExposureStatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d24b067f34ee26ff24911aa385905092405dce2ea521c41da92014bd160a17b3",
+      "ordered": false,
+      "columns": [
+        [
+          "registry_number",
+          1042,
+          14
+        ],
+        [
+          "name",
+          1043,
+          259
+        ],
+        [
+          "material_type",
+          17790,
+          -1
+        ],
+        [
+          "light_sensitivity",
+          1043,
+          84
+        ],
+        [
+          "current_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "b14445902bc059934f9abd50a7300616b49b52e4632e31feeb6cd11b8c205388",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "b14445902bc059934f9abd50a7300616b49b52e4632e31feeb6cd11b8c205388"
+    },
+    "4509e376a9db7abd878b9abc586b491fcc3bb9d9a6861dd8cdefdd64c6ed5dbd": {
+      "sql": "WITH max_light_sensitivity AS (\r\n    SELECT \r\n        a.artregistry, \r\n        MAX(lr.lightlux) AS max_light_lux\r\n    FROM \r\n        artifactscore a\r\n    JOIN \r\n        conditionassessments ca ON a.artregistry = ca.artrefexamined\r\n    JOIN \r\n        lightandradiationreadings lr ON ca.lightreadrefobserved = lr.lightradregistry\r\n    GROUP BY \r\n        a.artregistry\r\n),\r\nartifact_info AS (\r\n    SELECT \r\n        a.artregistry, \r\n        a.artname, \r\n        a.mattype, \r\n        sd.lightsensitivity\r\n    FROM \r\n        artifactscore a\r\n    JOIN \r\n        sensitivitydata sd ON a.artregistry = sd.artref\r\n)\r\nSELECT \r\n    ai.artregistry AS registry_number,\r\n    ai.artname AS name,\r\n    ai.mattype AS material_type,\r\n    ai.lightsensitivity AS light_sensitivity,\r\n    CASE \r\n        WHEN mls.max_light_lux > 1000 THEN 'Over Exposure'\r\n        ELSE 'Within Limits'\r\n    END AS current_status\r\nFROM \r\n    artifact_info ai\r\nLEFT JOIN \r\n    max_light_sensitivity mls ON ai.artregistry = mls.artregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7043dd5bf51a682c0c104fdc580ea2ec801a598941d3ef795731716c727e05d4",
+      "ordered": false,
+      "columns": [
+        [
+          "registry_number",
+          1042,
+          14
+        ],
+        [
+          "name",
+          1043,
+          259
+        ],
+        [
+          "material_type",
+          17790,
+          -1
+        ],
+        [
+          "light_sensitivity",
+          1043,
+          84
+        ],
+        [
+          "current_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 951,
+      "bag_digest": "9d076abc2341e53e30c45383621ff554c66822d5d9d1af261244a49d9162594f",
+      "values_digest": "fbaa59a7a7fb8122493c85ac6d1aefa5724b794b31521022f859dcdf82ee0bda",
+      "ordered_digest": "0dc77ca2a0ffe37a12505657d52355fd770d4da36538c56c74769db4b7f3b37f"
+    },
+    "c6df97cbba12ee08ea4106f808c6b02bb045b093c1951c7caa5a4d3581250103": {
+      "sql": "WITH sensitivity_summary AS (\n    SELECT\n        artref,\n        json_build_object(\n            'envsensitivity', envsensitivity,\n            'lightsensitivity', lightsensitivity,\n            'tempsensitivity', tempsensitivity,\n            'humiditysensitivity', humiditysensitivity,\n            'vibrasensitivity', vibrasensitivity,\n            'pollutantsensitivity', pollutantsensitivity,\n            'pestsensitivity', pestsensitivity,\n            'handlesensitivity', handlesensitivity,\n            'transportsensitivity', transportsensitivity,\n            'displaysensitivity', displaysensitivity,\n            'storagesensitivity', storagesensitivity\n        ) AS sensitivity_json\n    FROM sensitivitydata\n),\nrisk_scores AS (\n    SELECT\n        artref,\n        (\n            (CASE WHEN envsensitivity = 'High' THEN 10 WHEN envsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN lightsensitivity = 'High' THEN 10 WHEN lightsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN tempsensitivity = 'High' THEN 10 WHEN tempsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN humiditysensitivity = 'High' THEN 10 WHEN humiditysensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN vibrasensitivity = 'High' THEN 10 WHEN vibrasensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN pollutantsensitivity = 'High' THEN 10 WHEN pollutantsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN pestsensitivity = 'High' THEN 10 WHEN pestsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN handlesensitivity = 'High' THEN 10 WHEN handlesensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN transportsensitivity = 'High' THEN 10 WHEN transportsensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN displaysensitivity = 'High' THEN 10 WHEN displaysensitivity = 'Medium' THEN 5 ELSE 1 END) +\n            (CASE WHEN storagesensitivity = 'High' THEN 10 WHEN storagesensitivity = 'Medium' THEN 5 ELSE 1 END)\n        ) / 11.0 AS risk_factor\n    FROM sensitivitydata\n)\nSELECT\n    a.artregistry AS artifact_id,\n    a.artname AS artifact_name,\n    r.risk_factor,\n    s.sensitivity_json\nFROM\n    artifactscore a\nJOIN\n    risk_scores r ON a.artregistry = r.artref\nJOIN\n    sensitivity_summary s ON a.artregistry = s.artref\nWHERE\n    r.risk_factor > 7\nORDER BY\n    r.risk_factor DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bbccc13cc06bf8ba0e8253b5f766799606483857f41a0baa19928d6e4db91601",
+      "ordered": true,
+      "columns": [
+        [
+          "artifact_id",
+          1042,
+          14
+        ],
+        [
+          "artifact_name",
+          1043,
+          259
+        ],
+        [
+          "risk_factor",
+          1700,
+          -1
+        ],
+        [
+          "sensitivity_json",
+          114,
+          -1
+        ]
+      ],
+      "rows": 57,
+      "bag_digest": "34a02e93b61a847d22a6a2112bac637ad3818419b669aad5587e24ae3aa97434",
+      "values_digest": "dde074068b9a95881825a1988058241b889699c166b564ec6f92a53a4870f7f0",
+      "ordered_digest": "7ef9a02dd8926e2bc0b8a45f2ae92c269357a02e3f7af1f6d0b013bab2ffcc11"
+    },
+    "21f8a4708f074f4d91c829d21767c71a7af12a186eadcebe4fdae67a53922a87": {
+      "sql": "WITH sensitivity_weights AS (\r\n    SELECT \r\n        artref, \r\n        CASE \r\n            WHEN envsensitivity = 'Low' THEN 1\r\n            WHEN envsensitivity = 'Medium' THEN 2\r\n            WHEN envsensitivity = 'High' THEN 3\r\n        END AS env_weight, \r\n        CASE \r\n            WHEN lightsensitivity = 'Low' THEN 1\r\n            WHEN lightsensitivity = 'Medium' THEN 2\r\n            WHEN lightsensitivity = 'High' THEN 3\r\n        END AS light_weight, \r\n        CASE \r\n            WHEN tempsensitivity = 'Low' THEN 1\r\n            WHEN tempsensitivity = 'Medium' THEN 2\r\n            WHEN tempsensitivity = 'High' THEN 3\r\n        END AS temp_weight, \r\n        CASE \r\n            WHEN humiditysensitivity = 'Low' THEN 1\r\n            WHEN humiditysensitivity = 'Medium' THEN 2\r\n            WHEN humiditysensitivity = 'High' THEN 3\r\n        END AS humidity_weight, \r\n        CASE \r\n            WHEN vibrasensitivity = 'Low' THEN 1\r\n            WHEN vibrasensitivity = 'Medium' THEN 2\r\n            WHEN vibrasensitivity = 'High' THEN 3\r\n        END AS vibra_weight, \r\n        CASE \r\n            WHEN pollutantsensitivity = 'Low' THEN 1\r\n            WHEN pollutantsensitivity = 'Medium' THEN 2\r\n            WHEN pollutantsensitivity = 'High' THEN 3\r\n        END AS pollutant_weight, \r\n        CASE \r\n            WHEN pestsensitivity = 'Low' THEN 1\r\n            WHEN pestsensitivity = 'Medium' THEN 2\r\n            WHEN pestsensitivity = 'High' THEN 3\r\n        END AS pest_weight, \r\n        CASE \r\n            WHEN handlesensitivity = 'Low' THEN 1\r\n            WHEN handlesensitivity = 'Medium' THEN 2\r\n            WHEN handlesensitivity = 'High' THEN 3\r\n        END AS handle_weight, \r\n        CASE \r\n            WHEN transportsensitivity = 'Low' THEN 1\r\n            WHEN transportsensitivity = 'Medium' THEN 2\r\n            WHEN transportsensitivity = 'High' THEN 3\r\n        END AS transport_weight, \r\n        CASE \r\n            WHEN displaysensitivity = 'Low' THEN 1\r\n            WHEN displaysensitivity = 'Medium' THEN 2\r\n            WHEN displaysensitivity = 'High' THEN 3\r\n        END AS display_weight, \r\n        CASE \r\n            WHEN storagesensitivity = 'Low' THEN 1\r\n            WHEN storagesensitivity = 'Medium' THEN 2\r\n            WHEN storagesensitivity = 'High' THEN 3\r\n        END AS storage_weight\r\n    FROM sensitivitydata\r\n),\r\nrisk_scores AS (\r\n    SELECT \r\n        a.artregistry, \r\n        a.artname, \r\n        (\r\n            sw.env_weight + sw.light_weight + sw.temp_weight + sw.humidity_weight + \r\n            sw.vibra_weight + sw.pollutant_weight + sw.pest_weight + sw.handle_weight + \r\n            sw.transport_weight + sw.display_weight + sw.storage_weight\r\n        ) / 11.0 AS risk_score, \r\n        json_build_object(\r\n            'envsensitivity', sw.env_weight,\r\n            'lightsensitivity', sw.light_weight,\r\n            'tempsensitivity', sw.temp_weight,\r\n            'humiditysensitivity', sw.humidity_weight,\r\n            'vibrasensitivity', sw.vibra_weight,\r\n            'pollutantsensitivity', sw.pollutant_weight,\r\n            'pestsensitivity', sw.pest_weight,\r\n            'handlesensitivity', sw.handle_weight,\r\n            'transportsensitivity', sw.transport_weight,\r\n            'displaysensitivity', sw.display_weight,\r\n            'storagesensitivity', sw.storage_weight\r\n        ) AS sensitivity_ratings\r\n    FROM artifactscore a\r\n    JOIN sensitivity_weights sw ON a.artregistry = sw.artref\r\n)\r\nSELECT \r\n    artregistry, \r\n    artname, \r\n    risk_score, \r\n    sensitivity_ratings\r\nFROM risk_scores\r\nWHERE risk_score > 7\r\nORDER BY risk_score DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bf407ecf40529217d8aa7b8a688eca2fcdd4cc45a837832268be15226d6eed95",
+      "ordered": true,
+      "columns": [
+        [
+          "artregistry",
+          1042,
+          14
+        ],
+        [
+          "artname",
+          1043,
+          259
+        ],
+        [
+          "risk_score",
+          1700,
+          -1
+        ],
+        [
+          "sensitivity_ratings",
+          114,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "39efe237c605a88e2cb769246c29493976430afed3c73f37fba94d17c8c9d6ee",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "39efe237c605a88e2cb769246c29493976430afed3c73f37fba94d17c8c9d6ee"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "surfaceandphysicalreadings": {
+      "surfphysregistry": "int8",
+      "envreadref": "int8",
+      "vibralvlmms2": "float4",
+      "noisedb": "int2",
+      "dustaccummgm2": "numeric",
+      "microbialcountcfu": "int4",
+      "moldriskidx": "numeric",
+      "pestactivitylvl": "varchar",
+      "pesttrapcount": "int2",
+      "pestspeciesdetected": "text",
+      "surfaceph": "numeric",
+      "matmoistcontent": "numeric",
+      "saltcrystalrisk": "bpchar",
+      "metalcorroderate": "numeric",
+      "organicdegradidx": "numeric",
+      "colorchangedeltae": "float4",
+      "surfacetempc": "numeric",
+      "surfacerh": "numeric",
+      "condenserisk": "varchar",
+      "thermalimgstatus": "bpchar",
+      "structstability": "varchar",
+      "crackmonitor": "text",
+      "deformmm": "numeric",
+      "wtchangepct": "numeric",
+      "surfdustcoverage": "int2",
+      "o2concentration": "numeric",
+      "n2concentration": "numeric"
+    },
+    "lightandradiationreadings": {
+      "lightradregistry": "int8",
+      "envreadref": "int8",
+      "lightlux": "int4",
+      "uvuwcm2": "numeric",
+      "irwm2": "numeric",
+      "visibleexplxh": "int4"
+    },
+    "artifactsecurityaccess": {
+      "secrecordregistry": "int8",
+      "artref": "bpchar",
+      "ratingref": "int8",
+      "loanstatus": "bpchar",
+      "insvalueusd": "numeric",
+      "seclevel": "varchar",
+      "accessrestrictions": "text",
+      "docustatus": "varchar",
+      "photodocu": "varchar",
+      "condreportstatus": "varchar",
+      "conserverecstatus": "bpchar",
+      "researchaccessstatus": "varchar",
+      "digitalrecstatus": "text"
+    },
+    "sensitivitydata": {
+      "sensitivityregistry": "int8",
+      "artref": "bpchar",
+      "envsensitivity": "bpchar",
+      "lightsensitivity": "varchar",
+      "tempsensitivity": "varchar",
+      "humiditysensitivity": "text",
+      "vibrasensitivity": "bpchar",
+      "pollutantsensitivity": "varchar",
+      "pestsensitivity": "text",
+      "handlesensitivity": "bpchar",
+      "transportsensitivity": "varchar",
+      "displaysensitivity": "varchar",
+      "storagesensitivity": "text"
+    },
+    "conditionassessments": {
+      "conditionassessregistry": "int8",
+      "artrefexamined": "text",
+      "showcaserefexamined": "text",
+      "lightreadrefobserved": "int8",
+      "condassessscore": "int4",
+      "conserveassessdate": "date",
+      "nextassessdue": "date"
+    },
+    "showcases": {
+      "showcasereg": "bpchar",
+      "hallref": "bpchar",
+      "airtightness": "float4",
+      "showcasematerial": "varchar",
+      "sealcondition": "varchar",
+      "maintstatus": "bpchar",
+      "filterstatus": "text",
+      "silicagelstatus": "bpchar",
+      "silicagelchangedate": "date",
+      "humiditybuffercap": "int2",
+      "pollutantabsorbcap": "numeric",
+      "leakrate": "float4",
+      "pressurepa": "int8",
+      "inertgassysstatus": "varchar",
+      "firesuppresssys": "varchar",
+      "empowerstatus": "bpchar",
+      "backupsysstatus": "text"
+    },
+    "environmentalreadingscore": {
+      "envreadregistry": "int8",
+      "monitorcode": "bpchar",
+      "readtimestamp": "timestamp",
+      "showcaseref": "bpchar",
+      "tempc": "int2",
+      "tempvar24h": "float4",
+      "relhumidity": "int4",
+      "humvar24h": "int2",
+      "airpresshpa": "float4"
+    },
+    "airqualityreadings": {
+      "aqrecordregistry": "int8",
+      "envreadref": "int8",
+      "co2ppm": "int2",
+      "tvocppb": "int4",
+      "ozoneppb": "int4",
+      "so2ppb": "int2",
+      "no2ppb": "int8",
+      "pm25conc": "float4",
+      "pm10conc": "numeric",
+      "hchoconc": "numeric",
+      "airexrate": "numeric",
+      "airvelms": "numeric"
+    }
+  }
+}

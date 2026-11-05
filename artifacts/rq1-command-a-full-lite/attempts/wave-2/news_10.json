@@ -1,0 +1,204 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "news_10",
+    "instance_id": "news_10",
+    "database": "news",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 152.13296508789062,
+    "budget_used": 3.0,
+    "budget_remaining": 13.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"interactions\" (\nintkey bigint NOT NULL DEFAULT nextval('interactions_intkey_seq'::regclass),\nseshlink2 bigint NULL,\nreclink bigint NULL,\nartval bigint NULL,\nintts timestamp without time zone NULL,\nevttype USER-DEFINED NULL,\nseqval integer NULL,\nagentval USER-DEFINED NULL,\nclkts timestamp without time zone NULL,\nclkpos USER-DEFINED NULL,\nclktype USER-DEFINED NULL,\nclksrc USER-DEFINED NULL,\nclkctx USER-DEFINED NULL,\ninttype USER-DEFINED NULL,\n    PRIMARY KEY (intkey),\n    FOREIGN KEY (reclink) REFERENCES recommendations(reckey),\n    FOREIGN KEY (seshlink2) REFERENCES sessions(seshkey)\n);\n\nFirst 3 rows:\n  intkey    seshlink2    reclink    artval  intts                       evttype      seqval  agentval    clkts                         clkpos  clktype    clksrc    clkctx    inttype\n--------  -----------  ---------  --------  --------------------------  ---------  --------  ----------  --------------------------  --------  ---------  --------  --------  ---------\n       1            1          1     95846  2025-01-24 06:46:03.694670  bookmark         10  Desktop     2025-02-19 08:31:16.694670         7  Related    Article   Headline  Scroll\n       2            2          2     81619  2025-02-01 20:15:58.694670  bookmark         50  App         2025-02-19 08:31:16.694670         5  Trending   Homepage  Summary   Scroll\n       3            3          3     67960  2025-02-09 16:45:54.694670  bookmark          3  Desktop     2025-02-19 08:31:16.694670         4  Related    Article   Image     Share\n...\n\n\nCREATE TABLE \"users\" (\nuserkey bigint NOT NULL DEFAULT nextval('users_userkey_seq'::regclass),\nregmoment date NULL,\ntypelabel USER-DEFINED NULL,\nseglabel USER-DEFINED NULL,\nsubstatus USER-DEFINED NULL,\nsubdays integer NULL,\nageval integer NULL,\ngendlbl USER-DEFINED NULL,\nocculbl USER-DEFINED NULL,\ntestgrp USER-DEFINED NULL,\nuser_preferences jsonb NULL,\n    PRIMARY KEY (userkey)\n);\n\nFirst 3 rows:\n  userkey  regmoment    typelabel    seglabel    substatus      s...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"news|users|userkey\": \"A BIGSERIAL primary key for each user in the system (e.g., 1001).\",\n  \"news|users|regmoment\": \"A DATE indicating when the user registered (e.g., '2024-05-10').\",\n  \"news|users|typelabel\": \"An enum (usertype_enum) representing the user type (Trial, Premium, Free).\",\n  \"news|users|seglabel\": \"An enum (usersegment_enum) describing the user's segment (New, Dormant, Active, Regular).\",\n  \"news|users|substatus\": \"An enum (subscriptionstatus_enum) indicating subscription status (Premium, Enterprise, Basic).\",\n  \"news|users|subdays\": \"An INT specifying how many days the user has been subscribed (e.g., 60).\",\n  \"news|users|ageval\": \"An INT capturing the user's age in years (e.g., 30).\",\n  \"news|users|gendlbl\": \"An enum (usergender_enum) for the user's gender (M, F, Other).\",\n  \"news|users|occulbl\": \"An enum (useroccupation_enum) describing the user's occupation (Retired, Professional, Other, Student).\",\n  \"news|users|testgrp\": \"An enum (abtestgroup_enum) labeling which A/B test group the user belongs to (Control, Variant_A, Variant_B).\",\n  \"news|devices|devkey\": \"A BIGSERIAL primary key uniquely identifying a device (e.g., 501).\",\n  \"news|devices|devtype\": \"An enum (devicetype_enum) describing device OS type (iOS, Windows, MacOS, Android).\",\n  \"news|devices|brwtype\": \"An enum (browsertype_enum) referencing the browser used (Safari, Edge, Chrome, Firefox).\",\n  \"news|devices|osver\": \"A VARCHAR(40) capturing the specific OS version (e.g., 'Windows10.0.19042').\",\n  \"news|devices|appver\": \"A VARCHAR(20) for the app version if used (e.g., 'v3.1.2').\",\n  \"news|devices|scrres\": \"A VARCHAR(15) for screen resolution (e.g., '1920x1080').\",\n  \"news|devices|vpsize\": \"A VARCHAR(15) describing the viewport size in the browser/app (e.g., '414x896').\",\n  \"news|devices|conntype\": \"An enum (connectiontype_enum) for the network type (Cable, 5G, 4G, WiFi).\",\n  \"news|devices|netspd\": \"A NUMERIC(6,2) measuring network speed in Mbps (e.g., 25.75).\",\n  \"news|devices|uselin...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    userel AS user_id,\r\n    seshclicks AS clicks,\r\n    seshviews AS views,\r\n    engscore AS engagement_score,\r\n    (seshclicks + seshviews + engscore) AS custom_interaction_score\r\nFROM \r\n    sessions\r\nORDER BY \r\n    custom_interaction_score DESC\r\nLIMIT 10;"
+        },
+        "result": "user_id | clicks | views | engagement_score | custom_interaction_score\n----------------------------------------------------------------------\n922 | 20 | 50 | 0.70 | 70.70\n460 | 20 | 50 | 0.69 | 70.69\n583 | 19 | 50 | 0.60 | 69.60\n537 | 19 | 49 | 0.56 | 68.56\n436 | 18 | 49 | 0.73 | 67.73\n305 | 20 | 47 | 0.43 | 67.43\n994 | 19 | 48 | 0.38 | 67.38\n628 | 17 | 50 | 0.29 | 67.29\n240 | 18 | 48 | 0.69 | 66.69\n781 | 16 | 50 | 0.48 | 66.48",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: news\nTask ID: news_10\n\nUser Query:\nHelp me rank users based on their a custom interaction score, which considers session clicks, views, and engagement score to highlight the most active users. Display the top users, their clicks, views, engagement score, and custom interaction score.\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-04e780a4-81aa-47f3-8fab-f82ed7ad3b55",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_9p2vvht14ssk",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_tv121vnbj6cw",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-04e780a4-81aa-47f3-8fab-f82ed7ad3b55",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_9p2vvht14ssk",
+              "response": "{\"result\": \"CREATE TABLE \\\"interactions\\\" (\\nintkey bigint NOT NULL DEFAULT nextval('interactions_intkey_seq'::regclass),\\nseshlink2 bigint NULL,\\nreclink bigint NULL,\\nartval bigint NULL,\\nintts timestamp without time zone NULL,\\nevttype USER-DEFINED NULL,\\nseqval integer NULL,\\nagentval USER-DEFINED NULL,\\nclkts timestamp without time zone NULL,\\nclkpos USER-DEFINED NULL,\\nclktype USER-DEFINED NULL,\\nclksrc USER-DEFINED NULL,\\nclkctx USER-DEFINED NULL,\\ninttype USER-DEFINED NULL,\\n    PRIMARY KEY (intkey),\\n    FOREIGN KEY (reclink) REFERENCES recommendations(reckey),\\n    FOREIGN KEY (seshlink2) REFERENCES sessions(seshkey)\\n);\\n\\nFirst 3 rows:\\n  intkey    seshlink2    reclink    artval  intts                       evttype      seqval  agentval    clkts                         clkpos  clktype    clksrc    clkctx    inttype\\n--------  -----------  ---------  --------  --------------------------  ---------  --------  ----------  --------------------------  --------  ---------  --------  --------  ---------\\n       1            1          1     95846  2025-01-24 06:46:03.694670  bookmark         10  Desktop     2025-02-19 08:31:16.694670         7  Related    Article   Headline  Scroll\\n       2            2          2     81619  2025-02-01 20:15:58.694670  bookmark         50  App         2025-02-19 08:31:16.694670         5  Trending   Homepage  Summary   Scroll\\n       3            3          3     67960  2025-02-09 16:45:54.694670  bookmark          3  Desktop     2025-02-19 08:31:16.694670         4  Related    Article   Image     Share\\n...\\n\\n\\nCREATE TABLE \\\"users\\\" (\\nuserkey bigint NOT NULL DEFAULT nextval('users_userkey_seq'::regclass),\\nregmoment date NULL,\\ntypelabel USER-DEFINED NULL,\\nseglabel USER-DEFINED NULL,\\nsubstatus USER-DEFINED NULL,\\nsubdays integer NULL,\\nageval integer NULL,\\ngendlbl USER-DEFINED NULL,\\nocculbl USER-DEFINED NULL,\\ntestgrp USER-DEFINED NULL,\\nuser_preferences jsonb NULL,\\n    PRIMARY KEY (userkey)\\n);\\n\\nFirst 3 rows:\\n  userkey  regmoment    typelabel    seglabel    substatus      subdays    ageval  gendlbl    occulbl       testgrp    user_preferences\\n---------  -----------  -----------  ----------  -----------  ---------  --------  ---------  ------------  ---------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\n       11  2024-02-17   Trial        Regular     Enterprise          94        48  Other      Student       Variant_B  {'feedback': {'type': 'Dislike', 'value': '3.0', 'category': 'Format'}, 'interests': 'Entertainment,Tech,Politics', 'activity_level': 'Low', 'preference_score': 0.26, 'satisfaction_score': 0.52}\\n       12  2023-01-24   Premium      New         Premium            212        74  F          Professional  Control    {'feedback': {'type': 'Dislike', 'value': '2.0', 'category': 'Relevance'}, 'interests': 'Science,Entertainment', 'activity_level': 'Medium', 'preference_score': 0.79, 'satisfaction_score': 0.73}\\n       13  2023-11-21   Free         Regular     Basic              284        33  Other      Retired       Variant_B  {'feedback': {'type': 'Like', 'value': '5.0', 'category': 'Relevance'}, 'interests': 'Science', 'activity_level': 'High', 'preference_score': 0.5, 'satisfaction_score': 0.56}\\n...\\n\\n\\nCREATE TABLE \\\"devices\\\" (\\ndevkey bigint NOT NULL DEFAULT nextval('devices_devkey_seq'::regclass),\\ndevtype USER-DEFINED NULL,\\nbrwtype USER-DEFINED NULL,\\nosver character varying NULL,\\nappver character varying NULL,\\nscrres character varying NULL,\\nvpsize character varying NULL,\\nconntype USER-DEFINED NULL,\\nnetspd numeric NULL,\\nuselink bigint NULL,\\n    PRIMARY KEY (devkey),\\n    FOREIGN KEY (uselink) REFERENCES users(userkey)\\n);\\n\\nFirst 3 rows:\\n  devkey  devtype    brwtype      osver  appver    scrres     vpsize    conntype      netspd    uselink\\n--------  ---------  ---------  -------  --------  ----...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_tv121vnbj6cw",
+              "response": "{\"result\": \"{\\n  \\\"news|users|userkey\\\": \\\"A BIGSERIAL primary key for each user in the system (e.g., 1001).\\\",\\n  \\\"news|users|regmoment\\\": \\\"A DATE indicating when the user registered (e.g., '2024-05-10').\\\",\\n  \\\"news|users|typelabel\\\": \\\"An enum (usertype_enum) representing the user type (Trial, Premium, Free).\\\",\\n  \\\"news|users|seglabel\\\": \\\"An enum (usersegment_enum) describing the user's segment (New, Dormant, Active, Regular).\\\",\\n  \\\"news|users|substatus\\\": \\\"An enum (subscriptionstatus_enum) indicating subscription status (Premium, Enterprise, Basic).\\\",\\n  \\\"news|users|subdays\\\": \\\"An INT specifying how many days the user has been subscribed (e.g., 60).\\\",\\n  \\\"news|users|ageval\\\": \\\"An INT capturing the user's age in years (e.g., 30).\\\",\\n  \\\"news|users|gendlbl\\\": \\\"An enum (usergender_enum) for the user's gender (M, F, Other).\\\",\\n  \\\"news|users|occulbl\\\": \\\"An enum (useroccupation_enum) describing the user's occupation (Retired, Professional, Other, Student).\\\",\\n  \\\"news|users|testgrp\\\": \\\"An enum (abtestgroup_enum) labeling which A/B test group the user belongs to (Control, Variant_A, Variant_B).\\\",\\n  \\\"news|devices|devkey\\\": \\\"A BIGSERIAL primary key uniquely identifying a device (e.g., 501).\\\",\\n  \\\"news|devices|devtype\\\": \\\"An enum (devicetype_enum) describing device OS type (iOS, Windows, MacOS, Android).\\\",\\n  \\\"news|devices|brwtype\\\": \\\"An enum (browsertype_enum) referencing the browser used (Safari, Edge, Chrome, Firefox).\\\",\\n  \\\"news|devices|osver\\\": \\\"A VARCHAR(40) capturing the specific OS version (e.g., 'Windows10.0.19042').\\\",\\n  \\\"news|devices|appver\\\": \\\"A VARCHAR(20) for the app version if used (e.g., 'v3.1.2').\\\",\\n  \\\"news|devices|scrres\\\": \\\"A VARCHAR(15) for screen resolution (e.g., '1920x1080').\\\",\\n  \\\"news|devices|vpsize\\\": \\\"A VARCHAR(15) describing the viewport size in the browser/app (e.g., '414x896').\\\",\\n  \\\"news|devices|conntype\\\": \\\"An enum (connectiontype_enum) for the network type (Cable, 5G, 4G, WiFi).\\\",\\n  \\\"news|devices|netspd\\\": \\\"A NUMERIC(6,2) measuring network speed in Mbps (e.g., 25.75).\\\",\\n  \\\"news|devices|uselink\\\": \\\"A BIGINT FK linking to Users(UserKey) to show which user owns or uses this device.\\\",\\n  \\\"news|articles|artkey\\\": \\\"A BIGSERIAL primary key identifying each article (e.g., 10001).\\\",\\n  \\\"news|articles|catlabel\\\": \\\"An enum (articlecategory_enum) for article category (Entertainment, Business, Sports, News, Technology).\\\",\\n  \\\"news|articles|subcatlbl\\\": \\\"An enum (articlesubcategory_enum) for article subcategory (International, Opinion, Local, Feature).\\\",\\n  \\\"news|articles|pubtime\\\": \\\"A TIMESTAMP for when the article was published (e.g., '2025-02-10 08:00:00').\\\",\\n  \\\"news|articles|authname\\\": \\\"A VARCHAR(200) capturing the article\\\\u2019s author (e.g., 'John Smith').\\\",\\n  \\\"news|articles|srcref\\\": \\\"A VARCHAR(150) referencing the article source or publication name (e.g., 'Reuters').\\\",\\n  \\\"news|articles|wordlen\\\": \\\"An INT for the article's word count (e.g., 1200).\\\",\\n  \\\"news|articles|readsec\\\": \\\"An INT measuring the estimated reading time in seconds (e.g., 300).\\\",\\n  \\\"news|articles|difflevel\\\": \\\"An enum (articledifficultylevel_enum) describing the reading complexity (Basic, Intermediate, Advanced).\\\",\\n  \\\"news|articles|freshscore\\\": \\\"A NUMERIC(5,2) measuring how fresh or recent the content is (e.g., 65.50).\\\",\\n  \\\"news|articles|qualscore\\\": \\\"A NUMERIC(5,2) capturing an overall quality rating (e.g., 80.00).\\\",\\n  \\\"news|articles|sentscore\\\": \\\"A NUMERIC(5,2) referencing sentiment positivity (e.g., 40.25).\\\",\\n  \\\"news|articles|contrscore\\\": \\\"A NUMERIC(5,2) measuring controversy level (e.g., 10.50 = low controversy).\\\",\\n  \\\"news|articles|tagset\\\": \\\"A TEXT field listing associated tags/keywords (e.g., 'politics, election').\\\",\\n  \\\"news|articles|conttype\\\": \\\"An enum (contenttype_enum) describing the article's content type (Article, Gallery, Video, Interactive).\\\",\\n  \\\"news|articles|contformat\\\": \\\"An enum (contentformat_enum) speci...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-04e780a4-81aa-47f3-8fab-f82ed7ad3b55",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_a3m80q0a96kf",
+              "args": {
+                "sql": "SELECT \r\n    userel AS user_id,\r\n    seshclicks AS clicks,\r\n    seshviews AS views,\r\n    engscore AS engagement_score,\r\n    (seshclicks + seshviews + engscore) AS custom_interaction_score\r\nFROM \r\n    sessions\r\nORDER BY \r\n    custom_interaction_score DESC\r\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-04e780a4-81aa-47f3-8fab-f82ed7ad3b55",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_a3m80q0a96kf",
+              "response": "{\"result\": \"user_id | clicks | views | engagement_score | custom_interaction_score\\n----------------------------------------------------------------------\\n922 | 20 | 50 | 0.70 | 70.70\\n460 | 20 | 50 | 0.69 | 70.69\\n583 | 19 | 50 | 0.60 | 69.60\\n537 | 19 | 49 | 0.56 | 68.56\\n436 | 18 | 49 | 0.73 | 67.73\\n305 | 20 | 47 | 0.43 | 67.43\\n994 | 19 | 48 | 0.38 | 67.38\\n628 | 17 | 50 | 0.29 | 67.29\\n240 | 18 | 48 | 0.69 | 66.69\\n781 | 16 | 50 | 0.48 | 66.48\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-04e780a4-81aa-47f3-8fab-f82ed7ad3b55",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here are the top 10 users ranked by their custom interaction score, which considers session clicks, views, and engagement score:\n\n| user_id | clicks | views | engagement_score | custom_interaction_score |\n|---|---|---|---|---|\n| 922 | 20 | 50 | 0.70 | 70.70 |\n| 460 | 20 | 50 | 0.69 | 70.69 |\n| 583 | 19 | 50 | 0.60 | 69.60 |\n| 537 | 19 | 49 | 0.56 | 68.56 |\n| 436 | 18 | 49 | 0.73 | 67.73 |\n| 305 | 20 | 47 | 0.43 | 67.43 |\n| 994 | 19 | 48 | 0.38 | 67.38 |\n| 628 | 17 | 50 | 0.29 | 67.29 |\n| 240 | 18 | 48 | 0.69 | 66.69 |\n| 781 | 16 | 50 | 0.48 | 66.48 |\n\nThe custom interaction score is calculated by summing the clicks, views, and engagement score for each user. The users are then ranked in descending order based on this score."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here are the top 10 users ranked by their custom interaction score, which considers session clicks, views, and engagement score:\n\n| user_id | clicks | views | engagement_score | custom_interaction_score |\n|---|---|---|---|---|\n| 922 | 20 | 50 | 0.70 | 70.70 |\n| 460 | 20 | 50 | 0.69 | 70.69 |\n| 583 | 19 | 50 | 0.60 | 69.60 |\n| 537 | 19 | 49 | 0.56 | 68.56 |\n| 436 | 18 | 49 | 0.73 | 67.73 |\n| 305 | 20 | 47 | 0.43 | 67.43 |\n| 994 | 19 | 48 | 0.38 | 67.38 |\n| 628 | 17 | 50 | 0.29 | 67.29 |\n| 240 | 18 | 48 | 0.69 | 66.69 |\n| 781 | 16 | 50 | 0.48 | 66.48 |\n\nThe custom interaction score is calculated by summing the clicks, views, and engagement score for each user. The users are then ranked in descending order based on this score."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "46992e3f312f4485b8cd2705801d49e9",
+      "client": "news_10",
+      "database": "news",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b87742e91d264fe18afdf5744c3631ec/0",
+      "at": 1793843405.9089065,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.6835000021965243,
+      "response_bytes": 14003,
+      "response_digest": "39f919ee3f573b92bf1971711bcca0f1d72f8ca858fec93a1133ffe12ee3d187"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "915244b25b904dcebeab0bcdea248a0a",
+      "client": "news_10",
+      "database": "news",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b87742e91d264fe18afdf5744c3631ec/0",
+      "at": 1793843437.6511092,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.5181999949854799,
+      "response_bytes": 14003,
+      "response_digest": "39f919ee3f573b92bf1971711bcca0f1d72f8ca858fec93a1133ffe12ee3d187"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "0bffa87b010b48d6b7deae4e4517ecd5",
+      "client": "news_10",
+      "database": "news",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b87742e91d264fe18afdf5744c3631ec/0",
+      "at": 1793843496.1680455,
+      "sql": "SELECT \r\n    userel AS user_id,\r\n    seshclicks AS clicks,\r\n    seshviews AS views,\r\n    engscore AS engagement_score,\r\n    (seshclicks + seshviews + engscore) AS custom_interaction_score\r\nFROM \r\n    sessions\r\nORDER BY \r\n    custom_interaction_score DESC\r\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 38.761899995733984,
+      "response_bytes": 483,
+      "response_digest": "9b8441226ab0c90bf158179f4e2d312ba39bcf95095453bdbbd1ed000d4b535c",
+      "successful": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+name: sysml-cache-lab
+services:
+  loader:
+    profiles: ["tools"]
+    build: {context: ., dockerfile: benchbase.Dockerfile}
+    depends_on:
+      postgres: {condition: service_healthy}
+  postgres:
+    image: postgres:17
+    command: ["postgres", "-c", "max_connections=160"]
+    environment:
+      POSTGRES_DB: chbenchmark
+      POSTGRES_USER: bench
+      POSTGRES_PASSWORD: localbench
+    ports: ["127.0.0.1:55432:5432"]
+    volumes: ["pg-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bench -d chbenchmark"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:7
+    command: ["redis-server", "--maxmemory-policy", "noeviction", "--save", "", "--appendonly", "no"]
+    ports: ["127.0.0.1:56379:6379"]
+volumes:
+  pg-data:

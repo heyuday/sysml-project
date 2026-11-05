@@ -1,0 +1,312 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "crypto_M_1",
+    "instance_id": "crypto_M_1",
+    "database": "crypto",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 213.51035237312317,
+    "budget_used": 6.0,
+    "budget_remaining": 10.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"users\" (\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\nuserstamp character NOT NULL,\nacctscope USER-DEFINED NULL,\n    PRIMARY KEY (usersnode)\n);\n\nFirst 3 rows:\n  usersnode  userstamp    acctscope\n-----------  -----------  -----------\n          1  U583322      Margin\n          2  U810391      Spot\n          3  U485932      Options\n...\n\n\nCREATE TABLE \"riskandmargin\" (\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\nordervault character NULL,\nrisk_margin_profile jsonb NULL,\n    PRIMARY KEY (riskandmarginpivot),\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\n);\n\nFirst 3 rows:\n  riskandmarginpivot  ordervault    risk_margin_profile\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT DISTINCT cancelnote\nFROM orderexecutions;"
+        },
+        "result": "cancelnote\n----------\nNone\nInsufficientFunds\nExpired\nUserRequested",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "DELETE FROM orderexecutions\nWHERE cancelnote = 'Cancelled';"
+        },
+        "result": "SQL failed Phase 1. Error executing submitted SQL: invalid input value for enum cancelnote_enum: \"Cancelled\"\nLINE 2: WHERE cancelnote = 'Cancelled';\n                           ^\n\nBudget remaining: 11.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 14.0,
+        "budget_after": 11.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT DISTINCT mktnote\nFROM orders;"
+        },
+        "result": "mktnote\n-------\nETH-USDC\nETH-USDT\nADA-USDT\nBTC-USDC\nBTC-USDT\nSOL-USDT\nBTC-USD\nADA-USDC\nADA-USD\nSOL-USDC\nSOL-USD\nETH-USD",
+        "cost": 1.0,
+        "budget_before": 11.0,
+        "budget_after": 10.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: crypto\nTask ID: crypto_M_1\n\nUser Query:\nWe need to clean up our 'orderexecutions' table by removing all orders with a 'Cancelled' status. Can you create such query?\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_zdjcg5bwy7f0",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_zdjcg5bwy7f0",
+              "response": "{\"result\": \"CREATE TABLE \\\"users\\\" (\\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\\nuserstamp character NOT NULL,\\nacctscope USER-DEFINED NULL,\\n    PRIMARY KEY (usersnode)\\n);\\n\\nFirst 3 rows:\\n  usersnode  userstamp    acctscope\\n-----------  -----------  -----------\\n          1  U583322      Margin\\n          2  U810391      Spot\\n          3  U485932      Options\\n...\\n\\n\\nCREATE TABLE \\\"riskandmargin\\\" (\\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\\nordervault character NULL,\\nrisk_margin_profile jsonb NULL,\\n    PRIMARY KEY (riskandmarginpivot),\\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\\n);\\n\\nFirst 3 rows:\\n  riskandmarginpivot  ordervault    risk_margin_profile\\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10308.06, 'traildiff': 0.02, 'trigquote': 10689.56}, 'risk_factors': {'cpfactor': '0.823', 'liqfactor': '0.171', 'netfactor': '0.896', 'regfactor': '0.975', 'setfactor': '0.755', 'custfactor': '0.544'}, 'margin_thresholds': {'inithold': 81019.9, 'mainthold': 40509.95}}\\n                   3  OB179652      {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': None}, 'position': {'possum': 990687.61, 'posedge': 'Short', 'posmagn': '2', 'poscount': 92.888, 'posriskrate': 0.553}, 'collateral': {'collsum': 19000.13, 'collcoin': 'USDT', 'collrate': 0.438, 'insfundshare': 4.53}, 'margin_rates': {'margrate': 0.826, 'bkptquote': 11913.55, 'margcallquote': 6818.72}, 'price_levels': {'liqquote': 11661.77, 'stopquote': 10558.32, 'traildiff': 0.03, 'trigquote': 11263.9}, 'risk_factors': {'cpfactor': '0.286', 'liqfactor': '0.639', 'netfactor': '0.803', 'regfactor': '0.416', 'setfactor': '0.538', 'custfactor': '0.728'}, 'margin_thresholds': {'inithold': 42532.07, 'mainthold': 21266.03}}\\n                   4  OB827275      {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': None}, 'position': {'possum': 1210450.2, 'posedge': 'Long', 'posmagn': '1', 'poscount': 32.377, 'posriskrate': 0.836}, 'collateral': {'collsum': 87696.52, 'collcoin': 'USDT', 'collrate': 0.381, 'insfundshare': 38.45}, 'margin_rates': {'margrate': 0.403, 'bkptquote': 27881.46, 'margcallquote': 40130.12}, 'price_levels': {'liqquote': 34894.2, 'stopquote': 34914.37, 'traildiff': 0.038, 'trigquote': 35326.06}, 'risk_factors': {'cpfactor': '0.712', 'liqfactor': '0.959', 'netfactor': '0.226', 'regfactor': '0.421', 'setfactor': '0.296', 'custfactor': '0.199'}, 'margin_thresholds': {'inithold': 93681.57, 'mainthold': 46840.79}}\\n...\\n\\n\\nCREATE TABLE \\\"orders\\\" (\\norderspivot bigint NOT NULL DEFAULT nextval('orders_orderspivot_seq'::regclass),\\nrecordvault character NOT NULL,\\ntimecod...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_wz17cq4nv87z",
+              "args": {
+                "sql": "SELECT DISTINCT cancelnote\nFROM orderexecutions;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_wz17cq4nv87z",
+              "response": "{\"result\": \"cancelnote\\n----------\\nNone\\nInsufficientFunds\\nExpired\\nUserRequested\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_nvxzyb9b71ce",
+              "args": {
+                "sql": "DELETE FROM orderexecutions\nWHERE cancelnote = 'Cancelled';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_nvxzyb9b71ce",
+              "response": "{\"result\": \"SQL failed Phase 1. Error executing submitted SQL: invalid input value for enum cancelnote_enum: \\\"Cancelled\\\"\\nLINE 2: WHERE cancelnote = 'Cancelled';\\n                           ^\\n\\nBudget remaining: 11.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 11.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_gfpx3zs2d42f",
+              "args": {
+                "sql": "SELECT DISTINCT mktnote\nFROM orders;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_gfpx3zs2d42f",
+              "response": "{\"result\": \"mktnote\\n-------\\nETH-USDC\\nETH-USDT\\nADA-USDT\\nBTC-USDC\\nBTC-USDT\\nSOL-USDT\\nBTC-USD\\nADA-USDC\\nADA-USD\\nSOL-USDC\\nSOL-USD\\nETH-USD\\n\\n[SYSTEM NOTE: Remaining budget: 10.0/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4827f661-697d-4c25-89a1-1209a62351b3",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I could not find any orders with a 'Cancelled' status in the 'orderexecutions' table.\n\nHere are the distinct values in the 'cancelnote' column:\n- None\n- InsufficientFunds\n- Expired\n- UserRequested\n\nHere are the distinct values in the 'mktnote' column of the 'orders' table:\n- ETH-USDC\n- ETH-USDT\n- ADA-USDT\n- BTC-USDC\n- BTC-USDT\n- SOL-USDT\n- BTC-USD\n- ADA-USDC\n- ADA-USD\n- SOL-USDC\n- SOL-USD\n- ETH-USD"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I could not find any orders with a 'Cancelled' status in the 'orderexecutions' table.\n\nHere are the distinct values in the 'cancelnote' column:\n- None\n- InsufficientFunds\n- Expired\n- UserRequested\n\nHere are the distinct values in the 'mktnote' column of the 'orders' table:\n- ETH-USDC\n- ETH-USDT\n- ADA-USDT\n- BTC-USDC\n- BTC-USDT\n- SOL-USDT\n- BTC-USD\n- ADA-USDC\n- ADA-USD\n- SOL-USDC\n- SOL-USD\n- ETH-USD"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "042155f61d2c4c94b27037aa74cd03ab",
+      "client": "crypto_M_1",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/ee093ecbf605419495e8a0a86f06096a/0",
+      "at": 1793841206.453904,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.270400003704708,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "dc2e361a90144035aa4fd481c76b1a65",
+      "client": "crypto_M_1",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/ee093ecbf605419495e8a0a86f06096a/0",
+      "at": 1793841235.8805828,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.4865000009885989,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "ac24f2d257c84fdbbe0b352f6d06280a",
+      "client": "crypto_M_1",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/ee093ecbf605419495e8a0a86f06096a/0",
+      "at": 1793841242.6899238,
+      "sql": "SELECT DISTINCT cancelnote\nFROM orderexecutions;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 31.04940000048373,
+      "response_bytes": 112,
+      "response_digest": "9acfcbc27f357e470a6b495dd10171583ffff941f91b5b04ce7ce0bf21fbb1f7",
+      "successful": true
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "32aceca264624cfdaa8152addd32136d",
+      "client": "crypto_M_1",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/ee093ecbf605419495e8a0a86f06096a/0",
+      "at": 1793841324.3162107,
+      "sql": "DELETE FROM orderexecutions\nWHERE cancelnote = 'Cancelled';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 900.8995000040159,
+      "response_bytes": 308,
+      "response_digest": "249ba1ae8eaf55642bb341ea0d32d3111075f7472cca52e5c20e9c48aab8c192"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "c675aaadad1849c2a1195f2f9f497bfc",
+      "client": "crypto_M_1",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/ee093ecbf605419495e8a0a86f06096a/1",
+      "at": 1793841374.5490162,
+      "sql": "SELECT DISTINCT mktnote\nFROM orders;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 28.224399997270666,
+      "response_bytes": 173,
+      "response_digest": "e1473eadf2ae1217bd035b9bc1d8f3c3434257f9eae806501bb589b4e0e49c55",
+      "successful": true
+    }
+  ]
+}

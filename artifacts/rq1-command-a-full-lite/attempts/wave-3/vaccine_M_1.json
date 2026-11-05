@@ -1,0 +1,269 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "vaccine_M_1",
+    "instance_id": "vaccine_M_1",
+    "database": "vaccine",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 260.9880278110504,
+    "budget_used": 6.0,
+    "budget_remaining": 14.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"shipments\" (\nshipmentregistry character varying NOT NULL,\ntimemark timestamp without time zone NOT NULL,\nroutealign character varying NULL,\ncustomsflag USER-DEFINED NULL,\nimppermitref character varying NULL,\nexppermitref character varying NULL,\nregprofile character varying NULL,\ninsureflag USER-DEFINED NULL,\ninsureref character varying NULL,\nqualcheck USER-DEFINED NULL,\nintegritymark USER-DEFINED NULL,\ncontamlevel USER-DEFINED NULL,\nsterilemark USER-DEFINED NULL,\npackagestate USER-DEFINED NULL,\nsealflag USER-DEFINED NULL,\nsealref character varying NULL,\ntampersign USER-DEFINED NULL,\nhandlingguide text NULL,\nstoragepose character varying NULL,\ngeneralnote text NULL,\n    PRIMARY KEY (shipmentregistry)\n);\n\nFirst 3 rows:\nshipmentregistry    timemark                    routealign    customsflag    imppermitref    exppermitref    regprofile     insureflag    insureref    qualcheck    integritymark        contamlevel    sterilemark    packagestate    sealflag    sealref    tampersign     handlingguide    storagepose    generalnote\n------------------  --------------------------  ------------  -------------  --------------  --------------  -------------  ------------  -----------  -----------  -------------------  -------------  -------------  --------------  ----------  ---------  -------------  ---------------  -------------  ------------------------------------------------\nVS113526            2024-12-07 05:24:11.095446  Compliant     Cleared        IP92460         EP46429         Non-Compliant  Active        INS97642     Failed       Intact               High           Unknown        Excellent       Broken      SEAL34744  None Detected  Urgent           Horizontal     Rise industry maintain year structure north.\nVS255467            2024-07-17 11:50:00.095446  Under Review  In Process     IP48778         EP89571         Non-Compliant  Active        INS90844     Passed       Intact               Low            Compromised    Fair            Broken      SEAL281...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"vaccine|shipments|shipmentregistry\": \"A VARCHAR(20) primary key uniquely identifying each shipment record in the database.\",\n  \"vaccine|shipments|timemark\": \"A TIMESTAMP field indicating the exact date and time this shipment record was logged.\",\n  \"vaccine|shipments|routealign\": \"A VARCHAR(30) descriptor for the routing alignment or path code used by the shipment.\",\n  \"vaccine|shipments|customsflag\": \"An enum (CustomsFlag_enum) representing the customs clearance status (e.g., 'Cleared', 'In Process', 'Pending').\",\n  \"vaccine|shipments|imppermitref\": \"A VARCHAR(50) referencing the import permit number or identifier for the shipment.\",\n  \"vaccine|shipments|exppermitref\": \"A VARCHAR(50) referencing the export permit number or identifier for the shipment.\",\n  \"vaccine|shipments|regprofile\": \"A VARCHAR(50) signifying the regulatory or profile reference for this shipment.\",\n  \"vaccine|shipments|insureflag\": \"An enum (InsuranceFlag_enum) capturing the insurance status (e.g., 'Active', 'Expired', 'Pending').\",\n  \"vaccine|shipments|insureref\": \"A VARCHAR(50) referencing the insurance policy or coverage document number.\",\n  \"vaccine|shipments|qualcheck\": \"An enum (QualityCheck_enum) indicating the quality check result (e.g., 'Failed', 'Passed', 'Pending').\",\n  \"vaccine|shipments|integritymark\": \"An enum (IntegrityStatus_enum) showing the shipment\\u2019s integrity status (e.g., 'Intact', 'Under Investigation', 'Compromised').\",\n  \"vaccine|shipments|contamlevel\": \"An enum (ContaminationRisk_enum) denoting potential contamination risk level (e.g., 'High', 'Low', 'Medium').\",\n  \"vaccine|shipments|sterilemark\": \"An enum (SterilityStatus_enum) indicating sterility status (e.g., 'Unknown', 'Compromised', 'Maintained').\",\n  \"vaccine|shipments|packagestate\": \"An enum (PackageCondition_enum) describing the package condition (e.g., 'Excellent', 'Fair', 'Poor', 'Good').\",\n  \"vaccine|shipments|sealflag\": \"An enum (SecuritySealStatus_enum) for the security seal status (e.g., 'Broken',...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;"
+        },
+        "result": "SQL Error: Only SELECT queries allowed in execute_sql",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;"
+        },
+        "result": "SQL failed Phase 1. Your SQL is not correct.\nBudget remaining: 14.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 17.0,
+        "budget_after": 14.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: vaccine\nTask ID: vaccine_M_1\n\nUser Query:\nCreate a view named container_depletion_rank_view. This view should calculate the coolant usage for each container and assign a depletion status based on this rate, focusing on high depletion. The view should display relevant container details.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_86z271z0zvg7",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_fzf2gqbbhecx",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_86z271z0zvg7",
+              "response": "{\"result\": \"CREATE TABLE \\\"shipments\\\" (\\nshipmentregistry character varying NOT NULL,\\ntimemark timestamp without time zone NOT NULL,\\nroutealign character varying NULL,\\ncustomsflag USER-DEFINED NULL,\\nimppermitref character varying NULL,\\nexppermitref character varying NULL,\\nregprofile character varying NULL,\\ninsureflag USER-DEFINED NULL,\\ninsureref character varying NULL,\\nqualcheck USER-DEFINED NULL,\\nintegritymark USER-DEFINED NULL,\\ncontamlevel USER-DEFINED NULL,\\nsterilemark USER-DEFINED NULL,\\npackagestate USER-DEFINED NULL,\\nsealflag USER-DEFINED NULL,\\nsealref character varying NULL,\\ntampersign USER-DEFINED NULL,\\nhandlingguide text NULL,\\nstoragepose character varying NULL,\\ngeneralnote text NULL,\\n    PRIMARY KEY (shipmentregistry)\\n);\\n\\nFirst 3 rows:\\nshipmentregistry    timemark                    routealign    customsflag    imppermitref    exppermitref    regprofile     insureflag    insureref    qualcheck    integritymark        contamlevel    sterilemark    packagestate    sealflag    sealref    tampersign     handlingguide    storagepose    generalnote\\n------------------  --------------------------  ------------  -------------  --------------  --------------  -------------  ------------  -----------  -----------  -------------------  -------------  -------------  --------------  ----------  ---------  -------------  ---------------  -------------  ------------------------------------------------\\nVS113526            2024-12-07 05:24:11.095446  Compliant     Cleared        IP92460         EP46429         Non-Compliant  Active        INS97642     Failed       Intact               High           Unknown        Excellent       Broken      SEAL34744  None Detected  Urgent           Horizontal     Rise industry maintain year structure north.\\nVS255467            2024-07-17 11:50:00.095446  Under Review  In Process     IP48778         EP89571         Non-Compliant  Active        INS90844     Passed       Intact               Low            Compromised    Fair            Broken      SEAL28196  Suspected      Standard         Horizontal\\nVS971688            2024-08-06 10:58:47.096472  Compliant     In Process     IP85517         EP33313         Under Review   Expired       INS69630     Failed       Under Investigation  Medium         Unknown        Fair            Broken      SEAL19194  Confirmed      Special Care     Not Specified  On within old stock president development total.\\n...\\n\\n\\nCREATE TABLE \\\"container\\\" (\\ncontainregistry character varying NOT NULL,\\ncontainmodel character varying NULL,\\nvolliters integer NULL,\\nmasskg real NULL,\\ncontainflag character varying NULL,\\ncoolkind character varying NULL,\\ncoolmass real NULL,\\ncoolremainpct numeric NULL,\\ncoolrefills smallint NULL,\\nrefilllatest date NULL,\\nrefillnext date NULL,\\nbatterypct real NULL,\\npwrfeed character varying NULL,\\npwrbackupflag character varying NULL,\\nshipown character varying NOT NULL,\\n    PRIMARY KEY (containregistry),\\n    FOREIGN KEY (shipown) REFERENCES shipments(shipmentregistry)\\n);\\n\\nFirst 3 rows:\\ncontainregistry    containmodel         volliters    masskg  containflag    coolkind      coolmass    coolremainpct    coolrefills  refilllatest    refillnext      batterypct  pwrfeed    pwrbackupflag    shipown\\n-----------------  -----------------  -----------  --------  -------------  ----------  ----------  ---------------  -------------  --------------  ------------  ------------  ---------  ---------------  ---------\\nC62575             Cryo Container             155     153.7  In Transit     Dry Ice           37.8             80.3              0  2025-02-09      2025-02-20              72  Battery    Available        VS113526\\nC52903             Ultra-Low Freezer          494      99.7  Active         Dry Ice           19.3             35.7              2  2025-02-14      2025-02-24              27  External   In Use           VS255467\\nC13929             Ultra-Low Freezer          321     148.6  Active         Dry Ice  ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_fzf2gqbbhecx",
+              "response": "{\"result\": \"{\\n  \\\"vaccine|shipments|shipmentregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each shipment record in the database.\\\",\\n  \\\"vaccine|shipments|timemark\\\": \\\"A TIMESTAMP field indicating the exact date and time this shipment record was logged.\\\",\\n  \\\"vaccine|shipments|routealign\\\": \\\"A VARCHAR(30) descriptor for the routing alignment or path code used by the shipment.\\\",\\n  \\\"vaccine|shipments|customsflag\\\": \\\"An enum (CustomsFlag_enum) representing the customs clearance status (e.g., 'Cleared', 'In Process', 'Pending').\\\",\\n  \\\"vaccine|shipments|imppermitref\\\": \\\"A VARCHAR(50) referencing the import permit number or identifier for the shipment.\\\",\\n  \\\"vaccine|shipments|exppermitref\\\": \\\"A VARCHAR(50) referencing the export permit number or identifier for the shipment.\\\",\\n  \\\"vaccine|shipments|regprofile\\\": \\\"A VARCHAR(50) signifying the regulatory or profile reference for this shipment.\\\",\\n  \\\"vaccine|shipments|insureflag\\\": \\\"An enum (InsuranceFlag_enum) capturing the insurance status (e.g., 'Active', 'Expired', 'Pending').\\\",\\n  \\\"vaccine|shipments|insureref\\\": \\\"A VARCHAR(50) referencing the insurance policy or coverage document number.\\\",\\n  \\\"vaccine|shipments|qualcheck\\\": \\\"An enum (QualityCheck_enum) indicating the quality check result (e.g., 'Failed', 'Passed', 'Pending').\\\",\\n  \\\"vaccine|shipments|integritymark\\\": \\\"An enum (IntegrityStatus_enum) showing the shipment\\\\u2019s integrity status (e.g., 'Intact', 'Under Investigation', 'Compromised').\\\",\\n  \\\"vaccine|shipments|contamlevel\\\": \\\"An enum (ContaminationRisk_enum) denoting potential contamination risk level (e.g., 'High', 'Low', 'Medium').\\\",\\n  \\\"vaccine|shipments|sterilemark\\\": \\\"An enum (SterilityStatus_enum) indicating sterility status (e.g., 'Unknown', 'Compromised', 'Maintained').\\\",\\n  \\\"vaccine|shipments|packagestate\\\": \\\"An enum (PackageCondition_enum) describing the package condition (e.g., 'Excellent', 'Fair', 'Poor', 'Good').\\\",\\n  \\\"vaccine|shipments|sealflag\\\": \\\"An enum (SecuritySealStatus_enum) for the security seal status (e.g., 'Broken', 'Intact', 'Missing').\\\",\\n  \\\"vaccine|shipments|sealref\\\": \\\"A VARCHAR(50) referencing a security seal ID or documentation.\\\",\\n  \\\"vaccine|shipments|tampersign\\\": \\\"An enum (TamperEvidence_enum) noting tampering evidence (e.g., 'None Detected', 'Suspected', 'Confirmed').\\\",\\n  \\\"vaccine|shipments|handlingguide\\\": \\\"A TEXT field for special handling instructions or guidelines for the shipment.\\\",\\n  \\\"vaccine|shipments|storagepose\\\": \\\"A VARCHAR(40) specifying how the shipment must be positioned or oriented during storage/transport.\\\",\\n  \\\"vaccine|shipments|generalnote\\\": \\\"A TEXT field for any additional free-form notes regarding the shipment.\\\",\\n  \\\"vaccine|container|containregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each container record.\\\",\\n  \\\"vaccine|container|containmodel\\\": \\\"A VARCHAR(40) naming or describing the container model/type.\\\",\\n  \\\"vaccine|container|volliters\\\": \\\"An INTEGER specifying the container's internal volume in liters.\\\",\\n  \\\"vaccine|container|masskg\\\": \\\"A REAL number for the container\\\\u2019s mass in kilograms (when empty, if applicable).\\\",\\n  \\\"vaccine|container|containflag\\\": \\\"A VARCHAR(30) field capturing a container status or classification (e.g., \\\\u2018In Transit\\\\u2019, \\\\u2018Active\\\\u2019, \\\\u2018Return\\\\u2019, \\\\u2018Delivered\\\\u2019).\\\",\\n  \\\"vaccine|container|coolkind\\\": \\\"A VARCHAR(40) describing the coolant type used within the container (e.g., Dry Ice, Liquid Nitrogen, Phase Change Material).\\\",\\n  \\\"vaccine|container|coolmass\\\": \\\"A REAL number indicating the mass (in kilograms) of the coolant present.\\\",\\n  \\\"vaccine|container|coolremainpct\\\": \\\"A DECIMAL(5,2) representing the remaining percentage of coolant.\\\",\\n  \\\"vaccine|container|coolrefills\\\": \\\"A SMALLINT count of how many times coolant has been refilled.\\\",\\n  \\\"vaccine|container|refilllatest\\\": \\\"A DATE recording the most recent coolant refill date.\\\"...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_6raf97ev1jr6",
+              "args": {
+                "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_6raf97ev1jr6",
+              "response": "{\"result\": \"SQL Error: Only SELECT queries allowed in execute_sql\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_q810zfqna0xy",
+              "args": {
+                "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_q810zfqna0xy",
+              "response": "{\"result\": \"SQL failed Phase 1. Your SQL is not correct.\\nBudget remaining: 14.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-3de84649-6557-41a7-a7ad-f247eb9c3220",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I was unable to create the view due to an error in my SQL query."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I was unable to create the view due to an error in my SQL query."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "2ba3da98dca3459087d541c574eb6718",
+      "client": "vaccine_M_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/c67608fc4a0d4046a217a8b08d72922e/0",
+      "at": 1793850519.250863,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.6314000022248365,
+      "response_bytes": 15671,
+      "response_digest": "5515d3048c8f937061932fa5373e70d974005ef838ced8afab1589d2a2f04397"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "c6351c851ba34cff901aec4b5fc9c91d",
+      "client": "vaccine_M_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/c67608fc4a0d4046a217a8b08d72922e/0",
+      "at": 1793850565.7684662,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.1693999986164272,
+      "response_bytes": 15671,
+      "response_digest": "5515d3048c8f937061932fa5373e70d974005ef838ced8afab1589d2a2f04397"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "a194c23a552242d3b73cb49b5993bf2e",
+      "client": "vaccine_M_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/c67608fc4a0d4046a217a8b08d72922e/0",
+      "at": 1793850687.3704395,
+      "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.541699999710545,
+      "response_bytes": 82,
+      "response_digest": "aede9b8ea77a5fb18a6af8dd4fb207f1ee0e3c92b09c11fe28826e6750b7e42f",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "efbd39e27a7d4b66998ffdcea4137950",
+      "client": "vaccine_M_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/c67608fc4a0d4046a217a8b08d72922e/0",
+      "at": 1793850744.739604,
+      "sql": "CREATE VIEW container_depletion_rank_view AS\nSELECT\n    c.containregistry,\n    c.containmodel,\n    c.volliters,\n    c.masskg,\n    c.containflag,\n    c.coolkind,\n    c.coolmass,\n    c.coolremainpct,\n    c.coolrefills,\n    c.refilllatest,\n    c.refillnext,\n    c.batterypct,\n    c.pwrfeed,\n    c.pwrbackupflag,\n    s.shipmentregistry,\n    s.timemark,\n    s.routealign,\n    s.customsflag,\n    s.imppermitref,\n    s.exppermitref,\n    s.regprofile,\n    s.insureflag,\n    s.insureref,\n    s.qualcheck,\n    s.integritymark,\n    s.contamlevel,\n    s.sterilemark,\n    s.packagestate,\n    s.sealflag,\n    s.sealref,\n    s.tampersign,\n    s.handlingguide,\n    s.storagepose,\n    s.generalnote,\n    CASE\n        WHEN c.coolremainpct < 20 THEN 'High Depletion'\n        WHEN c.coolremainpct < 50 THEN 'Medium Depletion'\n        ELSE 'Low Depletion'\n    END AS depletion_status\nFROM\n    container c\nJOIN\n    shipments s ON c.shipown = s.shipmentregistry\nORDER BY\n    c.coolremainpct ASC;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 843.554300001415,
+      "response_bytes": 154,
+      "response_digest": "3bc559cdfefdb3a88525c33b5e269003c0e2c2d78731823302708f1be1a804e3"
+    }
+  ]
+}

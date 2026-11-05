@@ -1,0 +1,334 @@
+{
+  "wave": 1,
+  "result": {
+    "task_id": "mental_8",
+    "instance_id": "mental_8",
+    "database": "mental",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 328.888281583786,
+    "budget_used": 5.0,
+    "budget_remaining": 13.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"facilities\" (\nfackey character varying NOT NULL,\nrsource USER-DEFINED NULL,\nenvstress USER-DEFINED NULL,\nlifeimpact USER-DEFINED NULL,\nseasonpat USER-DEFINED NULL,\nleglissue USER-DEFINED NULL,\nssystemchg USER-DEFINED NULL,\nsupport_and_resources jsonb NULL,\n    PRIMARY KEY (fackey)\n);\n\nFirst 3 rows:\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\n...\n\n\nCREATE TABLE \"treatmentbasics\" (\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\nencref character varying NOT NULL,\ncurmed text NULL,\nmedadh USER-DEFINED NULL,\nmedside USER-DEFINED NULL,\nmedchg USER-DEFINED NULL,\ncrisisint numeric NULL,\ntherapy_details jsonb NULL,\n    PRIMARY KEY (txkey),\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\n);\n\nFirst 3 rows:\n  txkey  encref    curmed                         ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"mental|facilities|fackey\": \"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\",\n  \"mental|facilities|rsource\": \"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\",\n  \"mental|facilities|envstress\": \"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\",\n  \"mental|facilities|lifeimpact\": \"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\",\n  \"mental|facilities|seasonpat\": \"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\",\n  \"mental|facilities|leglissue\": \"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\",\n  \"mental|facilities|ssystemchg\": \"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\",\n  \"mental|facilities|leadclin\": \"A VARCHAR(20) referencing the lead clinician\\u2019s ID (not a foreign key here).\",\n  \"mental|clinicians|clinkey\": \"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\",\n  \"mental|clinicians|clinconf\": \"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\",\n  \"mental|clinicians|assesslim\": \"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\",\n  \"mental|clinicians|docustat\": \"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\",\n  \"mental|clinicians|billcode\": \"A VARCHAR(15) storing billing or service code (e.g., '99214').\",\n  \"mental|clinicians|nxtrevdt\": \"A DATE indicating next planned review date (e.g., '2025-06-01').\",\n  \"mental|clinicians|carecoord\": \"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\",\n  \"mental|clinicians|refneed\": \"An enum (referralneeds_enum) capturing referral needs (Services, Testing...<truncated>",
+        "cost": 1.0,
+        "budget_before": 17.0,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT therapy_details FROM treatmentbasics;"
+        },
+        "result": "therapy_details --------------- {'type': 'Group', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Low', 'durati {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_ {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_ {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'High', 'duratio {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'durati {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'Medium', 'dur {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'High', 'durat {'type': 'Group', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Non-compliant {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'duration {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'Low', 'durati {'type': 'Psychodynamic', 'changes': 'Therapist Change', 'frequency': 'Monthly', 'engagement': 'Low' {'type': 'Psychodynamic', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'High' {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Monthly', 'engagement': 'Medium', 'dura {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'duration {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'High', 'durat {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'High', 'duratio {'type': 'Psychodynamic', 'changes': 'Frequency C...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_score_variation AS NUMERIC\n        )\n    ) AS average_engagement_score_variation\nFROM\n    (\n        SELECT\n            (\n                therapy_details ->> 'changes'::TEXT\n            )::VARCHAR AS change_type,\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )::VARCHAR AS previous_engagement,\n            LEAD(\n                (\n                    therapy_details ->> 'engagement'::TEXT\n                )\n            ) OVER (\n                ORDER BY txkey\n            ) AS next_engagement\n        FROM\n            treatmentbasics\n    ) AS subquery\nWHERE\n    change_type IS NOT NULL\n    AND previous_engagement IS NOT NULL\n    AND next_engagement IS NOT NULL\n    AND previous_engagement <> next_engagement\nGROUP BY\n    change_type\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: column \"engagement_score_variation\" does not exist\nLINE 6:             engagement_score_variation AS NUMERIC\n                    ^\n",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "WITH therapy_changes AS (\n    SELECT\n        (\n            therapy_details ->> 'changes'::TEXT\n        )::VARCHAR AS change_type,\n        (\n            therapy_details ->> 'engagement'::TEXT\n        )::VARCHAR AS previous_engagement,\n        LEAD(\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )\n        ) OVER (\n            ORDER BY txkey\n        ) AS next_engagement\n    FROM\n        treatmentbasics\n),\nengagement_variations AS (\n    SELECT\n        change_type,\n        previous_engagement,\n        next_engagement,\n        CASE\n            WHEN previous_engagement = next_engagement THEN 0\n            WHEN previous_engagement IS NULL THEN 1\n            WHEN next_engagement IS NULL THEN -1\n            ELSE (\n                (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = next_engagement\n                ) - (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = previous_engagement\n                )\n            )\n        END AS engagement_variation\n    FROM\n        therapy_changes\n)\nSELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_variation AS NUMERIC\n        )\n    ) AS average_engagement_variation\nFROM\n    engagement_variations\nGROUP BY\n    change_type\nLIMIT 10;"
+        },
+        "result": "change_type | total_occurrences | average_engagement_variation\n--------------------------------------------------------------\nFrequency Change | 520 | -0.04230769230769230769\nModality Change | 243 | 0.04526748971193415638\nTherapist Change | 237 | 0.04219409282700421941",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: mental\nTask ID: mental_8\n\nUser Query:\nAnalyze the impact of therapy adjustments on the Therapy Engagement Score and calculate the engagement variation for each change type. Show the change type, total occurrences, and average engagement score variation.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_np71j9v798rh",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_yn6xxjcx5h35",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_np71j9v798rh",
+              "response": "{\"result\": \"CREATE TABLE \\\"facilities\\\" (\\nfackey character varying NOT NULL,\\nrsource USER-DEFINED NULL,\\nenvstress USER-DEFINED NULL,\\nlifeimpact USER-DEFINED NULL,\\nseasonpat USER-DEFINED NULL,\\nleglissue USER-DEFINED NULL,\\nssystemchg USER-DEFINED NULL,\\nsupport_and_resources jsonb NULL,\\n    PRIMARY KEY (fackey)\\n);\\n\\nFirst 3 rows:\\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\\n...\\n\\n\\nCREATE TABLE \\\"treatmentbasics\\\" (\\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\\nencref character varying NOT NULL,\\ncurmed text NULL,\\nmedadh USER-DEFINED NULL,\\nmedside USER-DEFINED NULL,\\nmedchg USER-DEFINED NULL,\\ncrisisint numeric NULL,\\ntherapy_details jsonb NULL,\\n    PRIMARY KEY (txkey),\\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\\n);\\n\\nFirst 3 rows:\\n  txkey  encref    curmed                             medadh         medside    medchg             crisisint  therapy_details\\n-------  --------  ---------------------------------  -------------  ---------  ---------------  -----------  -----------------------------------------------------------------------------------------------------------------------------\\n     17  MH485293  Antipsychotic,Antidepressant,None  Low            Moderate   Augmentation               3  {'type': 'Group', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 35}\\n     18  MH600211  Antipsychotic,None                 Medium         Severe     Dose Adjustment            1  {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 49}\\n     19  MH821921  Antipsychotic                      Non-compliant  Moderate   Switch                     3  {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium', 'duration_months': 55}\\n...\\n\\n\\nCREATE TABLE \\\"clinicians\\\" (\\nclinkey character varying NOT NULL,\\nclinconf USER-DEFINED NULL,\\nassesslim USER-DEFINED NULL,\\ndocustat USER-DEFINED NULL,\\nbillcode character varying NULL,\\nnxtrevdt date NULL,\\ncarecoord USER-DEFINED NULL,\\nrefneed USER-DEFINED NULL,\\nfuptype USER-DEFINED NULL,\\nfupfreq USER-DEFINED NULL,\\nfacconnect character varying NULL,\\n    PRIMARY KEY (clinkey),\\n    FOREIGN KEY (facconnect) REFERENCES facilities(fackey)\\n);\\n\\nFirst 3 rows:\\nclinkey    clinconf    assesslim    docustat    billcode    nxtrevdt    carecoord    refneed    fuptype    fupfreq    facconnect\\n---------  ----------  -----------  ----------  ----------  ----------  -----------  ---------  ---------  ---------  ------------\\nC8738      Medium      Cognitive    Complete    CPT90511    2025-05-09  Intensive    Services   Therapy    Weekly     F801\\nC6837      Low         Cognitive    Incomplete  CPT90696    2025-08-14  Regular   ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_yn6xxjcx5h35",
+              "response": "{\"result\": \"{\\n  \\\"mental|facilities|fackey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\\\",\\n  \\\"mental|facilities|rsource\\\": \\\"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\\\",\\n  \\\"mental|facilities|envstress\\\": \\\"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|lifeimpact\\\": \\\"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|seasonpat\\\": \\\"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\\\",\\n  \\\"mental|facilities|leglissue\\\": \\\"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\\\",\\n  \\\"mental|facilities|ssystemchg\\\": \\\"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\\\",\\n  \\\"mental|facilities|leadclin\\\": \\\"A VARCHAR(20) referencing the lead clinician\\\\u2019s ID (not a foreign key here).\\\",\\n  \\\"mental|clinicians|clinkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\\\",\\n  \\\"mental|clinicians|clinconf\\\": \\\"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\\\",\\n  \\\"mental|clinicians|assesslim\\\": \\\"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\\\",\\n  \\\"mental|clinicians|docustat\\\": \\\"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\\\",\\n  \\\"mental|clinicians|billcode\\\": \\\"A VARCHAR(15) storing billing or service code (e.g., '99214').\\\",\\n  \\\"mental|clinicians|nxtrevdt\\\": \\\"A DATE indicating next planned review date (e.g., '2025-06-01').\\\",\\n  \\\"mental|clinicians|carecoord\\\": \\\"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\\\",\\n  \\\"mental|clinicians|refneed\\\": \\\"An enum (referralneeds_enum) capturing referral needs (Services, Testing, Specialist).\\\",\\n  \\\"mental|clinicians|fuptype\\\": \\\"An enum (followuptype_enum) describing follow-up type (Therapy, Routine, Urgent, Medication Check).\\\",\\n  \\\"mental|clinicians|fupfreq\\\": \\\"An enum (followupfrequency_enum) describing follow-up frequency (Weekly, Quarterly, Biweekly, Monthly).\\\",\\n  \\\"mental|clinicians|facconnect\\\": \\\"A VARCHAR(20) FK referencing Facilities(FacKey), linking this clinician to a facility.\\\",\\n  \\\"mental|patients|patkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying each patient (e.g., 'PAT001').\\\",\\n  \\\"mental|patients|patage\\\": \\\"A SMALLINT indicating the patient's age in years.\\\",\\n  \\\"mental|patients|patgender\\\": \\\"An enum (patientgender_enum) for the patient's gender (Other, F, M).\\\",\\n  \\\"mental|patients|pateth\\\": \\\"An enum (patientethnicity_enum) indicating the patient's ethnicity (Other, Hispanic, African, Asian, Caucasian).\\\",\\n  \\\"mental|patients|edulevel\\\": \\\"An enum (educationlevel_enum) describing highest education achieved (High School, Other, Bachelor, Master, Doctorate).\\\",\\n  \\\"mental|patients|empstat\\\": \\\"An enum (employmentstatus_enum) capturing employment status (Retired, Employed, Unemployed, Disabled, Student).\\\",\\n  \\\"mental|patients|maristat\\\": \\\"An enum (maritalstatus_enum) describing marital status (Widowed, Married, Single, Divorced).\\\",\\n  \\\"mental|patients|livingarr\\\": \\\"An enum (livingarrangement_enum) for living arrangement (Alone, Partner, Family, Group Home, Homeless).\\\",\\n  \\\"mental|patients|insurtype\\\": \\\"An enum (insurancetype_enum) referencing type of insurance (Medicaid, Medicare, Private).\\\",\\n  \\\"mental|patients|insurstat\\\": \\\"An enum (insurancestatus_enum) describing insurance status (Pending, Approved, Denied).\\\",\\n  \\\"mental|patients|disabstat\\\": \\\"An enum (disabilitystatus_enum) indicating disability status (Pending, Permanent, Temporary).\\\",\\n  \\\"mental|patients|housestable\\\": \\\"An enum (housin...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_tbe92yghnnhs",
+              "args": {
+                "sql": "SELECT therapy_details FROM treatmentbasics;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_tbe92yghnnhs",
+              "response": "{\"result\": \"therapy_details --------------- {'type': 'Group', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Low', 'durati {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_ {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_ {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'High', 'duratio {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'durati {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'Medium', 'dur {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'High', 'durat {'type': 'Group', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Non-compliant {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'duration {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'Low', 'durati {'type': 'Psychodynamic', 'changes': 'Therapist Change', 'frequency': 'Monthly', 'engagement': 'Low' {'type': 'Psychodynamic', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'High' {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Monthly', 'engagement': 'Medium', 'dura {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'High', 'duration {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'High', 'durat {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'High', 'duratio {'type': 'Psychodynamic', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'High' {'type': 'Psychodynamic', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'Non-compliant', {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium', 'durati {'type': 'DBT', 'changes': 'Frequency Change', 'frequency': 'Monthly', 'engagement': 'Medium', 'dura {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duratio {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'High', 'duratio {'type': 'DBT', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'Medium', 'durat {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'Low', 'duration {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Non-compliant' {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration {'type': 'Psychodynamic', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Non-c {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Non-compliant', {'type': 'CBT', 'changes': 'Frequency Change', 'frequency': 'Biweekly', 'engagement': 'Low', 'durati {'type': 'Group', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'Medium', 'dur {'type': 'Psychodynamic', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Non-c {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Monthly', 'engagement': 'High', 'duratio {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Non-co {'type': 'CBT', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Medium', 'durat {'type': 'Group', 'changes': 'Frequency Change', 'frequency': 'Weekly', 'engagement': 'Low', 'durati {'type': 'Group', ...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_mzmtee4684dc",
+              "args": {
+                "sql": "SELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_score_variation AS NUMERIC\n        )\n    ) AS average_engagement_score_variation\nFROM\n    (\n        SELECT\n            (\n                therapy_details ->> 'changes'::TEXT\n            )::VARCHAR AS change_type,\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )::VARCHAR AS previous_engagement,\n            LEAD(\n                (\n                    therapy_details ->> 'engagement'::TEXT\n                )\n            ) OVER (\n                ORDER BY txkey\n            ) AS next_engagement\n        FROM\n            treatmentbasics\n    ) AS subquery\nWHERE\n    change_type IS NOT NULL\n    AND previous_engagement IS NOT NULL\n    AND next_engagement IS NOT NULL\n    AND previous_engagement <> next_engagement\nGROUP BY\n    change_type\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_mzmtee4684dc",
+              "response": "{\"result\": \"SQL Error: SQL error: column \\\"engagement_score_variation\\\" does not exist\\nLINE 6:             engagement_score_variation AS NUMERIC\\n                    ^\\n\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_qkjzrykg6g8m",
+              "args": {
+                "sql": "WITH therapy_changes AS (\n    SELECT\n        (\n            therapy_details ->> 'changes'::TEXT\n        )::VARCHAR AS change_type,\n        (\n            therapy_details ->> 'engagement'::TEXT\n        )::VARCHAR AS previous_engagement,\n        LEAD(\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )\n        ) OVER (\n            ORDER BY txkey\n        ) AS next_engagement\n    FROM\n        treatmentbasics\n),\nengagement_variations AS (\n    SELECT\n        change_type,\n        previous_engagement,\n        next_engagement,\n        CASE\n            WHEN previous_engagement = next_engagement THEN 0\n            WHEN previous_engagement IS NULL THEN 1\n            WHEN next_engagement IS NULL THEN -1\n            ELSE (\n                (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = next_engagement\n                ) - (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = previous_engagement\n                )\n            )\n        END AS engagement_variation\n    FROM\n        therapy_changes\n)\nSELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_variation AS NUMERIC\n        )\n    ) AS average_engagement_variation\nFROM\n    engagement_variations\nGROUP BY\n    change_type\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_qkjzrykg6g8m",
+              "response": "{\"result\": \"change_type | total_occurrences | average_engagement_variation\\n--------------------------------------------------------------\\nFrequency Change | 520 | -0.04230769230769230769\\nModality Change | 243 | 0.04526748971193415638\\nTherapist Change | 237 | 0.04219409282700421941\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d1d1dbfb-e9f9-4897-8171-1fbc896e4ade",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the impact of therapy adjustments on the Therapy Engagement Score:\n\n| change_type | total_occurrences | average_engagement_variation |\n|---|---|---|\n| Frequency Change | 520 | -0.04230769230769230769 |\n| Modality Change | 243 | 0.04526748971193415638 |\n| Therapist Change | 237 | 0.04219409282700421941 |\n\nThe engagement variation is calculated by subtracting the previous engagement score from the next engagement score. The engagement score is mapped to a numeric value, with 1 being the lowest (Non-compliant) and 4 being the highest (High). A positive variation indicates an improvement in engagement, while a negative variation indicates a decline."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the impact of therapy adjustments on the Therapy Engagement Score:\n\n| change_type | total_occurrences | average_engagement_variation |\n|---|---|---|\n| Frequency Change | 520 | -0.04230769230769230769 |\n| Modality Change | 243 | 0.04526748971193415638 |\n| Therapist Change | 237 | 0.04219409282700421941 |\n\nThe engagement variation is calculated by subtracting the previous engagement score from the next engagement score. The engagement score is mapped to a numeric value, with 1 being the lowest (Non-compliant) and 4 being the highest (High). A positive variation indicates an improvement in engagement, while a negative variation indicates a decline."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "557f2cc9dc5149eaa65771b186d67735",
+      "client": "mental_8",
+      "database": "mental",
+      "scope": "51a71bef3d7f4ba4a7a57f3a718bffb9/0257ec74b22b44c5ad7282b1edd7b0a5/0",
+      "at": 1793832910.0427845,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.31260000105248764,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "e345c7e16747482da31ea7f7c0edcb8d",
+      "client": "mental_8",
+      "database": "mental",
+      "scope": "51a71bef3d7f4ba4a7a57f3a718bffb9/0257ec74b22b44c5ad7282b1edd7b0a5/0",
+      "at": 1793832926.95338,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.8942999995488208,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "f98fd6997ac74c588f9fc5d7608a7704",
+      "client": "mental_8",
+      "database": "mental",
+      "scope": "51a71bef3d7f4ba4a7a57f3a718bffb9/0257ec74b22b44c5ad7282b1edd7b0a5/0",
+      "at": 1793832982.2986162,
+      "sql": "SELECT therapy_details FROM treatmentbasics;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 44.98719999901368,
+      "response_bytes": 5252,
+      "response_digest": "776642b884f37aa1f6fe4d43acca4086da16da8e0bb2e7708b8326da0c669fdf",
+      "successful": true
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "10b78b0ac7c24956a638390c4eb66aca",
+      "client": "mental_8",
+      "database": "mental",
+      "scope": "51a71bef3d7f4ba4a7a57f3a718bffb9/0257ec74b22b44c5ad7282b1edd7b0a5/0",
+      "at": 1793833154.644957,
+      "sql": "SELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_score_variation AS NUMERIC\n        )\n    ) AS average_engagement_score_variation\nFROM\n    (\n        SELECT\n            (\n                therapy_details ->> 'changes'::TEXT\n            )::VARCHAR AS change_type,\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )::VARCHAR AS previous_engagement,\n            LEAD(\n                (\n                    therapy_details ->> 'engagement'::TEXT\n                )\n            ) OVER (\n                ORDER BY txkey\n            ) AS next_engagement\n        FROM\n            treatmentbasics\n    ) AS subquery\nWHERE\n    change_type IS NOT NULL\n    AND previous_engagement IS NOT NULL\n    AND next_engagement IS NOT NULL\n    AND previous_engagement <> next_engagement\nGROUP BY\n    change_type\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 4.19289999990724,
+      "response_bytes": 187,
+      "response_digest": "f76126b46d6eceb202f59dddf5860e734706c5465af9129c6f47733df0a05df8",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "e9f57e9ace2a49fa9946d5fcd963a5a0",
+      "client": "mental_8",
+      "database": "mental",
+      "scope": "51a71bef3d7f4ba4a7a57f3a718bffb9/0257ec74b22b44c5ad7282b1edd7b0a5/0",
+      "at": 1793833196.755909,
+      "sql": "WITH therapy_changes AS (\n    SELECT\n        (\n            therapy_details ->> 'changes'::TEXT\n        )::VARCHAR AS change_type,\n        (\n            therapy_details ->> 'engagement'::TEXT\n        )::VARCHAR AS previous_engagement,\n        LEAD(\n            (\n                therapy_details ->> 'engagement'::TEXT\n            )\n        ) OVER (\n            ORDER BY txkey\n        ) AS next_engagement\n    FROM\n        treatmentbasics\n),\nengagement_variations AS (\n    SELECT\n        change_type,\n        previous_engagement,\n        next_engagement,\n        CASE\n            WHEN previous_engagement = next_engagement THEN 0\n            WHEN previous_engagement IS NULL THEN 1\n            WHEN next_engagement IS NULL THEN -1\n            ELSE (\n                (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = next_engagement\n                ) - (\n                    SELECT engagement_order\n                    FROM (\n                        VALUES\n                            ('Non-compliant', 1),\n                            ('Low', 2),\n                            ('Medium', 3),\n                            ('High', 4)\n                        ) AS t (engagement_level, engagement_order)\n                    WHERE\n                        t.engagement_level = previous_engagement\n                )\n            )\n        END AS engagement_variation\n    FROM\n        therapy_changes\n)\nSELECT\n    change_type,\n    COUNT(*) AS total_occurrences,\n    AVG(\n        CAST(\n            engagement_variation AS NUMERIC\n        )\n    ) AS average_engagement_variation\nFROM\n    engagement_variations\nGROUP BY\n    change_type\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 14.745199998287717,
+      "response_bytes": 314,
+      "response_digest": "3effe6e507f955567961ca0be9d49bd6f71d4f2cacb4b5f140285fd28b44eac5",
+      "successful": true
+    }
+  ]
+}

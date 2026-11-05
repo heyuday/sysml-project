@@ -1,0 +1,326 @@
+{
+  "wave": 4,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "alien_M_2",
+    "instance_id": "alien_M_2",
+    "database": "alien",
+    "phase1_passed": true,
+    "phase2_passed": true,
+    "has_follow_up": true,
+    "total_reward": 1.0,
+    "elapsed_seconds": 169.62478041648865,
+    "budget_used": 10.0,
+    "budget_remaining": 10.0,
+    "dialogue_history": [
+      {
+        "role": "agent",
+        "content": "How is the sensitivity factor calculated?"
+      },
+      {
+        "role": "user",
+        "content": "The sensitivity factor, or Detection Instrument Sensitivity Factor (DISF), is calculated using the formula: (10 - |AirTempC - 15|/10) * AtmosTransparency * (1 - HumidityRate/200) * ((100 - LunarDistDeg)/100). This formula takes into account air temperature, atmospheric transparency, relative humidity, and lunar distance to compute the sensitivity factor."
+      }
+    ],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"observatories\" (\nobservstation character NOT NULL,\nweathprofile character varying NULL,\nseeingprofile character varying NULL,\natmostransparency numeric NULL,\nlunarstage character varying NULL,\nlunardistdeg numeric NULL,\nsolarstatus character varying NULL,\ngeomagstatus character varying NULL,\nsidereallocal character NULL,\nairtempc numeric NULL,\nhumidityrate numeric NULL,\nwindspeedms numeric NULL,\npresshpa numeric NULL,\n    PRIMARY KEY (observstation)\n);\n\nFirst 3 rows:\nobservstation                weathprofile    seeingprofile      atmostransparency  lunarstage       lunardistdeg  solarstatus    geomagstatus      sidereallocal    airtempc    humidityrate    windspeedms    presshpa\n---------------------------  --------------  ---------------  -------------------  -------------  --------------  -------------  --------------  ---------------  ----------  --------------  -------------  ----------\nObservatory-East Darrenport  Clear           Good                            0.04  First Quarter          125.94  High           Quiet                   17.2762        37.6            21.5           26.7      1028\nObservatory-Pearsonstad      Clear           Poor                            0.25  Full                   100.56  Low            Quiet                   17.5804       -16.9            67.7           22        1022.3\nObservatory-New Lindastad    Cloudy          Good                            0.21  Last Quarter            98.09  High           Storm                   10.9481       -12.5            25.7            4.4      1011\n...\n\n\nCREATE TABLE \"signaldynamics\" (\nsignalref character NOT NULL,\nsigintegrity character varying NULL,\nsigrecurr character varying NULL,\nsigevolve character varying NULL,\ntempstab character varying NULL,\nspatstab character varying NULL,\nfreqstab character varying NULL,\nphasestab character varying NULL,\nampstab character varying NULL,\nmodstab character varying NULL,\nsigcoherence character varying NULL,\nsigdisp character varying NULL,...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"alien|observatories|observstation\": \"Full name: 'Observatory Name'. Explanation: This field holds the name or unique identifier for the observatory station. Data type: CHAR(60). Example: 'OBS_STATION_ALPHA'.\",\n  \"alien|observatories|weathprofile\": \"Full name: 'Weather Profile'. Explanation: A short description of weather conditions during observation. Data type: VARCHAR(40). Possible categories: Clear, Cloudy, Partially Cloudy.\",\n  \"alien|observatories|seeingprofile\": \"Full name: 'Seeing Profile'. Explanation: Assessment of sky seeing conditions (atmospheric steadiness). Data type: VARCHAR(50). Possible categories: Excellent, Good, Poor.\",\n  \"alien|observatories|atmostransparency\": \"Full name: 'Atmospheric Transparency'. Explanation: A numeric measure of how transparent the atmosphere is. Data type: NUMERIC(5,3). Example: '0.867'.\",\n  \"alien|observatories|lunarstage\": \"Full name: 'Lunar Phase'. Explanation: The current phase of the Moon during observation. Data type: VARCHAR(25). Possible categories: First Quarter, Full, Last Quarter, New.\",\n  \"alien|observatories|lunardistdeg\": \"Full name: 'Moon Distance (Degrees)'. Explanation: Angular distance to the Moon in degrees. Data type: DECIMAL(7,2). Example: '97.52'.\",\n  \"alien|observatories|solarstatus\": \"Full name: 'Solar Activity'. Explanation: The level of solar activity at the time of observation. Data type: VARCHAR(35). Possible categories: High, Low, Moderate.\",\n  \"alien|observatories|geomagstatus\": \"Full name: 'Geomagnetic Activity'. Explanation: The level of geomagnetic activity during observation. Data type: VARCHAR(35). Possible categories: Active, Quiet, Storm.\",\n  \"alien|observatories|sidereallocal\": \"Full name: 'Local Sidereal Time'. Explanation: Sidereal time at the observatory in HH:MM:SS format. Data type: CHAR(8). Example: '12:34:56'.\",\n  \"alien|observatories|airtempc\": \"Full name: 'Air Temperature (\\u00b0C)'. Explanation: Ambient temperature in Celsius. Data type: NUMERIC(5,2). Example: '18.45'.\",...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "How is the sensitivity factor calculated?"
+        },
+        "result": "The sensitivity factor, or Detection Instrument Sensitivity Factor (DISF), is calculated using the formula: (10 - |AirTempC - 15|/10) * AtmosTransparency * (1 - HumidityRate/200) * ((100 - LunarDistDeg)/100). This formula takes into account air temperature, atmospheric transparency, relative humidity, and lunar distance to compute the sensitivity factor.",
+        "cost": 2.0,
+        "budget_before": 18.0,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "CREATE OR REPLACE FUNCTION calculate_disf(air_temp_c NUMERIC, atmos_transparency NUMERIC, humidity_rate NUMERIC, lunar_dist_deg NUMERIC)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN (\n        (10 - ABS(air_temp_c - 15) / 10)\n        * atmos_transparency\n        * (1 - humidity_rate / 200)\n        * ((100 - lunar_dist_deg) / 100)\n    );\nEND;\n$$ LANGUAGE plpgsql;"
+        },
+        "result": "Phase 1 correct! (Reward: 0.7). Moving to Phase 2.\nReward: 0.7\nFollow-up question: Can you modify the function and add an optional minimum threshold parameter (defaulting to 0) to ensure the returned DISF value is never below this threshold?\nBudget remaining: 13.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 16.0,
+        "budget_after": 13.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "CREATE OR REPLACE FUNCTION calculate_disf(\n    air_temp_c NUMERIC,\n    atmos_transparency NUMERIC,\n    humidity_rate NUMERIC,\n    lunar_dist_deg NUMERIC,\n    min_threshold NUMERIC DEFAULT 0\n)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN GREATEST(\n        (\n            (10 - ABS(air_temp_c - 15) / 10)\n            * atmos_transparency\n            * (1 - humidity_rate / 200)\n            * ((100 - lunar_dist_deg) / 100)\n        ),\n        min_threshold\n    );\nEND;\n$$ LANGUAGE plpgsql;"
+        },
+        "result": "Phase 2 correct! (Reward: 0.3). Task finished.\nReward: 0.3\nBudget remaining: 10.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 13.0,
+        "budget_after": 10.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: alien\nTask ID: alien_M_2\n\nUser Query:\nDevelop a PL/pgSQL routine called 'calculate_disf' that computes the sensitivity factor and return the calculated value.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_f8yenev7vp44",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_ecazmwy3mads",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_f8yenev7vp44",
+              "response": "{\"result\": \"CREATE TABLE \\\"observatories\\\" (\\nobservstation character NOT NULL,\\nweathprofile character varying NULL,\\nseeingprofile character varying NULL,\\natmostransparency numeric NULL,\\nlunarstage character varying NULL,\\nlunardistdeg numeric NULL,\\nsolarstatus character varying NULL,\\ngeomagstatus character varying NULL,\\nsidereallocal character NULL,\\nairtempc numeric NULL,\\nhumidityrate numeric NULL,\\nwindspeedms numeric NULL,\\npresshpa numeric NULL,\\n    PRIMARY KEY (observstation)\\n);\\n\\nFirst 3 rows:\\nobservstation                weathprofile    seeingprofile      atmostransparency  lunarstage       lunardistdeg  solarstatus    geomagstatus      sidereallocal    airtempc    humidityrate    windspeedms    presshpa\\n---------------------------  --------------  ---------------  -------------------  -------------  --------------  -------------  --------------  ---------------  ----------  --------------  -------------  ----------\\nObservatory-East Darrenport  Clear           Good                            0.04  First Quarter          125.94  High           Quiet                   17.2762        37.6            21.5           26.7      1028\\nObservatory-Pearsonstad      Clear           Poor                            0.25  Full                   100.56  Low            Quiet                   17.5804       -16.9            67.7           22        1022.3\\nObservatory-New Lindastad    Cloudy          Good                            0.21  Last Quarter            98.09  High           Storm                   10.9481       -12.5            25.7            4.4      1011\\n...\\n\\n\\nCREATE TABLE \\\"signaldynamics\\\" (\\nsignalref character NOT NULL,\\nsigintegrity character varying NULL,\\nsigrecurr character varying NULL,\\nsigevolve character varying NULL,\\ntempstab character varying NULL,\\nspatstab character varying NULL,\\nfreqstab character varying NULL,\\nphasestab character varying NULL,\\nampstab character varying NULL,\\nmodstab character varying NULL,\\nsigcoherence character varying NULL,\\nsigdisp character varying NULL,\\nsigscint character varying NULL,\\n    PRIMARY KEY (signalref),\\n    FOREIGN KEY (signalref) REFERENCES signals(signalregistry)\\n);\\n\\nFirst 3 rows:\\nNo data available in this table.\\n\\n\\nCREATE TABLE \\\"telescopes\\\" (\\ntelescregistry character NOT NULL,\\nobservstation character NOT NULL,\\nequipstatus character varying NULL,\\ncalibrstatus character varying NULL,\\npointaccarc numeric NULL,\\ntrackaccarc numeric NULL,\\nfocusquality character varying NULL,\\ndetecttempk numeric NULL,\\ncoolsysstatus character varying NULL,\\npowerstatus character varying NULL,\\ndatastorstatus character varying NULL,\\nnetstatus character varying NULL,\\nbandusagepct numeric NULL,\\nprocqueuestatus character varying NULL,\\n    PRIMARY KEY (telescregistry),\\n    FOREIGN KEY (observstation) REFERENCES observatories(observstation)\\n);\\n\\nFirst 3 rows:\\ntelescregistry    observstation                equipstatus    calibrstatus      pointaccarc    trackaccarc  focusquality      detecttempk  coolsysstatus    powerstatus    datastorstatus    netstatus       bandusagepct  procqueuestatus\\n----------------  ---------------------------  -------------  --------------  -------------  -------------  --------------  -------------  ---------------  -------------  ----------------  ------------  --------------  -----------------\\nT4621             Observatory-East Darrenport  Operational    Current                  3.85           5.47  Poor                   227.34  Critical         Main           Available         Limited                 77.2  Full\\nT3182             Observatory-Pearsonstad      Degraded       Due                      3.96           1.58  Good                    94.66  Warning          Backup         Available         Disconnected             8.5  Empty\\nT6585             Observatory-New Lindastad    Degraded       Current                  6.93           9.4   Good                   233.2   Normal           Main           Available       ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_ecazmwy3mads",
+              "response": "{\"result\": \"{\\n  \\\"alien|observatories|observstation\\\": \\\"Full name: 'Observatory Name'. Explanation: This field holds the name or unique identifier for the observatory station. Data type: CHAR(60). Example: 'OBS_STATION_ALPHA'.\\\",\\n  \\\"alien|observatories|weathprofile\\\": \\\"Full name: 'Weather Profile'. Explanation: A short description of weather conditions during observation. Data type: VARCHAR(40). Possible categories: Clear, Cloudy, Partially Cloudy.\\\",\\n  \\\"alien|observatories|seeingprofile\\\": \\\"Full name: 'Seeing Profile'. Explanation: Assessment of sky seeing conditions (atmospheric steadiness). Data type: VARCHAR(50). Possible categories: Excellent, Good, Poor.\\\",\\n  \\\"alien|observatories|atmostransparency\\\": \\\"Full name: 'Atmospheric Transparency'. Explanation: A numeric measure of how transparent the atmosphere is. Data type: NUMERIC(5,3). Example: '0.867'.\\\",\\n  \\\"alien|observatories|lunarstage\\\": \\\"Full name: 'Lunar Phase'. Explanation: The current phase of the Moon during observation. Data type: VARCHAR(25). Possible categories: First Quarter, Full, Last Quarter, New.\\\",\\n  \\\"alien|observatories|lunardistdeg\\\": \\\"Full name: 'Moon Distance (Degrees)'. Explanation: Angular distance to the Moon in degrees. Data type: DECIMAL(7,2). Example: '97.52'.\\\",\\n  \\\"alien|observatories|solarstatus\\\": \\\"Full name: 'Solar Activity'. Explanation: The level of solar activity at the time of observation. Data type: VARCHAR(35). Possible categories: High, Low, Moderate.\\\",\\n  \\\"alien|observatories|geomagstatus\\\": \\\"Full name: 'Geomagnetic Activity'. Explanation: The level of geomagnetic activity during observation. Data type: VARCHAR(35). Possible categories: Active, Quiet, Storm.\\\",\\n  \\\"alien|observatories|sidereallocal\\\": \\\"Full name: 'Local Sidereal Time'. Explanation: Sidereal time at the observatory in HH:MM:SS format. Data type: CHAR(8). Example: '12:34:56'.\\\",\\n  \\\"alien|observatories|airtempc\\\": \\\"Full name: 'Air Temperature (\\\\u00b0C)'. Explanation: Ambient temperature in Celsius. Data type: NUMERIC(5,2). Example: '18.45'.\\\",\\n  \\\"alien|observatories|humidityrate\\\": \\\"Full name: 'Humidity (%)'. Explanation: Relative humidity as a percentage. Data type: NUMERIC(6,3). Example: '62.300'.\\\",\\n  \\\"alien|observatories|windspeedms\\\": \\\"Full name: 'Wind Speed (m/s)'. Explanation: Wind speed in meters per second. Data type: NUMERIC(4,2). Example: '3.45'.\\\",\\n  \\\"alien|observatories|presshpa\\\": \\\"Full name: 'Pressure (hPa)'. Explanation: Atmospheric pressure in hectopascals. Data type: DECIMAL(6,1). Example: '1013.2'.\\\",\\n  \\\"alien|telescopes|telescregistry\\\": \\\"Full name: 'Telescope Registry'. Explanation: A unique identifier for the telescope. Data type: CHAR(20). Example: 'TELESC_0001'.\\\",\\n  \\\"alien|telescopes|observstation\\\": \\\"Full name: 'Observatory Name Reference'. Explanation: Foreign key linking to the observatory station. Data type: CHAR(60). Example: 'OBS_STATION_ALPHA'.\\\",\\n  \\\"alien|telescopes|equipstatus\\\": \\\"Full name: 'Equipment Status'. Explanation: Operational state of the telescope. Data type: VARCHAR(35). Possible categories: Degraded, Maintenance, Operational.\\\",\\n  \\\"alien|telescopes|calibrstatus\\\": \\\"Full name: 'Calibration Status'. Explanation: Status of telescope\\\\u2019s calibration. Data type: VARCHAR(50). Possible categories: Current, Due, Overdue.\\\",\\n  \\\"alien|telescopes|pointaccarc\\\": \\\"Full name: 'Pointing Accuracy (arcsec)'. Explanation: How precise the telescope can point, in arcseconds. Data type: NUMERIC(6,2). Example: '0.45'.\\\",\\n  \\\"alien|telescopes|trackaccarc\\\": \\\"Full name: 'Tracking Accuracy (arcsec)'. Explanation: How accurately the telescope can track a target, in arcseconds. Data type: NUMERIC(6,2). Example: '1.20'.\\\",\\n  \\\"alien|telescopes|focusquality\\\": \\\"Full name: 'Focus Quality'. Explanation: Quality of the telescope\\\\u2019s focusing system. Data type: VARCHAR(25). Possible categories: Excellent, Good, Poor.\\\",\\n  \\\"alien|telescopes|detecttempk\\\": \\\"Full name: 'Detector Temperature (K...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_zk0s1c66m3zk",
+              "args": {
+                "question": "How is the sensitivity factor calculated?"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_zk0s1c66m3zk",
+              "response": "{\"result\": \"The sensitivity factor, or Detection Instrument Sensitivity Factor (DISF), is calculated using the formula: (10 - |AirTempC - 15|/10) * AtmosTransparency * (1 - HumidityRate/200) * ((100 - LunarDistDeg)/100). This formula takes into account air temperature, atmospheric transparency, relative humidity, and lunar distance to compute the sensitivity factor.\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_dj1jzbs82c0d",
+              "args": {
+                "sql": "CREATE OR REPLACE FUNCTION calculate_disf(air_temp_c NUMERIC, atmos_transparency NUMERIC, humidity_rate NUMERIC, lunar_dist_deg NUMERIC)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN (\n        (10 - ABS(air_temp_c - 15) / 10)\n        * atmos_transparency\n        * (1 - humidity_rate / 200)\n        * ((100 - lunar_dist_deg) / 100)\n    );\nEND;\n$$ LANGUAGE plpgsql;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_dj1jzbs82c0d",
+              "response": "{\"result\": \"Phase 1 correct! (Reward: 0.7). Moving to Phase 2.\\nReward: 0.7\\nFollow-up question: Can you modify the function and add an optional minimum threshold parameter (defaulting to 0) to ensure the returned DISF value is never below this threshold?\\nBudget remaining: 13.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_y7r76acyzv9t",
+              "args": {
+                "sql": "CREATE OR REPLACE FUNCTION calculate_disf(\n    air_temp_c NUMERIC,\n    atmos_transparency NUMERIC,\n    humidity_rate NUMERIC,\n    lunar_dist_deg NUMERIC,\n    min_threshold NUMERIC DEFAULT 0\n)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN GREATEST(\n        (\n            (10 - ABS(air_temp_c - 15) / 10)\n            * atmos_transparency\n            * (1 - humidity_rate / 200)\n            * ((100 - lunar_dist_deg) / 100)\n        ),\n        min_threshold\n    );\nEND;\n$$ LANGUAGE plpgsql;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_y7r76acyzv9t",
+              "response": "{\"result\": \"Phase 2 correct! (Reward: 0.3). Task finished.\\nReward: 0.3\\nBudget remaining: 10.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 10.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-435a5da0-3da1-4aea-ac24-37b063793732",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Task completed."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Task completed."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "46eefa21d84e4a44a03a98c00a9833ca",
+      "client": "alien_M_2",
+      "database": "alien",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/771d19de52ef43dd9e67e0aed3f24f05/0",
+      "at": 1793853946.550933,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.9622000036179088,
+      "response_bytes": 13362,
+      "response_digest": "7c52ad9da63c819dc92f1883ab8e90960a633b6521997c1295cb41a1976562af"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "8b9b9ecf7ac54f5791b461253d96f50c",
+      "client": "alien_M_2",
+      "database": "alien",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/771d19de52ef43dd9e67e0aed3f24f05/0",
+      "at": 1793853968.3326292,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.82970000221394,
+      "response_bytes": 13362,
+      "response_digest": "7c52ad9da63c819dc92f1883ab8e90960a633b6521997c1295cb41a1976562af"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "a8a231e7a9004627aad027931df7a6d2",
+      "client": "alien_M_2",
+      "database": "alien",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/771d19de52ef43dd9e67e0aed3f24f05/0",
+      "at": 1793854055.542594,
+      "sql": "CREATE OR REPLACE FUNCTION calculate_disf(air_temp_c NUMERIC, atmos_transparency NUMERIC, humidity_rate NUMERIC, lunar_dist_deg NUMERIC)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN (\n        (10 - ABS(air_temp_c - 15) / 10)\n        * atmos_transparency\n        * (1 - humidity_rate / 200)\n        * ((100 - lunar_dist_deg) / 100)\n    );\nEND;\n$$ LANGUAGE plpgsql;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1686.089800001355,
+      "response_bytes": 311,
+      "response_digest": "09402de3a14a7b2b17636a17d50985bd4f7d7a8d3dba5d70c42ea2637a4e954a"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "90cee3848a174ee8b50417c6b5666e24",
+      "client": "alien_M_2",
+      "database": "alien",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/771d19de52ef43dd9e67e0aed3f24f05/1",
+      "at": 1793854108.1631167,
+      "sql": "CREATE OR REPLACE FUNCTION calculate_disf(\n    air_temp_c NUMERIC,\n    atmos_transparency NUMERIC,\n    humidity_rate NUMERIC,\n    lunar_dist_deg NUMERIC,\n    min_threshold NUMERIC DEFAULT 0\n)\nRETURNS NUMERIC AS\n$$\nBEGIN\n    RETURN GREATEST(\n        (\n            (10 - ABS(air_temp_c - 15) / 10)\n            * atmos_transparency\n            * (1 - humidity_rate / 200)\n            * ((100 - lunar_dist_deg) / 100)\n        ),\n        min_threshold\n    );\nEND;\n$$ LANGUAGE plpgsql;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 537.6787999994121,
+      "response_bytes": 152,
+      "response_digest": "49e181d26aa72fd6413045ff95c376c74304f43a9c8afdc62e4f05a847c72729"
+    }
+  ]
+}

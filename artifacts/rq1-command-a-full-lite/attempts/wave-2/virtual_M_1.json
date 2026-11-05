@@ -1,0 +1,350 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "virtual_M_1",
+    "instance_id": "virtual_M_1",
+    "database": "virtual",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 194.83290719985962,
+    "budget_used": 8.0,
+    "budget_remaining": 10.0,
+    "dialogue_history": [
+      {
+        "role": "agent",
+        "content": "What is a 'big fan'?"
+      },
+      {
+        "role": "user",
+        "content": "I'm not sure I understand your question."
+      }
+    ],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"fans\" (\nuserregistry character varying NOT NULL,\nnicklabel character varying NULL,\nregmoment date NULL,\ntierstep smallint NULL,\nptsval integer NULL,\nstatustag USER-DEFINED NULL,\npersonal_attributes jsonb NULL,\n    PRIMARY KEY (userregistry)\n);\n\nFirst 3 rows:\nuserregistry    nicklabel    regmoment      tierstep    ptsval  statustag    personal_attributes\n--------------  -----------  -----------  ----------  --------  -----------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nFAN27103        kmcgee       2023-05-22           52     47635  VIP          {'preferences': {'langpref': 'Korean', 'occupath': 'Student', 'interestset': 'Art'}, 'demographics': {'loctown': 'Youngview', 'agecount': 39, 'locnation': 'Botswana', 'gendertype': 'Female'}}\nFAN55719        brownandrew  2024-07-22           52     93976  Inactive     {'preferences': {'langpref': 'Multiple', 'occupath': 'Professional', 'interestset': 'Technology'}, 'demographics': {'loctown': 'Patelbury', 'agecount': 55, 'locnation': 'United States Minor Outlying Islands', 'gendertype': 'Other'}}\nFAN75581        lauren67     2024-01-23           41     72104  VIP          {'preferences': {'langpref': 'Korean', 'occupath': 'Professional', 'interestset': 'Anime'}, 'demographics': {'loctown': 'Virginiabury', 'agecount': 38, 'locnation': 'United States Minor Outlying Islands', 'gendertype': 'Male'}}\n...\n\n\nCREATE TABLE \"eventsandclub\" (\neventsreg character varying NOT NULL,\neventssocialpivot character varying NULL,\neventsmemberpivot character varying NULL,\nclubjdate date NULL,\nparticipation_summary jsonb NULL,\n    PRIMARY KEY (eventsreg),\n    FOREIGN KEY (eventsmemberpivot) REFERENCES membershipandspending(memberreg),\n    FOREIGN KEY (eventssocialpivot) REFERENCES socialcommunity(socialreg)\n);\n\nFirst 3 rows:\neventsreg    eventss...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "What is a 'big fan'?"
+        },
+        "result": "I'm not sure I understand your question.",
+        "cost": 2.0,
+        "budget_before": 17.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"virtual|fans|userregistry\": \"A VARCHAR(20) primary key uniquely identifying each fan record (e.g., 'FAN001').\",\n  \"virtual|fans|nicklabel\": \"A VARCHAR(100) storing the fan's chosen nickname or handle.\",\n  \"virtual|fans|regmoment\": \"A DATE noting when the fan first registered (e.g., '2025-02-15').\",\n  \"virtual|fans|tierstep\": \"A SMALLINT that captures the fan's level or tier progression (e.g., 1, 2, 3).\",\n  \"virtual|fans|ptsval\": \"An INT holding the fan's accumulated points or score within the system.\",\n  \"virtual|fans|statustag\": \"An enum (FanStatus_enum) describing the fan\\u2019s current status (Inactive, VIP, Active, Blocked).\",\n  \"virtual|virtualidols|entityreg\": \"A VARCHAR(20) primary key uniquely identifying the virtual idol (e.g., 'IDOL001').\",\n  \"virtual|virtualidols|nametag\": \"A VARCHAR(100) for the idol\\u2019s name or stage name.\",\n  \"virtual|virtualidols|kindtag\": \"An enum (IdolType_enum) describing the idol's nature (2D, AI Generated, 3D, Mixed Reality).\",\n  \"virtual|virtualidols|debdate\": \"A DATE for the idol's debut (e.g., '2023-06-01').\",\n  \"virtual|virtualidols|assocgroup\": \"A VARCHAR(100) naming the idol's company or group affiliation.\",\n  \"virtual|virtualidols|genretag\": \"An enum (IdolGenre_enum) indicating the idol\\u2019s main genre (Electronic, Dance, Pop, Traditional, Rock).\",\n  \"virtual|virtualidols|primlang\": \"A VARCHAR(50) referencing the idol's primary performance language (e.g., 'English').\",\n  \"virtual|interactions|activityreg\": \"A VARCHAR(20) primary key for each interaction record (e.g., 'ACT001').\",\n  \"virtual|interactions|timemark\": \"A TIMESTAMP indicating when the interaction occurred.\",\n  \"virtual|interactions|interactfanpivot\": \"A VARCHAR(20) FK referencing Fans(UserRegistry), indicating which fan was involved.\",\n  \"virtual|interactions|interactidolpivot\": \"A VARCHAR(20) FK referencing VirtualIdols(EntityReg), showing which idol was involved.\",\n  \"virtual|interactions|actkind\": \"An enum (InteractionType_enum) describing the acti...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';"
+        },
+        "result": "SQL Error: Only SELECT queries allowed in execute_sql",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';"
+        },
+        "result": "SQL failed Phase 1. Error executing submitted SQL: invalid input value for enum fanstatus_enum: \"Big Fan\"\nLINE 3: WHERE statustag = 'Big Fan';\n                          ^\n\nBudget remaining: 10.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 13.0,
+        "budget_after": 10.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: virtual\nTask ID: virtual_M_1\n\nUser Query:\nSet the status for big fans to 'VIP'.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_ey4xmsf1ykk9",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_ey4xmsf1ykk9",
+              "response": "{\"result\": \"CREATE TABLE \\\"fans\\\" (\\nuserregistry character varying NOT NULL,\\nnicklabel character varying NULL,\\nregmoment date NULL,\\ntierstep smallint NULL,\\nptsval integer NULL,\\nstatustag USER-DEFINED NULL,\\npersonal_attributes jsonb NULL,\\n    PRIMARY KEY (userregistry)\\n);\\n\\nFirst 3 rows:\\nuserregistry    nicklabel    regmoment      tierstep    ptsval  statustag    personal_attributes\\n--------------  -----------  -----------  ----------  --------  -----------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nFAN27103        kmcgee       2023-05-22           52     47635  VIP          {'preferences': {'langpref': 'Korean', 'occupath': 'Student', 'interestset': 'Art'}, 'demographics': {'loctown': 'Youngview', 'agecount': 39, 'locnation': 'Botswana', 'gendertype': 'Female'}}\\nFAN55719        brownandrew  2024-07-22           52     93976  Inactive     {'preferences': {'langpref': 'Multiple', 'occupath': 'Professional', 'interestset': 'Technology'}, 'demographics': {'loctown': 'Patelbury', 'agecount': 55, 'locnation': 'United States Minor Outlying Islands', 'gendertype': 'Other'}}\\nFAN75581        lauren67     2024-01-23           41     72104  VIP          {'preferences': {'langpref': 'Korean', 'occupath': 'Professional', 'interestset': 'Anime'}, 'demographics': {'loctown': 'Virginiabury', 'agecount': 38, 'locnation': 'United States Minor Outlying Islands', 'gendertype': 'Male'}}\\n...\\n\\n\\nCREATE TABLE \\\"eventsandclub\\\" (\\neventsreg character varying NOT NULL,\\neventssocialpivot character varying NULL,\\neventsmemberpivot character varying NULL,\\nclubjdate date NULL,\\nparticipation_summary jsonb NULL,\\n    PRIMARY KEY (eventsreg),\\n    FOREIGN KEY (eventsmemberpivot) REFERENCES membershipandspending(memberreg),\\n    FOREIGN KEY (eventssocialpivot) REFERENCES socialcommunity(socialreg)\\n);\\n\\nFirst 3 rows:\\neventsreg    eventssocialpivot    eventsmemberpivot    clubjdate    participation_summary\\n-----------  -------------------  -------------------  -----------  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nEVT_XG51P    SOC_7GA9A            MEM_QCM5T            2023-07-31   {'club': {'clubstat': 'Non-member', 'clubcontrib': 'Medium'}, 'engagement': {'camppart': 'Selective', 'votepartrate': 9.2}, 'event_attendance': {'concatt': 17, 'evtpart': 'Regular', 'meetatt': 8, 'onevtatt': 12, 'offevtatt': 6}}\\nEVT_BVAXK    SOC_GIW1H            MEM_KGCEJ            2023-04-07   {'club': {'clubstat': 'Non-member', 'clubcontrib': 'Outstanding'}, 'engagement': {'camppart': 'Selective', 'votepartrate': 34.4}, 'event_attendance': {'concatt': 26, 'evtpart': 'Regular', 'meetatt': 10, 'onevtatt': 31, 'offevtatt': 1}}\\nEVT_0C7WE    SOC_8ILAQ            MEM_P91DJ            2023-04-10   {'club': {'clubstat': 'Premium', 'clubcontrib': 'Outstanding'}, 'engagement': {'camppart': 'Selective', 'votepartrate': 38.0}, 'event_attendance': {'concatt': 4, 'evtpart': 'Rare', 'meetatt': 4, 'onevtatt': 94, 'offevtatt': 6}}\\n...\\n\\n\\nCREATE TABLE \\\"additionalnotes\\\" (\\nnotesreg character varying NOT NULL,\\nnotesretainpivot character varying NULL,\\nnoteinfo text NULL,\\n    PRIMARY KEY (notesreg),\\n    FOREIGN KEY (notesretainpivot) REFERENCES retentionandinfluence(retreg)\\n);\\n\\nFirst 3 rows:\\nnotesreg    notesretainpivot    noteinfo\\n----------  ------------------  --------------\\nNOTE_62WV   RET_M9GTT           Take cut east.\\nNOTE_FCBF   RET_L8K68\\nNOTE_XD4E   RET_4S9OK\\n...\\n\\n\\nCREATE TABLE \\\"virtualidols\\\" (\\nentityreg character varying NOT NULL,\\nnametag character varying NULL,\\nkindtag USER-DEFINED NULL,\\ndebdate date NULL,\\nassocgroup character varying NULL,\\ngenretag USER-DEFINED...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_7nkz2zwt99ev",
+              "args": {
+                "question": "What is a 'big fan'?"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_7nkz2zwt99ev",
+              "response": "{\"result\": \"I'm not sure I understand your question.\\n\\n[SYSTEM NOTE: Remaining budget: 15.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_nf44dyhnp18d",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_nf44dyhnp18d",
+              "response": "{\"result\": \"{\\n  \\\"virtual|fans|userregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each fan record (e.g., 'FAN001').\\\",\\n  \\\"virtual|fans|nicklabel\\\": \\\"A VARCHAR(100) storing the fan's chosen nickname or handle.\\\",\\n  \\\"virtual|fans|regmoment\\\": \\\"A DATE noting when the fan first registered (e.g., '2025-02-15').\\\",\\n  \\\"virtual|fans|tierstep\\\": \\\"A SMALLINT that captures the fan's level or tier progression (e.g., 1, 2, 3).\\\",\\n  \\\"virtual|fans|ptsval\\\": \\\"An INT holding the fan's accumulated points or score within the system.\\\",\\n  \\\"virtual|fans|statustag\\\": \\\"An enum (FanStatus_enum) describing the fan\\\\u2019s current status (Inactive, VIP, Active, Blocked).\\\",\\n  \\\"virtual|virtualidols|entityreg\\\": \\\"A VARCHAR(20) primary key uniquely identifying the virtual idol (e.g., 'IDOL001').\\\",\\n  \\\"virtual|virtualidols|nametag\\\": \\\"A VARCHAR(100) for the idol\\\\u2019s name or stage name.\\\",\\n  \\\"virtual|virtualidols|kindtag\\\": \\\"An enum (IdolType_enum) describing the idol's nature (2D, AI Generated, 3D, Mixed Reality).\\\",\\n  \\\"virtual|virtualidols|debdate\\\": \\\"A DATE for the idol's debut (e.g., '2023-06-01').\\\",\\n  \\\"virtual|virtualidols|assocgroup\\\": \\\"A VARCHAR(100) naming the idol's company or group affiliation.\\\",\\n  \\\"virtual|virtualidols|genretag\\\": \\\"An enum (IdolGenre_enum) indicating the idol\\\\u2019s main genre (Electronic, Dance, Pop, Traditional, Rock).\\\",\\n  \\\"virtual|virtualidols|primlang\\\": \\\"A VARCHAR(50) referencing the idol's primary performance language (e.g., 'English').\\\",\\n  \\\"virtual|interactions|activityreg\\\": \\\"A VARCHAR(20) primary key for each interaction record (e.g., 'ACT001').\\\",\\n  \\\"virtual|interactions|timemark\\\": \\\"A TIMESTAMP indicating when the interaction occurred.\\\",\\n  \\\"virtual|interactions|interactfanpivot\\\": \\\"A VARCHAR(20) FK referencing Fans(UserRegistry), indicating which fan was involved.\\\",\\n  \\\"virtual|interactions|interactidolpivot\\\": \\\"A VARCHAR(20) FK referencing VirtualIdols(EntityReg), showing which idol was involved.\\\",\\n  \\\"virtual|interactions|actkind\\\": \\\"An enum (InteractionType_enum) describing the action (Vote, Comment, Share, Gift, Live Stream).\\\",\\n  \\\"virtual|interactions|actplat\\\": \\\"An enum (InteractionPlatform_enum) for the platform used (YouTube, Twitter, Official App, TikTok).\\\",\\n  \\\"virtual|interactions|platused\\\": \\\"An enum (PlatformUsed_enum) describing the device platform (Tablet, Mobile, Console, PC).\\\",\\n  \\\"virtual|interactions|devtype\\\": \\\"An enum (DeviceType_enum) specifying the device type (Windows, iOS, Android, Mac).\\\",\\n  \\\"virtual|interactions|appver\\\": \\\"A VARCHAR(20) capturing the version of the app used (e.g., 'v2.3.1').\\\",\\n  \\\"virtual|interactions|giftfreq\\\": \\\"An enum (GiftSendingFrequency_enum) capturing how often gifts are sent (Often, Rarely, Never, Frequent).\\\",\\n  \\\"virtual|interactions|gifttot\\\": \\\"An INT total count of gifts sent during this session/interaction (e.g., 3).\\\",\\n  \\\"virtual|interactions|giftvalusd\\\": \\\"A DECIMAL(10,2) total USD value of gifts (e.g., 15.50).\\\",\\n  \\\"virtual|interactions|favgifttag\\\": \\\"An enum (FavoriteGiftType_enum) for the fan\\\\u2019s preferred gift type (Limited, Custom, Premium, Standard).\\\",\\n  \\\"virtual|membershipandspending|memberreg\\\": \\\"A VARCHAR(20) primary key for membership & spending records (e.g., 'MEM001').\\\",\\n  \\\"virtual|membershipandspending|memberfanpivot\\\": \\\"A VARCHAR(20) FK referencing Fans(UserRegistry).\\\",\\n  \\\"virtual|membershipandspending|membkind\\\": \\\"An enum (MembershipType_enum) describing membership tier (Free, Basic, Diamond, Premium).\\\",\\n  \\\"virtual|membershipandspending|membdays\\\": \\\"A SMALLINT capturing how many days the fan has been a member (e.g., 120).\\\",\\n  \\\"virtual|membershipandspending|spendusd\\\": \\\"A DECIMAL(10,2) total USD spent (e.g., 350.75).\\\",\\n  \\\"virtual|membershipandspending|spendfreq\\\": \\\"An enum (SpendingFrequency_enum) for spending pattern (Occasional, Weekly, Monthly, Daily).\\\",\\n  \\\"virtual|membershipandspending|paymethod\\\": \\\"An enum (Payme...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_m7dmy9k14eyn",
+              "args": {
+                "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_m7dmy9k14eyn",
+              "response": "{\"result\": \"SQL Error: Only SELECT queries allowed in execute_sql\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_nn7cgpgbs62f",
+              "args": {
+                "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_nn7cgpgbs62f",
+              "response": "{\"result\": \"SQL failed Phase 1. Error executing submitted SQL: invalid input value for enum fanstatus_enum: \\\"Big Fan\\\"\\nLINE 3: WHERE statustag = 'Big Fan';\\n                          ^\\n\\nBudget remaining: 10.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 10.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e8b3b32c-3bc0-4927-bc44-81f85397d551",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, there is no status called 'Big Fan'. The available statuses are Inactive, VIP, Active and Blocked."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, there is no status called 'Big Fan'. The available statuses are Inactive, VIP, Active and Blocked."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "126b3fe6dd6f40be89897258e16669e1",
+      "client": "virtual_M_1",
+      "database": "virtual",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/dcedf83d85e2419e80dbc61b83b19cf9/0",
+      "at": 1793843560.4187827,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.5514000004041009,
+      "response_bytes": 20563,
+      "response_digest": "f9247b8ac1bdb4c4762dff19625ec2fee180ec076623bbc11574df6b571f93e4"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "12be805dcf90431aa9d1166c88566bf2",
+      "client": "virtual_M_1",
+      "database": "virtual",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/dcedf83d85e2419e80dbc61b83b19cf9/0",
+      "at": 1793843581.5650153,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.023399996687658,
+      "response_bytes": 20563,
+      "response_digest": "f9247b8ac1bdb4c4762dff19625ec2fee180ec076623bbc11574df6b571f93e4"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "566dd35711fc4444b141ce5de23e54bb",
+      "client": "virtual_M_1",
+      "database": "virtual",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/dcedf83d85e2419e80dbc61b83b19cf9/0",
+      "at": 1793843697.0248032,
+      "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.4905999996699393,
+      "response_bytes": 82,
+      "response_digest": "aede9b8ea77a5fb18a6af8dd4fb207f1ee0e3c92b09c11fe28826e6750b7e42f",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "7db7ead22eff4943bc6b58b8b4e2bc24",
+      "client": "virtual_M_1",
+      "database": "virtual",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/dcedf83d85e2419e80dbc61b83b19cf9/0",
+      "at": 1793843708.8181543,
+      "sql": "UPDATE fans\nSET statustag = 'VIP'\nWHERE statustag = 'Big Fan';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 927.5390999973752,
+      "response_bytes": 301,
+      "response_digest": "03a1f1668e4aa1d9559dd6ed828b6f07850964a30d1f19ac3d85eab4d92afc0c"
+    }
+  ]
+}

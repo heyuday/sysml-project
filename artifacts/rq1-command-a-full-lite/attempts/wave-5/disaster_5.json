@@ -1,0 +1,413 @@
+{
+  "wave": 5,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "disaster_5",
+    "instance_id": "disaster_5",
+    "database": "disaster",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 365.31325912475586,
+    "budget_used": 8.0,
+    "budget_remaining": 12.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"beneficiariesandassessments\" (\nbeneregistry character varying NOT NULL,\nbenedistref character varying NULL,\nbeneopsref character varying NULL,\nbeneregister USER-DEFINED NULL,\nvulnerabilityreview USER-DEFINED NULL,\nneedsassessstatus USER-DEFINED NULL,\ndistequityidx numeric NULL,\nbenefeedbackscore numeric NULL,\ncommengagelvl USER-DEFINED NULL,\nlocalcapacitygrowth USER-DEFINED NULL,\n    PRIMARY KEY (beneregistry),\n    FOREIGN KEY (benedistref) REFERENCES disasterevents(distregistry),\n    FOREIGN KEY (beneopsref) REFERENCES operations(opsregistry)\n);\n\nFirst 3 rows:\nbeneregistry    benedistref    beneopsref    beneregister    vulnerabilityreview    needsassessstatus      distequityidx    benefeedbackscore  commengagelvl    localcapacitygrowth\n--------------  -------------  ------------  --------------  ---------------------  -------------------  ---------------  -------------------  ---------------  ---------------------\nBENE_4NZJ       DIST_SB6K7     OPS_76ZOW     Complete        Complete               Due                             0.54                  2.3  High             Limited\nBENE_FJSN       DIST_PGACZ     OPS_QXWBZ     Pending         Complete               Overdue                         0.87                  1.3  Low              Limited\nBENE_RCD9       DIST_HJ1BQ     OPS_GGBVJ     Complete        Pending                Overdue                         0.88                  1.5  Medium           Active\n...\n\n\nCREATE TABLE \"disasterevents\" (\ndistregistry character varying NOT NULL,\ntimemark timestamp without time zone NOT NULL,\nhaztype USER-DEFINED NOT NULL,\nhazlevel USER-DEFINED NULL,\naffectedarea character varying NULL,\nregiontag character NULL,\nlatcoord numeric NULL,\nloncoord numeric NULL,\nimpactmetrics jsonb NULL,\n    PRIMARY KEY (distregistry)\n);\n\nFirst 3 rows:\ndistregistry    timemark                    haztype     hazlevel    affectedarea      regiontag      latcoord    loncoord  impactmetrics\n--------------  --------------------------  ---...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"disaster|disasterevents|distregistry\": \"A VARCHAR(20) primary key uniquely identifying each disaster record (e.g., 'DIST0001').\",\n  \"disaster|disasterevents|timemark\": \"A TIMESTAMP indicating when this disaster event record was created (e.g., '2025-04-15 10:30:00').\",\n  \"disaster|disasterevents|haztype\": \"An enum (HazType_enum) describing the primary hazard type; possible values include 'Wildfire', 'Earthquake', 'Tsunami', 'Flood', 'Hurricane'.\",\n  \"disaster|disasterevents|hazlevel\": \"An enum (HazLevel_enum) specifying the hazard\\u2019s severity level; possible values include 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'.\",\n  \"disaster|disasterevents|affectedarea\": \"A VARCHAR(100) naming the geographic area impacted by the disaster (e.g., 'Coastal Region').\",\n  \"disaster|disasterevents|regiontag\": \"A CHAR(10) tagging the region code (e.g., 'REG001').\",\n  \"disaster|disasterevents|latcoord\": \"A NUMERIC(9,6) capturing the latitude coordinate of the affected area (e.g., 34.052235).\",\n  \"disaster|disasterevents|loncoord\": \"A DECIMAL(10,7) capturing the longitude coordinate (e.g., -118.243683).\",\n  \"disaster|distributionhubs|hubregistry\": \"A VARCHAR(20) primary key identifying each distribution hub record (e.g., 'HUB0001').\",\n  \"disaster|distributionhubs|disteventref\": \"A VARCHAR(20) referencing DisasterEvents(DistRegistry), linking this hub to a specific disaster event (e.g., 'DIST0001').\",\n  \"disaster|distributionhubs|hubcaptons\": \"A DECIMAL(11,2) for the hub\\u2019s maximum capacity in tons (e.g., 350.00).\",\n  \"disaster|distributionhubs|hubutilpct\": \"A DECIMAL(7,3) showing the percentage of hub capacity currently utilized (e.g., 85.300).\",\n  \"disaster|distributionhubs|storecapm3\": \"A NUMERIC(9,2) representing total storage capacity in cubic meters (e.g., 2000.00).\",\n  \"disaster|distributionhubs|storeavailm3\": \"A DECIMAL(8,3) specifying how many cubic meters of storage remain available (e.g., 450.750).\",\n  \"disaster|distributionhubs|coldstorecapm3\": \"A DECIM...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"hazlevel\", \"emerglevel\", \"respphase\", \"lastmilestatus\", \"fundingstate\", \"impactMetrics.communication\", \"resourceallocstate\", \"impactMetrics.damage_level\", \"staffingProfile.readiness.ppe_status\", \"coordeffectlvl\", \"Resource Utilization Ratio (RUR)\", \"Operational Efficiency Index (OEI)\", \"Communication Security Risk (CSR)\", \"Personnel Effectiveness Ratio (PER)\", \"Market Stability Index (MSI)\", \"Logistics Performance Metric (LPM)\", \"Environmental Impact Factor (EIF)\", \"Financial Sustainability Ratio (FSR)\", \"Beneficiary Satisfaction Index (BSI)\", \"Critical Resource Shortage\", \"High-Risk Response Operation\", \"Resource Optimization Opportunity\", \"Vulnerable Population Hotspot\", \"Operational Excellence\", \"Sustainable Response Operation\", \"Public Health Emergency\", \"Financial Crisis Risk\", \"Community Resilience Builder\", \"Logistics Breakdown\", \"Response Time Effectiveness Ratio (RTER)\", \"Resource Distribution Equity (RDE)\", \"Communication Resilience Factor (CRF)\", \"Supply Chain Sustainability Index (SCSI)\", \"Staffing to Need Ratio (SNR)\", \"Financial Efficiency Metric (FEM)\", \"Logistics Network Resilience (LNR)\", \"Health System Capacity Index (HSCI)\", \"Community Engagement Effectiveness (CEE)\", \"Cross-Agency Coordination Index (CACI)\", \"Critical Resource Prioritization Need\", \"High-Impact Communication Failure\", \"Sustainable Operation Excellence\", \"Financial Vulnerability Zone\", \"Critical Health Response Requirement\", \"Logistics System Collapse Risk\", \"Community Resilience Opportunity\", \"Cross-Agency Coordination Crisis\", \"Resource Distribution Inequity\", \"Rapid Response Success Model\", \"Resource Utilization Classification\", \"Environmental Impact Classification\", \"Community Resilience Classification\", \"available storage percentage\"]",
+        "cost": 0.5,
+        "budget_before": 18.0,
+        "budget_after": 17.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Health System Capacity Index (HSCI)"
+        },
+        "result": "{\n  \"id\": 37,\n  \"knowledge\": \"Health System Capacity Index (HSCI)\",\n  \"description\": \"Measures the disaster area's health system ability to handle medical emergencies\",\n  \"definition\": \"HSCI = PHRS \\\\times medcap\\\\_numeric \\\\times \\\\left(1 - \\\\frac{hazlevel\\\\_numeric}{6}\\\\right), \\\\text{ where medcap\\\\_numeric maps Adequate=1.0, Limited=0.6, Critical=0.3, else=0 for medical emergency capacity, and hazlevel\\\\_numeric represents severity level from 1-5}\"\n}",
+        "cost": 0.5,
+        "budget_before": 17.5,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Public Health Emergency"
+        },
+        "result": "{\n  \"id\": 26,\n  \"knowledge\": \"Public Health Emergency\",\n  \"description\": \"Identifies situations with severe public health implications\",\n  \"definition\": \"Conditions where diseaserisk is 'High' AND waterqualityindex < 50 AND PHRS < 40, indicating critical threats to public health requiring immediate intervention\"\n}",
+        "cost": 0.5,
+        "budget_before": 17.0,
+        "budget_after": 16.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Critical Health Response Requirement"
+        },
+        "result": "{\n  \"id\": 44,\n  \"knowledge\": \"Critical Health Response Requirement\",\n  \"description\": \"Identifies areas needing urgent health system reinforcement\",\n  \"definition\": \"Areas experiencing Public Health Emergency where HSCI < 30 AND staffingProfile.readiness.ppe_status is 'Critical', indicating severely compromised health response capacity requiring immediate intervention\"\n}",
+        "cost": 0.5,
+        "budget_before": 16.5,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN \"medicalEmergencyCapacity\" = 'Adequate' THEN 1.0\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Limited' THEN 0.6\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN \"hazlevel\" = 'Level 1' THEN 5\r\n                    WHEN \"hazlevel\" = 'Level 2' THEN 4\r\n                    WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                    WHEN \"hazlevel\" = 'Level 4' THEN 2\r\n                    WHEN \"hazlevel\" = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN \"hazlevel\" = 'Level 1' THEN 1\r\n                        WHEN \"hazlevel\" = 'Level 2' THEN 2\r\n                        WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                        WHEN \"hazlevel\" = 'Level 4' THEN 4\r\n                        WHEN \"hazlevel\" = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (\"diseaserisk\" = 'High') AND (waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (\"diseaserisk\" = 'High') \r\n            AND (waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;"
+        },
+        "result": "SQL Error: SQL error: column \"medicalEmergencyCapacity\" does not exist\nLINE 7:                     WHEN \"medicalEmergencyCapacity\" = 'Adequ...\n                                 ^\nHINT:  Perhaps you meant to reference the column \"eh.medicalemergencycapacity\".\n",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "submit_sql",
+        "args": {
+          "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN eh.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                    WHEN eh.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                    WHEN eh.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN de.hazlevel = 'Level 1' THEN 5\r\n                    WHEN de.hazlevel = 'Level 2' THEN 4\r\n                    WHEN de.hazlevel = 'Level 3' THEN 3\r\n                    WHEN de.hazlevel = 'Level 4' THEN 2\r\n                    WHEN de.hazlevel = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN de.hazlevel = 'Level 1' THEN 1\r\n                        WHEN de.hazlevel = 'Level 2' THEN 2\r\n                        WHEN de.hazlevel = 'Level 3' THEN 3\r\n                        WHEN de.hazlevel = 'Level 4' THEN 4\r\n                        WHEN de.hazlevel = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (eh.diseaserisk = 'High') AND (eh.waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (eh.diseaserisk = 'High') \r\n            AND (eh.waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;"
+        },
+        "result": "SQL failed Phase 1. Error executing submitted SQL: column \"phrs\" does not exist\nLINE 33: ...sk = 'High') AND (eh.waterqualityindex < 50) AND (PHRS < 40)\n                                                              ^\n\nBudget remaining: 12.0 bird-coins",
+        "cost": 3.0,
+        "budget_before": 15.0,
+        "budget_after": 12.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: disaster\nTask ID: disaster_5\n\nUser Query:\nCould you calculate the Health Resilience Score for all disaster areas and identify which ones are facing a Health Crisis? List the registry ID, the actual Health Resilience Score value, and label each area that meets Health Crisis standard as 'Health Crisis', otherwise 'Normal Health Status'. Please sort the results.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_0t7yzbspdm2x",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_2bjvy76kbtk9",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_0t7yzbspdm2x",
+              "response": "{\"result\": \"CREATE TABLE \\\"beneficiariesandassessments\\\" (\\nbeneregistry character varying NOT NULL,\\nbenedistref character varying NULL,\\nbeneopsref character varying NULL,\\nbeneregister USER-DEFINED NULL,\\nvulnerabilityreview USER-DEFINED NULL,\\nneedsassessstatus USER-DEFINED NULL,\\ndistequityidx numeric NULL,\\nbenefeedbackscore numeric NULL,\\ncommengagelvl USER-DEFINED NULL,\\nlocalcapacitygrowth USER-DEFINED NULL,\\n    PRIMARY KEY (beneregistry),\\n    FOREIGN KEY (benedistref) REFERENCES disasterevents(distregistry),\\n    FOREIGN KEY (beneopsref) REFERENCES operations(opsregistry)\\n);\\n\\nFirst 3 rows:\\nbeneregistry    benedistref    beneopsref    beneregister    vulnerabilityreview    needsassessstatus      distequityidx    benefeedbackscore  commengagelvl    localcapacitygrowth\\n--------------  -------------  ------------  --------------  ---------------------  -------------------  ---------------  -------------------  ---------------  ---------------------\\nBENE_4NZJ       DIST_SB6K7     OPS_76ZOW     Complete        Complete               Due                             0.54                  2.3  High             Limited\\nBENE_FJSN       DIST_PGACZ     OPS_QXWBZ     Pending         Complete               Overdue                         0.87                  1.3  Low              Limited\\nBENE_RCD9       DIST_HJ1BQ     OPS_GGBVJ     Complete        Pending                Overdue                         0.88                  1.5  Medium           Active\\n...\\n\\n\\nCREATE TABLE \\\"disasterevents\\\" (\\ndistregistry character varying NOT NULL,\\ntimemark timestamp without time zone NOT NULL,\\nhaztype USER-DEFINED NOT NULL,\\nhazlevel USER-DEFINED NULL,\\naffectedarea character varying NULL,\\nregiontag character NULL,\\nlatcoord numeric NULL,\\nloncoord numeric NULL,\\nimpactmetrics jsonb NULL,\\n    PRIMARY KEY (distregistry)\\n);\\n\\nFirst 3 rows:\\ndistregistry    timemark                    haztype     hazlevel    affectedarea      regiontag      latcoord    loncoord  impactmetrics\\n--------------  --------------------------  ----------  ----------  ----------------  -----------  ----------  ----------  ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nDIST_SB6K7      2024-12-21 19:49:09.720370  Wildfire    Level 3     East Jeremy       RC7250          51.2036     36.2211  {'population': {'injured': 4524, 'missing': 212, 'affected': 228943, 'displaced': 38806, 'casualties': 174}, 'damage_level': 'Severe', 'communication': 'Limited', 'infrastructure': {'damage_percent': 19.0, 'power_outage_percent': 93.2, 'water_damage_percent': 77}, 'transportation': 'Full'}\\nDIST_PGACZ      2024-03-13 16:56:26.720370  Earthquake  Level 5     Lake Mariah       RC2170         -89.8906     62.0815  {'population': {'injured': 4304, 'missing': 363, 'affected': 241273, 'displaced': 31578, 'casualties': 8}, 'damage_level': 'Moderate', 'communication': 'Operational', 'infrastructure': {'damage_percent': 68.9, 'power_outage_percent': 22.5, 'water_damage_percent': 40}, 'transportation': 'Full'}\\nDIST_HJ1BQ      2024-12-08 06:09:09.720370  Earthquake  Level 5     New Kellychester  RC8678          80.0269   -146.007   {'population': {'injured': 4333, 'missing': 222, 'affected': 389569, 'displaced': 66484, 'casualties': 355}, 'damage_level': 'Minor', 'communication': 'Limited', 'infrastructure': {'damage_percent': 79.7, 'power_outage_percent': 83.8, 'water_damage_percent': 27}, 'transportation': 'Limited'}\\n...\\n\\n\\nCREATE TABLE \\\"distributionhubs\\\" (\\nhubregistry character varying NOT NULL,\\ndisteventref character varying NULL,\\nhubcaptons numeric NULL,\\nhubutilpct numeric NULL,\\nstorecapm3 numeric NULL,\\nstoreavailm3 numeric NULL,\\ncoldstorecapm3 numeric NULL,\\ncoldstoretempc numeric NULL,\\nwarehousestate USER-DEFINED NU...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_2bjvy76kbtk9",
+              "response": "{\"result\": \"{\\n  \\\"disaster|disasterevents|distregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each disaster record (e.g., 'DIST0001').\\\",\\n  \\\"disaster|disasterevents|timemark\\\": \\\"A TIMESTAMP indicating when this disaster event record was created (e.g., '2025-04-15 10:30:00').\\\",\\n  \\\"disaster|disasterevents|haztype\\\": \\\"An enum (HazType_enum) describing the primary hazard type; possible values include 'Wildfire', 'Earthquake', 'Tsunami', 'Flood', 'Hurricane'.\\\",\\n  \\\"disaster|disasterevents|hazlevel\\\": \\\"An enum (HazLevel_enum) specifying the hazard\\\\u2019s severity level; possible values include 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'.\\\",\\n  \\\"disaster|disasterevents|affectedarea\\\": \\\"A VARCHAR(100) naming the geographic area impacted by the disaster (e.g., 'Coastal Region').\\\",\\n  \\\"disaster|disasterevents|regiontag\\\": \\\"A CHAR(10) tagging the region code (e.g., 'REG001').\\\",\\n  \\\"disaster|disasterevents|latcoord\\\": \\\"A NUMERIC(9,6) capturing the latitude coordinate of the affected area (e.g., 34.052235).\\\",\\n  \\\"disaster|disasterevents|loncoord\\\": \\\"A DECIMAL(10,7) capturing the longitude coordinate (e.g., -118.243683).\\\",\\n  \\\"disaster|distributionhubs|hubregistry\\\": \\\"A VARCHAR(20) primary key identifying each distribution hub record (e.g., 'HUB0001').\\\",\\n  \\\"disaster|distributionhubs|disteventref\\\": \\\"A VARCHAR(20) referencing DisasterEvents(DistRegistry), linking this hub to a specific disaster event (e.g., 'DIST0001').\\\",\\n  \\\"disaster|distributionhubs|hubcaptons\\\": \\\"A DECIMAL(11,2) for the hub\\\\u2019s maximum capacity in tons (e.g., 350.00).\\\",\\n  \\\"disaster|distributionhubs|hubutilpct\\\": \\\"A DECIMAL(7,3) showing the percentage of hub capacity currently utilized (e.g., 85.300).\\\",\\n  \\\"disaster|distributionhubs|storecapm3\\\": \\\"A NUMERIC(9,2) representing total storage capacity in cubic meters (e.g., 2000.00).\\\",\\n  \\\"disaster|distributionhubs|storeavailm3\\\": \\\"A DECIMAL(8,3) specifying how many cubic meters of storage remain available (e.g., 450.750).\\\",\\n  \\\"disaster|distributionhubs|coldstorecapm3\\\": \\\"A DECIMAL(10,3) indicating cold-storage capacity in cubic meters (e.g., 150.300).\\\",\\n  \\\"disaster|distributionhubs|coldstoretempc\\\": \\\"A NUMERIC(4,1) for the temperature in the cold storage facility (e.g., -5.0).\\\",\\n  \\\"disaster|distributionhubs|warehousestate\\\": \\\"An enum (WarehouseState_enum) describing the warehouse\\\\u2019s condition; values: 'Fair', 'Excellent', 'Good', 'Poor'.\\\",\\n  \\\"disaster|distributionhubs|invaccpct\\\": \\\"A DECIMAL(5,2) representing inventory accuracy as a percentage (e.g., 98.50).\\\",\\n  \\\"disaster|distributionhubs|stockturnrate\\\": \\\"A DECIMAL(5,2) measuring how often inventory is turned over during a specific period (e.g., 5.20).\\\",\\n  \\\"disaster|operations|opsregistry\\\": \\\"A VARCHAR(20) primary key for each operations record (e.g., 'OPS0001').\\\",\\n  \\\"disaster|operations|opsdistref\\\": \\\"A VARCHAR(20) referencing DisasterEvents(DistRegistry), tying these operations to a disaster (e.g., 'DIST0001').\\\",\\n  \\\"disaster|operations|opshubref\\\": \\\"A VARCHAR(20) referencing DistributionHubs(HubRegistry), associating operations with a particular hub (e.g., 'HUB0001').\\\",\\n  \\\"disaster|operations|emerglevel\\\": \\\"An enum (EmergLevel_enum) labeling the emergency level; possible values: 'Black', 'Orange', 'Red', 'Yellow'.\\\",\\n  \\\"disaster|operations|respphase\\\": \\\"An enum (RespPhase_enum) for the disaster response phase; possible values: 'Reconstruction', 'Recovery', 'Emergency', 'Initial'.\\\",\\n  \\\"disaster|operations|opsstatus\\\": \\\"An enum (OpsStatus_enum) showing the operation\\\\u2019s status; values: 'Completed', 'Scaling Down', 'Active', 'Planning'.\\\",\\n  \\\"disaster|operations|coordcenter\\\": \\\"A VARCHAR(80) describing the coordination center or command location (e.g., 'Central Ops HQ').\\\",\\n  \\\"disaster|operations|opsstartdate\\\": \\\"A DATE indicating when operations began (e.g., '2025-04-01').\\\",\\n  \\\"disaster|operations|estdurationdays\\\": \\\"An INT estimating how many d...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_v5scj1zcrkxg",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_v5scj1zcrkxg",
+              "response": "{\"result\": \"[\\\"hazlevel\\\", \\\"emerglevel\\\", \\\"respphase\\\", \\\"lastmilestatus\\\", \\\"fundingstate\\\", \\\"impactMetrics.communication\\\", \\\"resourceallocstate\\\", \\\"impactMetrics.damage_level\\\", \\\"staffingProfile.readiness.ppe_status\\\", \\\"coordeffectlvl\\\", \\\"Resource Utilization Ratio (RUR)\\\", \\\"Operational Efficiency Index (OEI)\\\", \\\"Communication Security Risk (CSR)\\\", \\\"Personnel Effectiveness Ratio (PER)\\\", \\\"Market Stability Index (MSI)\\\", \\\"Logistics Performance Metric (LPM)\\\", \\\"Environmental Impact Factor (EIF)\\\", \\\"Financial Sustainability Ratio (FSR)\\\", \\\"Beneficiary Satisfaction Index (BSI)\\\", \\\"Critical Resource Shortage\\\", \\\"High-Risk Response Operation\\\", \\\"Resource Optimization Opportunity\\\", \\\"Vulnerable Population Hotspot\\\", \\\"Operational Excellence\\\", \\\"Sustainable Response Operation\\\", \\\"Public Health Emergency\\\", \\\"Financial Crisis Risk\\\", \\\"Community Resilience Builder\\\", \\\"Logistics Breakdown\\\", \\\"Response Time Effectiveness Ratio (RTER)\\\", \\\"Resource Distribution Equity (RDE)\\\", \\\"Communication Resilience Factor (CRF)\\\", \\\"Supply Chain Sustainability Index (SCSI)\\\", \\\"Staffing to Need Ratio (SNR)\\\", \\\"Financial Efficiency Metric (FEM)\\\", \\\"Logistics Network Resilience (LNR)\\\", \\\"Health System Capacity Index (HSCI)\\\", \\\"Community Engagement Effectiveness (CEE)\\\", \\\"Cross-Agency Coordination Index (CACI)\\\", \\\"Critical Resource Prioritization Need\\\", \\\"High-Impact Communication Failure\\\", \\\"Sustainable Operation Excellence\\\", \\\"Financial Vulnerability Zone\\\", \\\"Critical Health Response Requirement\\\", \\\"Logistics System Collapse Risk\\\", \\\"Community Resilience Opportunity\\\", \\\"Cross-Agency Coordination Crisis\\\", \\\"Resource Distribution Inequity\\\", \\\"Rapid Response Success Model\\\", \\\"Resource Utilization Classification\\\", \\\"Environmental Impact Classification\\\", \\\"Community Resilience Classification\\\", \\\"available storage percentage\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 17.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_atsc64fzsaf3",
+              "args": {
+                "knowledge_name": "Health System Capacity Index (HSCI)"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_yavzpkta5pc9",
+              "args": {
+                "knowledge_name": "Public Health Emergency"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_fj7xpy3359d0",
+              "args": {
+                "knowledge_name": "Critical Health Response Requirement"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_atsc64fzsaf3",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 37,\\n  \\\"knowledge\\\": \\\"Health System Capacity Index (HSCI)\\\",\\n  \\\"description\\\": \\\"Measures the disaster area's health system ability to handle medical emergencies\\\",\\n  \\\"definition\\\": \\\"HSCI = PHRS \\\\\\\\times medcap\\\\\\\\_numeric \\\\\\\\times \\\\\\\\left(1 - \\\\\\\\frac{hazlevel\\\\\\\\_numeric}{6}\\\\\\\\right), \\\\\\\\text{ where medcap\\\\\\\\_numeric maps Adequate=1.0, Limited=0.6, Critical=0.3, else=0 for medical emergency capacity, and hazlevel\\\\\\\\_numeric represents severity level from 1-5}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_yavzpkta5pc9",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 26,\\n  \\\"knowledge\\\": \\\"Public Health Emergency\\\",\\n  \\\"description\\\": \\\"Identifies situations with severe public health implications\\\",\\n  \\\"definition\\\": \\\"Conditions where diseaserisk is 'High' AND waterqualityindex < 50 AND PHRS < 40, indicating critical threats to public health requiring immediate intervention\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 16.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_fj7xpy3359d0",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 44,\\n  \\\"knowledge\\\": \\\"Critical Health Response Requirement\\\",\\n  \\\"description\\\": \\\"Identifies areas needing urgent health system reinforcement\\\",\\n  \\\"definition\\\": \\\"Areas experiencing Public Health Emergency where HSCI < 30 AND staffingProfile.readiness.ppe_status is 'Critical', indicating severely compromised health response capacity requiring immediate intervention\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_77mj4bb8hgcs",
+              "args": {
+                "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN \"medicalEmergencyCapacity\" = 'Adequate' THEN 1.0\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Limited' THEN 0.6\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN \"hazlevel\" = 'Level 1' THEN 5\r\n                    WHEN \"hazlevel\" = 'Level 2' THEN 4\r\n                    WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                    WHEN \"hazlevel\" = 'Level 4' THEN 2\r\n                    WHEN \"hazlevel\" = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN \"hazlevel\" = 'Level 1' THEN 1\r\n                        WHEN \"hazlevel\" = 'Level 2' THEN 2\r\n                        WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                        WHEN \"hazlevel\" = 'Level 4' THEN 4\r\n                        WHEN \"hazlevel\" = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (\"diseaserisk\" = 'High') AND (waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (\"diseaserisk\" = 'High') \r\n            AND (waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_77mj4bb8hgcs",
+              "response": "{\"result\": \"SQL Error: SQL error: column \\\"medicalEmergencyCapacity\\\" does not exist\\nLINE 7:                     WHEN \\\"medicalEmergencyCapacity\\\" = 'Adequ...\\n                                 ^\\nHINT:  Perhaps you meant to reference the column \\\"eh.medicalemergencycapacity\\\".\\n\\n\\n[SYSTEM NOTE: Remaining budget: 15.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "submit_sql",
+              "id": "submit_sql_8cyq01p8xjkz",
+              "args": {
+                "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN eh.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                    WHEN eh.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                    WHEN eh.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN de.hazlevel = 'Level 1' THEN 5\r\n                    WHEN de.hazlevel = 'Level 2' THEN 4\r\n                    WHEN de.hazlevel = 'Level 3' THEN 3\r\n                    WHEN de.hazlevel = 'Level 4' THEN 2\r\n                    WHEN de.hazlevel = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN de.hazlevel = 'Level 1' THEN 1\r\n                        WHEN de.hazlevel = 'Level 2' THEN 2\r\n                        WHEN de.hazlevel = 'Level 3' THEN 3\r\n                        WHEN de.hazlevel = 'Level 4' THEN 4\r\n                        WHEN de.hazlevel = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (eh.diseaserisk = 'High') AND (eh.waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (eh.diseaserisk = 'High') \r\n            AND (eh.waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "submit_sql",
+              "id": "submit_sql_8cyq01p8xjkz",
+              "response": "{\"result\": \"SQL failed Phase 1. Error executing submitted SQL: column \\\"phrs\\\" does not exist\\nLINE 33: ...sk = 'High') AND (eh.waterqualityindex < 50) AND (PHRS < 40)\\n                                                              ^\\n\\nBudget remaining: 12.0 bird-coins\\n\\n[SYSTEM NOTE: Remaining budget: 12.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-af27a07d-d54f-4d90-8a73-e42547e7b6f5",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I was unable to complete your request within the given budget."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I was unable to complete your request within the given budget."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "052dc1186e62459c8947a98540ee359c",
+      "client": "disaster_5",
+      "database": "disaster",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/aec8bc9f2d38402fbf7bd184cd364eb4/0",
+      "at": 1793856817.860678,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 3.5499999939929694,
+      "response_bytes": 20150,
+      "response_digest": "c62be15b6e43de501e945b9dc6549714d879912843c5828cffedf6dee201ca5f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "5bb3b782528245d3a755e6028a42d2e2",
+      "client": "disaster_5",
+      "database": "disaster",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/aec8bc9f2d38402fbf7bd184cd364eb4/0",
+      "at": 1793856896.0902514,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 5.147699994267896,
+      "response_bytes": 20150,
+      "response_digest": "c62be15b6e43de501e945b9dc6549714d879912843c5828cffedf6dee201ca5f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "a35a0ede8c114c94a8c88a46705afd3b",
+      "client": "disaster_5",
+      "database": "disaster",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/aec8bc9f2d38402fbf7bd184cd364eb4/0",
+      "at": 1793857052.013758,
+      "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN \"medicalEmergencyCapacity\" = 'Adequate' THEN 1.0\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Limited' THEN 0.6\r\n                    WHEN \"medicalEmergencyCapacity\" = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN \"hazlevel\" = 'Level 1' THEN 5\r\n                    WHEN \"hazlevel\" = 'Level 2' THEN 4\r\n                    WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                    WHEN \"hazlevel\" = 'Level 4' THEN 2\r\n                    WHEN \"hazlevel\" = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN \"hazlevel\" = 'Level 1' THEN 1\r\n                        WHEN \"hazlevel\" = 'Level 2' THEN 2\r\n                        WHEN \"hazlevel\" = 'Level 3' THEN 3\r\n                        WHEN \"hazlevel\" = 'Level 4' THEN 4\r\n                        WHEN \"hazlevel\" = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (\"diseaserisk\" = 'High') AND (waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (\"diseaserisk\" = 'High') \r\n            AND (waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 24.62329999980284,
+      "response_bytes": 297,
+      "response_digest": "7cecda70a2b0a0a1d1625d207d6d10029e3295cf505ea42b9daa4ecb4646678b",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "submission",
+      "id": "df8dca946f1147129a792663ce882a32",
+      "client": "disaster_5",
+      "database": "disaster",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/aec8bc9f2d38402fbf7bd184cd364eb4/0",
+      "at": 1793857094.0226362,
+      "sql": "WITH health_resilience_scores AS (\r\n    SELECT \r\n        distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN eh.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                    WHEN eh.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                    WHEN eh.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN de.hazlevel = 'Level 1' THEN 5\r\n                    WHEN de.hazlevel = 'Level 2' THEN 4\r\n                    WHEN de.hazlevel = 'Level 3' THEN 3\r\n                    WHEN de.hazlevel = 'Level 4' THEN 2\r\n                    WHEN de.hazlevel = 'Level 5' THEN 1\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN de.hazlevel = 'Level 1' THEN 1\r\n                        WHEN de.hazlevel = 'Level 2' THEN 2\r\n                        WHEN de.hazlevel = 'Level 3' THEN 3\r\n                        WHEN de.hazlevel = 'Level 4' THEN 4\r\n                        WHEN de.hazlevel = 'Level 5' THEN 5\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score,\r\n        (\r\n            (eh.diseaserisk = 'High') AND (eh.waterqualityindex < 50) AND (PHRS < 40)\r\n        ) AS is_public_health_emergency,\r\n        (\r\n            (eh.diseaserisk = 'High') \r\n            AND (eh.waterqualityindex < 50) \r\n            AND (PHRS < 40)\r\n            AND (health_resilience_score < 30)\r\n            AND (staffingProfile->>'ppe_status' = 'Critical')\r\n        ) AS is_critical_health_response_required\r\n    FROM \r\n        \"environmentandhealth\" AS eh\r\n    INNER JOIN disasterevents AS de ON de.distregistry = eh.envdistref\r\n)\r\nSELECT \r\n    registry_id,\r\n    health_resilience_score,\r\n    CASE \r\n        WHEN is_critical_health_response_required THEN 'Health Crisis'\r\n        ELSE 'Normal Health Status'\r\n    END AS health_status\r\nFROM \r\n    health_resilience_scores\r\nORDER BY \r\n    registry_id;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 848.3061999941128,
+      "response_bytes": 347,
+      "response_digest": "823d923f4012ae29c8e4877a0950a4ee123c97a49df6a5d3e6b3d4c8726e4b50"
+    }
+  ]
+}

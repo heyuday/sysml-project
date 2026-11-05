@@ -1,0 +1,32 @@
+[
+  {
+    "task": "gaming_3",
+    "wave": 1,
+    "simulator": "qwen3.5-4b",
+    "sql": "SELECT \n    d.makername AS manufacturer,\n    d.modnum AS model,\n    ts.devscope AS device_type,\n    r.rgbbright AS rgb_brightness,\n    r.rgbcoloracc AS color_accuracy,\n    r.rgbzones AS num_rgb_zones,\n    r.rgbmodes AS rgb_modes,\n    r.rgbcolors AS supported_colors,\n    r.rgbregistry AS rgb_implementation_quality_score,\n    CASE \n        WHEN r.rgbregistry ILIKE '%RGB Quality Classification%' THEN 'High'\n        ELSE 'Low'\n    END AS rgb_classification\nFROM \n    DeviceIdentity d\nJOIN \n    TestSessions ts ON d.devsessionref = ts.sessionregistry\nJOIN \n    Mechanical m ON d.devregistry = m.mechdevref\nJOIN \n    RGB r ON m.mechregistry = r.rgbmechref\nORDER BY \n    rgb_implementation_quality_score DESC;\n\nSELECT \n    d.makername AS manufacturer,\n    d.modnum AS model,\n    ts.devscope AS device_type,\n    r.rgbbright AS rgb_brightness,\n    r.rgbcoloracc AS color_accuracy,\n    r.rgbzones AS num_rgb_zones,\n    r.rgbmodes AS rgb_modes,\n    r.rgbcolors AS supported_colors,\n    r.rgbregistry AS rgb_implementation_quality_score,\n    CASE \n        WHEN r.rgbregistry ILIKE '%RGB Quality Classification%' THEN 'High'\n        ELSE 'Low'\n    END AS rgb_classification\nFROM \n    DeviceIdentity d\nJOIN \n    TestSessions ts ON d.devsessionref = ts.sessionregistry\nJOIN \n    AudioAndMedia a ON d.devregistry = a.auddevref\nJOIN \n    RGB r ON a.audregistry = r.rgbaudref\nORDER BY \n    rgb_implementation_quality_score DESC;"
+  },
+  {
+    "task": "robot_M_4",
+    "wave": 2,
+    "simulator": "qwen3.5-4b",
+    "sql": "WITH deleted_records AS (\r\n    DELETE FROM maintenance_and_fault mf\r\n    WHERE mf.faultpredscore < 0.05\r\n    AND EXISTS (\r\n        SELECT 1\r\n        FROM robot_details rd\r\n        WHERE rd.botdetreg = mf.upkeeprobot\r\n        AND EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM rd.instdateval) > 5\r\n    )\r\n    RETURNING mf.*\r\n)\r\nSELECT * FROM deleted_records;"
+  },
+  {
+    "task": "cross_db_M_1",
+    "wave": 3,
+    "simulator": "command-a-03-2025",
+    "sql": "WITH security_issues AS (\r\n    SELECT \r\n        dp.profiletrace,\r\n        dp.volgb,\r\n        dp.datasense,\r\n        sp.encstate,\r\n        sp.aclstate,\r\n        -- Calculate DSI and SRS\r\n        (dp.volgb * CASE dp.datasense WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 ELSE 1 END) AS dsi,\r\n        (\r\n            CASE sp.encstate \r\n                WHEN 'Full' THEN 3\r\n                WHEN 'Partial' THEN 2\r\n                ELSE 1\r\n            END * \r\n            CASE sp.aclstate \r\n                WHEN 'Strong' THEN 3\r\n                WHEN 'Adequate' THEN 2\r\n                ELSE 1\r\n            END\r\n        ) AS srs\r\n    FROM \r\n        dataprofile dp\r\n    JOIN \r\n        securityprofile sp ON dp.profiletrace = sp.profilekey\r\n)\r\n-- Update API security state to 'Review Required' for profiles with potential security issues\r\nUPDATE securityprofile sp\r\nSET apisecstate = 'Review Required'\r\nFROM security_issues si\r\nWHERE \r\n    sp.profilekey = si.profiletrace AND \r\n    si.dsi > 100 AND \r\n    si.srs < 2;\r\n\r\n-- Return the updated details for these profiles\r\nSELECT \r\n    dp.profiletrace,\r\n    dp.volgb,\r\n    dp.datasense,\r\n    sp.encstate,\r\n    sp.aclstate,\r\n    sp.apisecstate\r\nFROM \r\n    dataprofile dp\r\nJOIN \r\n    securityprofile sp ON dp.profiletrace = sp.profilekey\r\nWHERE \r\n    (dp.volgb * CASE dp.datasense WHEN 'High' THEN 3 WHEN 'Medium' THEN 2 ELSE 1 END) > 100 AND \r\n    (\r\n        CASE sp.encstate \r\n            WHEN 'Full' THEN 3\r\n            WHEN 'Partial' THEN 2\r\n            ELSE 1\r\n        END * \r\n        CASE sp.aclstate \r\n            WHEN 'Strong' THEN 3\r\n            WHEN 'Adequate' THEN 2\r\n            ELSE 1\r\n        END\r\n    ) < 2;"
+  },
+  {
+    "task": "robot_M_4",
+    "wave": 3,
+    "simulator": "command-a-03-2025",
+    "sql": "WITH deleted_records AS (\r\n    DELETE FROM maintenance_and_fault\r\n    WHERE faultpredscore < (SELECT AVG(faultpredscore) FROM maintenance_and_fault)\r\n    RETURNING *\r\n)\r\nSELECT * FROM deleted_records;"
+  },
+  {
+    "task": "credit_M_5",
+    "wave": 5,
+    "simulator": "command-a-03-2025",
+    "sql": "EXPLAIN ANALYZE\nSELECT chaninvdatablock->>'onlineuse'\nFROM bank_and_transactions\nWHERE chaninvdatablock->>'onlineuse' = 'High';"
+  }
+]

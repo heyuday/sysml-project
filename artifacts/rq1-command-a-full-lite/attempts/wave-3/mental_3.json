@@ -1,0 +1,523 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "mental_3",
+    "instance_id": "mental_3",
+    "database": "mental",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 323.55561423301697,
+    "budget_used": 9.0,
+    "budget_remaining": 9.0,
+    "dialogue_history": [
+      {
+        "role": "agent",
+        "content": "Could you please clarify what is meant by the \"Facility with Potential Engagement-Outcome Disconnect\" classification and which scores are relevant?"
+      },
+      {
+        "role": "user",
+        "content": "The \"Facility with Potential Engagement-Outcome Disconnect\" refers to facilities that show a high average Therapy Engagement Score (TES) but a low Recovery Trajectory Index (RTI). The relevant scores are the average TES and the RTI, both rounded to 2 decimal places."
+      }
+    ],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"facilities\" (\nfackey character varying NOT NULL,\nrsource USER-DEFINED NULL,\nenvstress USER-DEFINED NULL,\nlifeimpact USER-DEFINED NULL,\nseasonpat USER-DEFINED NULL,\nleglissue USER-DEFINED NULL,\nssystemchg USER-DEFINED NULL,\nsupport_and_resources jsonb NULL,\n    PRIMARY KEY (fackey)\n);\n\nFirst 3 rows:\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\n...\n\n\nCREATE TABLE \"treatmentbasics\" (\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\nencref character varying NOT NULL,\ncurmed text NULL,\nmedadh USER-DEFINED NULL,\nmedside USER-DEFINED NULL,\nmedchg USER-DEFINED NULL,\ncrisisint numeric NULL,\ntherapy_details jsonb NULL,\n    PRIMARY KEY (txkey),\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\n);\n\nFirst 3 rows:\n  txkey  encref    curmed                         ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"mental|facilities|fackey\": \"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\",\n  \"mental|facilities|rsource\": \"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\",\n  \"mental|facilities|envstress\": \"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\",\n  \"mental|facilities|lifeimpact\": \"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\",\n  \"mental|facilities|seasonpat\": \"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\",\n  \"mental|facilities|leglissue\": \"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\",\n  \"mental|facilities|ssystemchg\": \"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\",\n  \"mental|facilities|leadclin\": \"A VARCHAR(20) referencing the lead clinician\\u2019s ID (not a foreign key here).\",\n  \"mental|clinicians|clinkey\": \"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\",\n  \"mental|clinicians|clinconf\": \"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\",\n  \"mental|clinicians|assesslim\": \"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\",\n  \"mental|clinicians|docustat\": \"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\",\n  \"mental|clinicians|billcode\": \"A VARCHAR(15) storing billing or service code (e.g., '99214').\",\n  \"mental|clinicians|nxtrevdt\": \"A DATE indicating next planned review date (e.g., '2025-06-01').\",\n  \"mental|clinicians|carecoord\": \"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\",\n  \"mental|clinicians|refneed\": \"An enum (referralneeds_enum) capturing referral needs (Services, Testing...<truncated>",
+        "cost": 1.0,
+        "budget_before": 17.0,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "Could you please clarify what is meant by the \"Facility with Potential Engagement-Outcome Disconnect\" classification and which scores are relevant?"
+        },
+        "result": "The \"Facility with Potential Engagement-Outcome Disconnect\" refers to facilities that show a high average Therapy Engagement Score (TES) but a low Recovery Trajectory Index (RTI). The relevant scores are the average TES and the RTI, both rounded to 2 decimal places.",
+        "cost": 2.0,
+        "budget_before": 16.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(to.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb ON e.enckey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    jsonb_to_record(tb.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(to.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: syntax error at or near \"to\"\nLINE 4:     AVG(to.funcimpv) AS rti\n                ^\n",
+        "cost": 1.0,
+        "budget_before": 14.0,
+        "budget_after": 13.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nJOIN \n    jsonb_to_record(tb_e.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: a column definition list is required for functions returning \"record\"\nLINE 26:     jsonb_to_record(tb_e.therapy_details) td ON TRUE\n             ^\n",
+        "cost": 1.0,
+        "budget_before": 13.0,
+        "budget_after": 12.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: function avg(text) does not exist\nLINE 3:     AVG(td.engagement) AS avg_tes, \n            ^\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\n",
+        "cost": 1.0,
+        "budget_before": 12.0,
+        "budget_after": 11.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: function avg(functionalimprovement_enum) does not exist\nLINE 4:     AVG(t_out.funcimpv) AS rti\n            ^\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\n",
+        "cost": 1.0,
+        "budget_before": 11.0,
+        "budget_after": 10.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(CAST(t_out.funcimpv AS NUMERIC)) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(CAST(t_out.funcimpv AS NUMERIC)) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+        },
+        "result": "SQL Error: SQL error: cannot cast type functionalimprovement_enum to numeric\nLINE 4:     AVG(CAST(t_out.funcimpv AS NUMERIC)) AS rti\n                ^\n",
+        "cost": 1.0,
+        "budget_before": 10.0,
+        "budget_after": 9.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: mental\nTask ID: mental_3\n\nUser Query:\nIdentify facilities classified as having a Facility with Potential Engagement-Outcome Disconnect. Display the facility ID and relevant scores. Sort them and send the first batch.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_eqr84kdd7m7n",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_f9sra5nfnsdf",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_eqr84kdd7m7n",
+              "response": "{\"result\": \"CREATE TABLE \\\"facilities\\\" (\\nfackey character varying NOT NULL,\\nrsource USER-DEFINED NULL,\\nenvstress USER-DEFINED NULL,\\nlifeimpact USER-DEFINED NULL,\\nseasonpat USER-DEFINED NULL,\\nleglissue USER-DEFINED NULL,\\nssystemchg USER-DEFINED NULL,\\nsupport_and_resources jsonb NULL,\\n    PRIMARY KEY (fackey)\\n);\\n\\nFirst 3 rows:\\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\\n...\\n\\n\\nCREATE TABLE \\\"treatmentbasics\\\" (\\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\\nencref character varying NOT NULL,\\ncurmed text NULL,\\nmedadh USER-DEFINED NULL,\\nmedside USER-DEFINED NULL,\\nmedchg USER-DEFINED NULL,\\ncrisisint numeric NULL,\\ntherapy_details jsonb NULL,\\n    PRIMARY KEY (txkey),\\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\\n);\\n\\nFirst 3 rows:\\n  txkey  encref    curmed                             medadh         medside    medchg             crisisint  therapy_details\\n-------  --------  ---------------------------------  -------------  ---------  ---------------  -----------  -----------------------------------------------------------------------------------------------------------------------------\\n     17  MH485293  Antipsychotic,Antidepressant,None  Low            Moderate   Augmentation               3  {'type': 'Group', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 35}\\n     18  MH600211  Antipsychotic,None                 Medium         Severe     Dose Adjustment            1  {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 49}\\n     19  MH821921  Antipsychotic                      Non-compliant  Moderate   Switch                     3  {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium', 'duration_months': 55}\\n...\\n\\n\\nCREATE TABLE \\\"clinicians\\\" (\\nclinkey character varying NOT NULL,\\nclinconf USER-DEFINED NULL,\\nassesslim USER-DEFINED NULL,\\ndocustat USER-DEFINED NULL,\\nbillcode character varying NULL,\\nnxtrevdt date NULL,\\ncarecoord USER-DEFINED NULL,\\nrefneed USER-DEFINED NULL,\\nfuptype USER-DEFINED NULL,\\nfupfreq USER-DEFINED NULL,\\nfacconnect character varying NULL,\\n    PRIMARY KEY (clinkey),\\n    FOREIGN KEY (facconnect) REFERENCES facilities(fackey)\\n);\\n\\nFirst 3 rows:\\nclinkey    clinconf    assesslim    docustat    billcode    nxtrevdt    carecoord    refneed    fuptype    fupfreq    facconnect\\n---------  ----------  -----------  ----------  ----------  ----------  -----------  ---------  ---------  ---------  ------------\\nC8738      Medium      Cognitive    Complete    CPT90511    2025-05-09  Intensive    Services   Therapy    Weekly     F801\\nC6837      Low         Cognitive    Incomplete  CPT90696    2025-08-14  Regular   ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_f9sra5nfnsdf",
+              "response": "{\"result\": \"{\\n  \\\"mental|facilities|fackey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\\\",\\n  \\\"mental|facilities|rsource\\\": \\\"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\\\",\\n  \\\"mental|facilities|envstress\\\": \\\"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|lifeimpact\\\": \\\"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|seasonpat\\\": \\\"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\\\",\\n  \\\"mental|facilities|leglissue\\\": \\\"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\\\",\\n  \\\"mental|facilities|ssystemchg\\\": \\\"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\\\",\\n  \\\"mental|facilities|leadclin\\\": \\\"A VARCHAR(20) referencing the lead clinician\\\\u2019s ID (not a foreign key here).\\\",\\n  \\\"mental|clinicians|clinkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\\\",\\n  \\\"mental|clinicians|clinconf\\\": \\\"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\\\",\\n  \\\"mental|clinicians|assesslim\\\": \\\"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\\\",\\n  \\\"mental|clinicians|docustat\\\": \\\"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\\\",\\n  \\\"mental|clinicians|billcode\\\": \\\"A VARCHAR(15) storing billing or service code (e.g., '99214').\\\",\\n  \\\"mental|clinicians|nxtrevdt\\\": \\\"A DATE indicating next planned review date (e.g., '2025-06-01').\\\",\\n  \\\"mental|clinicians|carecoord\\\": \\\"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\\\",\\n  \\\"mental|clinicians|refneed\\\": \\\"An enum (referralneeds_enum) capturing referral needs (Services, Testing, Specialist).\\\",\\n  \\\"mental|clinicians|fuptype\\\": \\\"An enum (followuptype_enum) describing follow-up type (Therapy, Routine, Urgent, Medication Check).\\\",\\n  \\\"mental|clinicians|fupfreq\\\": \\\"An enum (followupfrequency_enum) describing follow-up frequency (Weekly, Quarterly, Biweekly, Monthly).\\\",\\n  \\\"mental|clinicians|facconnect\\\": \\\"A VARCHAR(20) FK referencing Facilities(FacKey), linking this clinician to a facility.\\\",\\n  \\\"mental|patients|patkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying each patient (e.g., 'PAT001').\\\",\\n  \\\"mental|patients|patage\\\": \\\"A SMALLINT indicating the patient's age in years.\\\",\\n  \\\"mental|patients|patgender\\\": \\\"An enum (patientgender_enum) for the patient's gender (Other, F, M).\\\",\\n  \\\"mental|patients|pateth\\\": \\\"An enum (patientethnicity_enum) indicating the patient's ethnicity (Other, Hispanic, African, Asian, Caucasian).\\\",\\n  \\\"mental|patients|edulevel\\\": \\\"An enum (educationlevel_enum) describing highest education achieved (High School, Other, Bachelor, Master, Doctorate).\\\",\\n  \\\"mental|patients|empstat\\\": \\\"An enum (employmentstatus_enum) capturing employment status (Retired, Employed, Unemployed, Disabled, Student).\\\",\\n  \\\"mental|patients|maristat\\\": \\\"An enum (maritalstatus_enum) describing marital status (Widowed, Married, Single, Divorced).\\\",\\n  \\\"mental|patients|livingarr\\\": \\\"An enum (livingarrangement_enum) for living arrangement (Alone, Partner, Family, Group Home, Homeless).\\\",\\n  \\\"mental|patients|insurtype\\\": \\\"An enum (insurancetype_enum) referencing type of insurance (Medicaid, Medicare, Private).\\\",\\n  \\\"mental|patients|insurstat\\\": \\\"An enum (insurancestatus_enum) describing insurance status (Pending, Approved, Denied).\\\",\\n  \\\"mental|patients|disabstat\\\": \\\"An enum (disabilitystatus_enum) indicating disability status (Pending, Permanent, Temporary).\\\",\\n  \\\"mental|patients|housestable\\\": \\\"An enum (housin...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_9nj7pm36rc4j",
+              "args": {
+                "question": "Could you please clarify what is meant by the \"Facility with Potential Engagement-Outcome Disconnect\" classification and which scores are relevant?"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_9nj7pm36rc4j",
+              "response": "{\"result\": \"The \\\"Facility with Potential Engagement-Outcome Disconnect\\\" refers to facilities that show a high average Therapy Engagement Score (TES) but a low Recovery Trajectory Index (RTI). The relevant scores are the average TES and the RTI, both rounded to 2 decimal places.\\n\\n[SYSTEM NOTE: Remaining budget: 14.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_caz4bmtrtb9c",
+              "args": {
+                "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(to.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb ON e.enckey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    jsonb_to_record(tb.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(to.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_caz4bmtrtb9c",
+              "response": "{\"result\": \"SQL Error: SQL error: syntax error at or near \\\"to\\\"\\nLINE 4:     AVG(to.funcimpv) AS rti\\n                ^\\n\\n\\n[SYSTEM NOTE: Remaining budget: 13.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_aaedzwg4fhys",
+              "args": {
+                "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nJOIN \n    jsonb_to_record(tb_e.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_aaedzwg4fhys",
+              "response": "{\"result\": \"SQL Error: SQL error: a column definition list is required for functions returning \\\"record\\\"\\nLINE 26:     jsonb_to_record(tb_e.therapy_details) td ON TRUE\\n             ^\\n\\n\\n[SYSTEM NOTE: Remaining budget: 12.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_j1fh9z2mkss6",
+              "args": {
+                "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_j1fh9z2mkss6",
+              "response": "{\"result\": \"SQL Error: SQL error: function avg(text) does not exist\\nLINE 3:     AVG(td.engagement) AS avg_tes, \\n            ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\\n\\n[SYSTEM NOTE: Remaining budget: 11.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_2998h2md8r3e",
+              "args": {
+                "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_2998h2md8r3e",
+              "response": "{\"result\": \"SQL Error: SQL error: function avg(functionalimprovement_enum) does not exist\\nLINE 4:     AVG(t_out.funcimpv) AS rti\\n            ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\\n\\n[SYSTEM NOTE: Remaining budget: 10.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_dkf68jp90nhm",
+              "args": {
+                "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(CAST(t_out.funcimpv AS NUMERIC)) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(CAST(t_out.funcimpv AS NUMERIC)) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_dkf68jp90nhm",
+              "response": "{\"result\": \"SQL Error: SQL error: cannot cast type functionalimprovement_enum to numeric\\nLINE 4:     AVG(CAST(t_out.funcimpv AS NUMERIC)) AS rti\\n                ^\\n\\n\\n[SYSTEM NOTE: Remaining budget: 9.0/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-2bcd3624-abaf-47fc-bcb3-942d1e12ebf3",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I was unable to complete your request within the given budget."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I was unable to complete your request within the given budget."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "576074715ab841eaa09b3047aab6b8d5",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850695.9187365,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.9162000025971793,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "46145b39371343aba20d8019e63e719d",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850753.0400555,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.738900002441369,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "708c994a24a649229a463cb779275e99",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850831.7072682,
+      "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(to.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb ON e.enckey = tb.encref\nJOIN \n    treatmentoutcomes to ON tb.txkey = to.txref\nJOIN \n    jsonb_to_record(tb.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(to.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 23.660400001972448,
+      "response_bytes": 139,
+      "response_digest": "e470a323154e98b67b30f72302188df4b8f93176bc3f6c8fa379595cf3085cfa",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "b34c04a5f6fe490ea0463d2b576d2576",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850858.7622,
+      "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nJOIN \n    jsonb_to_record(tb_e.therapy_details) td ON TRUE\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 13.830500000040047,
+      "response_bytes": 203,
+      "response_digest": "7dc57e70797ce0d21a50e9896890805b02e5772407ca343d938df4aeea85b129",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "f34cf83a13a74dd79a49120871d70b96",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850903.7215948,
+      "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(td.engagement) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(td.engagement) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 11.351599998306483,
+      "response_bytes": 252,
+      "response_digest": "3dfbcd475ee7c9a67eb0c9e8027821a2f55b797ee66eebf11a5101a0d5f4fa5d",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "84d480aed3cc44399852bbfc1a548ae8",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793850947.9977915,
+      "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(t_out.funcimpv) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(t_out.funcimpv) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 12.028799996187445,
+      "response_bytes": 269,
+      "response_digest": "5a77b0d52dad6fd9503bd58567fc327b70bb88c27c36d43d18d0bb0e404573e2",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "5f00ef6fef3e4ae4a4f3375a04ae5f18",
+      "client": "mental_3",
+      "database": "mental",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/358b7df0d6f64c74838529be885c5f87/0",
+      "at": 1793851006.8123903,
+      "sql": "SELECT \n    f.fackey AS facility_id, \n    AVG(CAST(td.engagement AS NUMERIC)) AS avg_tes, \n    AVG(CAST(t_out.funcimpv AS NUMERIC)) AS rti\nFROM \n    facilities f\nJOIN \n    clinicians c ON f.fackey = c.facconnect\nJOIN \n    patients p ON c.clinkey = p.clinleadref\nJOIN \n    assessmentbasics a ON p.patkey = a.patownerref\nJOIN \n    assessmentsymptomsandrisk asr ON a.abkey = asr.asrkey\nJOIN \n    treatmentbasics tb ON p.patkey = tb.encref\nJOIN \n    treatmentoutcomes t_out ON tb.txkey = t_out.txref\nJOIN \n    encounters e ON p.patkey = e.patref\nJOIN \n    treatmentbasics tb_e ON e.enckey = tb_e.encref\nJOIN \n    treatmentoutcomes t_out_e ON tb_e.txkey = t_out_e.txref\nCROSS JOIN LATERAL jsonb_to_record(tb_e.therapy_details) AS td(engagement TEXT)\nGROUP BY \n    f.fackey\nHAVING \n    AVG(CAST(td.engagement AS NUMERIC)) > 0.8 AND AVG(CAST(t_out.funcimpv AS NUMERIC)) < 0.2\nORDER BY \n    avg_tes DESC, rti ASC\nLIMIT 10;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 5.98339999851305,
+      "response_bytes": 183,
+      "response_digest": "369ddf3bab05e155b2251cb280edda888f2000115177a14bd7e9f1dfb4414c43",
+      "successful": false
+    }
+  ]
+}

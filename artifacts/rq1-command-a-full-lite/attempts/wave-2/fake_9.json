@@ -1,0 +1,358 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "fake_9",
+    "instance_id": "fake_9",
+    "database": "fake",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 374.6876366138458,
+    "budget_used": 5.0,
+    "budget_remaining": 19.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"account\" (\naccindex character NOT NULL,\nacctident character varying NULL,\nplatident character varying NULL,\nplattype USER-DEFINED NULL,\nacctcreatedate date NULL,\nacctagespan smallint NULL,\nacctstatus USER-DEFINED NULL,\nacctcategory USER-DEFINED NULL,\nauthstatus USER-DEFINED NULL,\n    PRIMARY KEY (accindex)\n);\n\nFirst 3 rows:\naccindex    acctident    platident    plattype        acctcreatedate      acctagespan  acctstatus    acctcategory    authstatus\n----------  -----------  -----------  --------------  ----------------  -------------  ------------  --------------  ------------\nFA410087    ACC7210284   PL331        Microblog       2023-12-26                  393  Active        Personal        Unverified\nFA122676    ACC2686094   PL784        Social Network  2023-03-20                  353  Deleted       Bot             Unverified\nFA731882    ACC7106934   PL235        Social Network  2023-07-12                  244  Active        Hybrid          Pending\n...\n\n\nCREATE TABLE \"securitydetection\" (\nsecdetkey character NOT NULL,\nsectechref character NULL,\ndetecttime timestamp without time zone NULL,\ndetectsource USER-DEFINED NULL,\nlastupd timestamp without time zone NULL,\nupdfreqhrs smallint NULL,\ndetection_score_profile jsonb NULL,\n    PRIMARY KEY (secdetkey),\n    FOREIGN KEY (sectechref) REFERENCES technicalinfo(techkey)\n);\n\nFirst 3 rows:\nsecdetkey    sectechref    detecttime           detectsource    lastupd                updfreqhrs  detection_score_profile\n-----------  ------------  -------------------  --------------  -------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------...<truncated>",
+        "cost": 1.0,
+        "budget_before": 24.0,
+        "budget_after": 23.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"fake|account|accindex\": \"A CHAR(12) primary key uniquely identifying each account record (e.g., 'AC1234567890').\",\n  \"fake|account|acctident\": \"A VARCHAR(14) field holding an external-facing or system-defined account identifier (e.g., 'ACC2686094').\",\n  \"fake|account|platident\": \"An 8-character field indicating which platform ID the account is associated with (e.g., 'PL784').\",\n  \"fake|account|plattype\": \"An enum (PlatformType_enum) describing the platform type (Microblog, Social Network, Video Platform, Forum).\",\n  \"fake|account|acctcreatedate\": \"A DATE indicating when the account was created (e.g., '2025-02-20').\",\n  \"fake|account|acctagespan\": \"A SMALLINT showing the account\\u2019s age in days since creation (e.g., '45').\",\n  \"fake|account|acctstatus\": \"An enum (AccountStatus_enum) capturing the account status (Active, Deleted, Suspended, Dormant).\",\n  \"fake|account|acctcategory\": \"An enum (AccountType_enum) labeling the account type (Personal, Bot, Hybrid, Business).\",\n  \"fake|account|authstatus\": \"An enum (VerificationStatus_enum) describing the verification state (Unverified, Pending, Failed, Suspicious).\",\n  \"fake|profile|profkey\": \"A CHAR(12) primary key uniquely identifying each profile record (e.g., 'PF1234567890').\",\n  \"fake|profile|profaccref\": \"A CHAR(12) referencing Account(AccIndex), linking this profile to a single account (e.g., 'AC1234567890').\",\n  \"fake|sessionbehavior|sessref\": \"A CHAR(12) primary key uniquely identifying each session behavior record (e.g., 'SE1234567890').\",\n  \"fake|sessionbehavior|sessprofref\": \"A CHAR(12) referencing Profile(ProfKey) (e.g., 'PF1234567890').\",\n  \"fake|sessionbehavior|logintimepat\": \"An enum (LoginTimePattern_enum) describing login times (Burst, Bot-like, Random, Regular).\",\n  \"fake|sessionbehavior|loginfreq\": \"An enum (LoginFrequency_enum) labeling login frequency (Medium, High, Low, Suspicious).\",\n  \"fake|sessionbehavior|loginlocvar\": \"NUMERIC(4,1) measuring variance in login locations (e.g., '2.7').\",\n  ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 23.0,
+        "budget_after": 22.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON cb.cntref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+        },
+        "result": "Query executed, empty result set.",
+        "cost": 1.0,
+        "budget_before": 22.0,
+        "budget_after": 21.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    securitydetection sd\nJOIN \n    contentbehavior cb ON sd.secdetkey = cb.cntref\nJOIN \n    sessionbehavior sb ON cb.cntsessref = sb.sessref\nJOIN \n    profile p ON sb.sessprofref = p.profkey\nJOIN \n    account a ON p.profaccref = a.accindex\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+        },
+        "result": "Query executed, empty result set.",
+        "cost": 1.0,
+        "budget_before": 21.0,
+        "budget_after": 20.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nLEFT JOIN \n    moderationaction ma ON cb.cntref = ma.macntref\nLEFT JOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+        },
+        "result": "account_id | session_tally | overall_posting_speed | fixed_platform_count | cross_risk_score\n--------------------------------------------------------------------------------------------\nFA108387     | 999880 | 49.775 | 1 | 8.90",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: fake\nTask ID: fake_9\n\nUser Query:\nI want to identify the top hyper-active user group, showing each account's ID, the session tally, their overall posting speed, a fixed platform count of 1, and the cross-risk score.\n\nYou have a budget of 24.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_bv8571p6hdmz",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_bv8571p6hdmz",
+              "response": "{\"result\": \"CREATE TABLE \\\"account\\\" (\\naccindex character NOT NULL,\\nacctident character varying NULL,\\nplatident character varying NULL,\\nplattype USER-DEFINED NULL,\\nacctcreatedate date NULL,\\nacctagespan smallint NULL,\\nacctstatus USER-DEFINED NULL,\\nacctcategory USER-DEFINED NULL,\\nauthstatus USER-DEFINED NULL,\\n    PRIMARY KEY (accindex)\\n);\\n\\nFirst 3 rows:\\naccindex    acctident    platident    plattype        acctcreatedate      acctagespan  acctstatus    acctcategory    authstatus\\n----------  -----------  -----------  --------------  ----------------  -------------  ------------  --------------  ------------\\nFA410087    ACC7210284   PL331        Microblog       2023-12-26                  393  Active        Personal        Unverified\\nFA122676    ACC2686094   PL784        Social Network  2023-03-20                  353  Deleted       Bot             Unverified\\nFA731882    ACC7106934   PL235        Social Network  2023-07-12                  244  Active        Hybrid          Pending\\n...\\n\\n\\nCREATE TABLE \\\"securitydetection\\\" (\\nsecdetkey character NOT NULL,\\nsectechref character NULL,\\ndetecttime timestamp without time zone NULL,\\ndetectsource USER-DEFINED NULL,\\nlastupd timestamp without time zone NULL,\\nupdfreqhrs smallint NULL,\\ndetection_score_profile jsonb NULL,\\n    PRIMARY KEY (secdetkey),\\n    FOREIGN KEY (sectechref) REFERENCES technicalinfo(techkey)\\n);\\n\\nFirst 3 rows:\\nsecdetkey    sectechref    detecttime           detectsource    lastupd                updfreqhrs  detection_score_profile\\n-----------  ------------  -------------------  --------------  -------------------  ------------  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nSEC_5MMN6    TECH_TYVED    2021-10-16 07:40:11  User Report     2021-10-09 22:04:40           720  {'overall': {'confval': 0.20736, 'riskval': 0.28, 'fposprob': 0.4435, 'threatlvl': 'Critical', 'detectconf': 0.26}, 'pattern_scores': {'netpatscore': 8.4, 'contpatscore': 0.007, 'profpatscore': 0.611, 'techpatscore': 0.183, 'temppatscore': 5.463, 'behavpatscore': 2.86}, 'behavior_scores': {'botlikscore': 59.44, 'commintscore': 0.8785, 'autobehavscore': 0.264, 'spambehavscore': 1.65}, 'detection_reliability': {'featver': 'FV_M3', 'modelver': 'MV_F7', 'detmethrel': 0.512}}\\nSEC_26GHN    TECH_M7PND    2021-07-08 14:53:21  Pattern Match   2020-06-15 23:41:26           117  {'overall': {'confval': 0.06661, 'riskval': 5.94, 'fposprob': 0.7838, 'threatlvl': 'Low', 'detectconf': 0.08}, 'pattern_scores': {'netpatscore': 3.3, 'contpatscore': 0.738, 'profpatscore': 0.567, 'techpatscore': 0.036, 'temppatscore': 1.035, 'behavpatscore': 91.63}, 'behavior_scores': {'botlikscore': 7.623, 'commintscore': 0.2123, 'autobehavscore': 0.845, 'spambehavscore': 5.63}, 'detection_reliability': {'featver': 'FV_UF', 'modelver': 'MV_QK', 'detmethrel': 0.617}}\\nSEC_G61S4    TECH_9KWQR    2021-08-07 23:20:51  Pattern Match   2025-11-11 09:00:25            10  {'overall': {'confval': 0.45097, 'riskval': 1.11, 'fposprob': 0.5395, 'threatlvl': 'Medium', 'detectconf': 0.75}, 'pattern_scores': {'netpatscore': 1.34, 'contpatscore': 0.322, 'profpatscore': 0.522, 'techpatscore': 0.182, 'temppatscore': 1.982, 'behavpatscore': 78.95}, 'behavior_scores': {'botlikscore': 52.237, 'commintscore': 0.139, 'autobehavscore': 0.848, 'spambehavscore': 5.18}, 'detection_reliability': {'featver': 'FV_DP', 'modelver': 'MV_E2', 'detmethrel': 0.074}}\\n...\\n\\n\\nCREATE TABLE \\\"moderationaction\\\" (\\nmodactkey character NOT NULL,\\nmasedetref character NULL,\\nmacntref character NULL,\\nabuserepnum smallint NULL,...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_f7a09dg11fnb",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_f7a09dg11fnb",
+              "response": "{\"result\": \"{\\n  \\\"fake|account|accindex\\\": \\\"A CHAR(12) primary key uniquely identifying each account record (e.g., 'AC1234567890').\\\",\\n  \\\"fake|account|acctident\\\": \\\"A VARCHAR(14) field holding an external-facing or system-defined account identifier (e.g., 'ACC2686094').\\\",\\n  \\\"fake|account|platident\\\": \\\"An 8-character field indicating which platform ID the account is associated with (e.g., 'PL784').\\\",\\n  \\\"fake|account|plattype\\\": \\\"An enum (PlatformType_enum) describing the platform type (Microblog, Social Network, Video Platform, Forum).\\\",\\n  \\\"fake|account|acctcreatedate\\\": \\\"A DATE indicating when the account was created (e.g., '2025-02-20').\\\",\\n  \\\"fake|account|acctagespan\\\": \\\"A SMALLINT showing the account\\\\u2019s age in days since creation (e.g., '45').\\\",\\n  \\\"fake|account|acctstatus\\\": \\\"An enum (AccountStatus_enum) capturing the account status (Active, Deleted, Suspended, Dormant).\\\",\\n  \\\"fake|account|acctcategory\\\": \\\"An enum (AccountType_enum) labeling the account type (Personal, Bot, Hybrid, Business).\\\",\\n  \\\"fake|account|authstatus\\\": \\\"An enum (VerificationStatus_enum) describing the verification state (Unverified, Pending, Failed, Suspicious).\\\",\\n  \\\"fake|profile|profkey\\\": \\\"A CHAR(12) primary key uniquely identifying each profile record (e.g., 'PF1234567890').\\\",\\n  \\\"fake|profile|profaccref\\\": \\\"A CHAR(12) referencing Account(AccIndex), linking this profile to a single account (e.g., 'AC1234567890').\\\",\\n  \\\"fake|sessionbehavior|sessref\\\": \\\"A CHAR(12) primary key uniquely identifying each session behavior record (e.g., 'SE1234567890').\\\",\\n  \\\"fake|sessionbehavior|sessprofref\\\": \\\"A CHAR(12) referencing Profile(ProfKey) (e.g., 'PF1234567890').\\\",\\n  \\\"fake|sessionbehavior|logintimepat\\\": \\\"An enum (LoginTimePattern_enum) describing login times (Burst, Bot-like, Random, Regular).\\\",\\n  \\\"fake|sessionbehavior|loginfreq\\\": \\\"An enum (LoginFrequency_enum) labeling login frequency (Medium, High, Low, Suspicious).\\\",\\n  \\\"fake|sessionbehavior|loginlocvar\\\": \\\"NUMERIC(4,1) measuring variance in login locations (e.g., '2.7').\\\",\\n  \\\"fake|sessionbehavior|sesslenmean\\\": \\\"NUMERIC(7,2) average session length (e.g., '123.45').\\\",\\n  \\\"fake|sessionbehavior|sesscount\\\": \\\"An INTEGER counting total sessions (e.g., '57').\\\",\\n  \\\"fake|sessionbehavior|actregval\\\": \\\"NUMERIC(4,2) measuring how regularly the user logs in (e.g., '0.75').\\\",\\n  \\\"fake|sessionbehavior|acttimedist\\\": \\\"A JSONB structure capturing session activity distribution (e.g., '{\\\\\\\"morning\\\\\\\": 30, \\\\\\\"night\\\\\\\": 70}').\\\",\\n  \\\"fake|networkmetrics|netkey\\\": \\\"A CHAR(12) primary key for each network metrics record (e.g., 'NE1234567890').\\\",\\n  \\\"fake|networkmetrics|netsessref\\\": \\\"A CHAR(12) referencing SessionBehavior(SessRef) (e.g., 'SE1234567890').\\\",\\n  \\\"fake|contentbehavior|cntref\\\": \\\"A CHAR(12) primary key for each content behavior record (e.g., 'CB1234567890').\\\",\\n  \\\"fake|contentbehavior|cntsessref\\\": \\\"A CHAR(12) referencing SessionBehavior(SessRef) (e.g., 'SE1234567890').\\\",\\n  \\\"fake|contentbehavior|postnum\\\": \\\"An INTEGER counting total posts (e.g., '45').\\\",\\n  \\\"fake|contentbehavior|postfreq\\\": \\\"NUMERIC(5,3) capturing post frequency (e.g., '1.235').\\\",\\n  \\\"fake|contentbehavior|postintvar\\\": \\\"NUMERIC(6,3) variance in posting intervals (e.g., '0.457').\\\",\\n  \\\"fake|contentbehavior|cntsimscore\\\": \\\"NUMERIC(4,2) content similarity (e.g., '0.85').\\\",\\n  \\\"fake|contentbehavior|cntuniqscore\\\": \\\"NUMERIC(5,4) content uniqueness measure (e.g., '0.9432').\\\",\\n  \\\"fake|contentbehavior|cntdiverseval\\\": \\\"NUMERIC(6,3) diversity of user\\\\u2019s content (e.g., '1.234').\\\",\\n  \\\"fake|contentbehavior|cntlangnum\\\": \\\"An enum (ContentLanguageCount_enum) showing language count in posts (1, 2, 3, 4, or 5).\\\",\\n  \\\"fake|contentbehavior|cnttopicent\\\": \\\"NUMERIC(4,3) topic entropy measure (e.g., '0.123').\\\",\\n  \\\"fake|contentbehavior|hashusepat\\\": \\\"An enum (HashtagUsagePattern_enum) describing hashtag usage (Trending, Normal, Random, Spam).\\\",\\n...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_xjy4zef6ntds",
+              "args": {
+                "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON cb.cntref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_xjy4zef6ntds",
+              "response": "{\"result\": \"Query executed, empty result set.\\n\\n[SYSTEM NOTE: Remaining budget: 21.0/24.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_xj8qm8wdf8h0",
+              "args": {
+                "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    securitydetection sd\nJOIN \n    contentbehavior cb ON sd.secdetkey = cb.cntref\nJOIN \n    sessionbehavior sb ON cb.cntsessref = sb.sessref\nJOIN \n    profile p ON sb.sessprofref = p.profkey\nJOIN \n    account a ON p.profaccref = a.accindex\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_xj8qm8wdf8h0",
+              "response": "{\"result\": \"Query executed, empty result set.\\n\\n[SYSTEM NOTE: Remaining budget: 20.0/24.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_m257808kh2se",
+              "args": {
+                "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nLEFT JOIN \n    moderationaction ma ON cb.cntref = ma.macntref\nLEFT JOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_m257808kh2se",
+              "response": "{\"result\": \"account_id | session_tally | overall_posting_speed | fixed_platform_count | cross_risk_score\\n--------------------------------------------------------------------------------------------\\nFA108387     | 999880 | 49.775 | 1 | 8.90\\n\\n[SYSTEM NOTE: Remaining budget: 19.0/24.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-d147737f-9285-4f6b-bf2a-a2072972a28e",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the top hyper-active user group:\n\n| account_id | session_tally | overall_posting_speed | fixed_platform_count | cross_risk_score |\n|---|---|---|---|---|\n| FA108387 | 999880 | 49.775 | 1 | 8.90 |"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the top hyper-active user group:\n\n| account_id | session_tally | overall_posting_speed | fixed_platform_count | cross_risk_score |\n|---|---|---|---|---|\n| FA108387 | 999880 | 49.775 | 1 | 8.90 |"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "edee45f3e5164045ae1bb076f079796f",
+      "client": "fake_9",
+      "database": "fake",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/93972cb0ff7240278b1f7abb6bed7a15/0",
+      "at": 1793840345.2418897,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.6478000034112483,
+      "response_bytes": 16433,
+      "response_digest": "f51eaba75e0cf969df4e5aae17d3dcd2c03a818aaf295287dce3325826569b89"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "ba27b1a7362a48b4b3e07e0d02a5d35b",
+      "client": "fake_9",
+      "database": "fake",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/93972cb0ff7240278b1f7abb6bed7a15/0",
+      "at": 1793840399.5816333,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.6028999962145463,
+      "response_bytes": 16433,
+      "response_digest": "f51eaba75e0cf969df4e5aae17d3dcd2c03a818aaf295287dce3325826569b89"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "85dcbd7d3d904ce2984b0a6716f5545f",
+      "client": "fake_9",
+      "database": "fake",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/93972cb0ff7240278b1f7abb6bed7a15/0",
+      "at": 1793840444.4846196,
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nJOIN \n    securitydetection sd ON cb.cntref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 34.82850000000326,
+      "response_bytes": 74,
+      "response_digest": "3a85c143a286e7fb851c6d05424615923dbf278df3140938e651873a2019d4d0",
+      "successful": true
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "95af6f1c3afe4f39ae5024941b30c656",
+      "client": "fake_9",
+      "database": "fake",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/93972cb0ff7240278b1f7abb6bed7a15/0",
+      "at": 1793840579.9642577,
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    securitydetection sd\nJOIN \n    contentbehavior cb ON sd.secdetkey = cb.cntref\nJOIN \n    sessionbehavior sb ON cb.cntsessref = sb.sessref\nJOIN \n    profile p ON sb.sessprofref = p.profkey\nJOIN \n    account a ON p.profaccref = a.accindex\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 13.080600001558196,
+      "response_bytes": 74,
+      "response_digest": "3a85c143a286e7fb851c6d05424615923dbf278df3140938e651873a2019d4d0",
+      "successful": true
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "6f226d5e3a4d46e0aed3b1c4fe4f5a29",
+      "client": "fake_9",
+      "database": "fake",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/93972cb0ff7240278b1f7abb6bed7a15/0",
+      "at": 1793840667.799775,
+      "sql": "SELECT \n    a.accindex AS account_id,\n    sb.sesscount AS session_tally,\n    cb.postfreq AS overall_posting_speed,\n    1 AS fixed_platform_count,\n    sd.detection_score_profile->'overall'->>'riskval' AS cross_risk_score\nFROM \n    account a\nJOIN \n    profile p ON a.accindex = p.profaccref\nJOIN \n    sessionbehavior sb ON p.profkey = sb.sessprofref\nJOIN \n    contentbehavior cb ON sb.sessref = cb.cntsessref\nLEFT JOIN \n    moderationaction ma ON cb.cntref = ma.macntref\nLEFT JOIN \n    securitydetection sd ON ma.masedetref = sd.secdetkey\nORDER BY \n    sb.sesscount DESC\nLIMIT 1;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 17.119999996793922,
+      "response_bytes": 270,
+      "response_digest": "e5a0adcd274b32df1b75ebce2d8564863db4b0ab4db44bcacc58398c4deaf024",
+      "successful": true
+    }
+  ]
+}

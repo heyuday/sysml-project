@@ -1,0 +1,274 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "mental_M_4",
+    "instance_id": "mental_M_4",
+    "database": "mental",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 307.67222785949707,
+    "budget_used": 4.0,
+    "budget_remaining": 16.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"facilities\" (\nfackey character varying NOT NULL,\nrsource USER-DEFINED NULL,\nenvstress USER-DEFINED NULL,\nlifeimpact USER-DEFINED NULL,\nseasonpat USER-DEFINED NULL,\nleglissue USER-DEFINED NULL,\nssystemchg USER-DEFINED NULL,\nsupport_and_resources jsonb NULL,\n    PRIMARY KEY (fackey)\n);\n\nFirst 3 rows:\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\n...\n\n\nCREATE TABLE \"treatmentbasics\" (\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\nencref character varying NOT NULL,\ncurmed text NULL,\nmedadh USER-DEFINED NULL,\nmedside USER-DEFINED NULL,\nmedchg USER-DEFINED NULL,\ncrisisint numeric NULL,\ntherapy_details jsonb NULL,\n    PRIMARY KEY (txkey),\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\n);\n\nFirst 3 rows:\n  txkey  encref    curmed                         ...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"mental|facilities|fackey\": \"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\",\n  \"mental|facilities|rsource\": \"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\",\n  \"mental|facilities|envstress\": \"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\",\n  \"mental|facilities|lifeimpact\": \"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\",\n  \"mental|facilities|seasonpat\": \"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\",\n  \"mental|facilities|leglissue\": \"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\",\n  \"mental|facilities|ssystemchg\": \"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\",\n  \"mental|facilities|leadclin\": \"A VARCHAR(20) referencing the lead clinician\\u2019s ID (not a foreign key here).\",\n  \"mental|clinicians|clinkey\": \"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\",\n  \"mental|clinicians|clinconf\": \"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\",\n  \"mental|clinicians|assesslim\": \"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\",\n  \"mental|clinicians|docustat\": \"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\",\n  \"mental|clinicians|billcode\": \"A VARCHAR(15) storing billing or service code (e.g., '99214').\",\n  \"mental|clinicians|nxtrevdt\": \"A DATE indicating next planned review date (e.g., '2025-06-01').\",\n  \"mental|clinicians|carecoord\": \"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\",\n  \"mental|clinicians|refneed\": \"An enum (referralneeds_enum) capturing referral needs (Services, Testing...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Average PHQ-9 Score by Facility (APSF)\", \"Average GAD-7 Score by Facility (AGSF)\", \"Treatment Adherence Rate (TAR)\", \"Suicide Risk Prevalence (SRP)\", \"Therapy Engagement Score (TES)\", \"Facility Resource Adequacy Index (FRAI)\", \"Patient Functional Impairment Score (PFIS)\", \"Crisis Intervention Frequency (CIF)\", \"Social Support Effectiveness (SSE)\", \"Missed Appointment Rate (MAR)\", \"High-Risk Patient\", \"Treatment-Resistant Patient\", \"Complex Care Needs\", \"Stable Recovery Patient\", \"Low Engagement Risk\", \"Resource-Supported Facility\", \"High Social Support Patient\", \"Frequent Crisis Patient\", \"Non-Compliant Patient\", \"High Appointment Adherence\", \"PHQ-9 Score (Depression)\", \"GAD-7 Score (Anxiety)\", \"Suicide Risk Level\", \"Therapy Engagement\", \"Community Resources\", \"Functional Impairment\", \"Treatment Adherence\", \"Crisis Intervention Count\", \"Social Support Level\", \"Missed Appointment Count\", \"Symptom Severity Index (SSI)\", \"Engagement-Adherence Score (EAS)\", \"Facility Risk Profile Index (FRPI)\", \"Patient Stability Metric (PSM)\", \"Resource-Demand Differential (RDD)\", \"Socio-Environmental Support Index (SESI)\", \"Adherence Effectiveness Ratio (AER)\", \"Engagement Deficit Index (EDI)\", \"Comprehensive Facility Risk Score (CFRS)\", \"Support System Pressure Index (SSPI)\", \"High-Need, Under-Resourced Facility\", \"Facility with Engaged but High-Impairment Population\", \"Patient with Strong Recovery Capital\", \"Facility Attrition Risk Indicator\", \"Well-Resourced High-Support Environment\", \"Patient with Severe Comorbid Distress Profile\", \"Facility with Potential Treatment Inertia\", \"Patient with High Crisis & Low Support Profile\", \"Facility Demonstrating Strong Patient Retention\", \"High Severity, High Risk Patient Group\", \"Clinical Improvement Potential Index (CIPI)\", \"Facility Efficiency Index (FEI)\", \"Therapeutic Alliance & Engagement Score (TAES)\", \"Recovery Trajectory Index (RTI)\", \"Crisis Adherence Ratio (CAR)\", \"Facility with High Clinical Leverage Potential\", \"Patient Exhibitin...<truncated>",
+        "cost": 0.5,
+        "budget_before": 18.0,
+        "budget_after": 17.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Therapy Engagement Score (TES)"
+        },
+        "result": "{\n  \"id\": 4,\n  \"knowledge\": \"Therapy Engagement Score (TES)\",\n  \"description\": \"Computes an average engagement score across therapy sessions.\",\n  \"definition\": \"TES = \\\\frac{\\\\sum_{i \\\\in treatmentbasics} (therapy\\\\_details_i['engagement\\\\_score'])} {|treatmentbasics|}, \\\\text{where } engagement\\\\_score = \\\\begin{cases} 3 & \\\\text{if } therapy\\\\_details['engagement'] = High \\\\\\\\ 2 & \\\\text{if } therapy\\\\_details['engagement'] = Medium \\\\\\\\ 1 & \\\\text{if } therapy\\\\_details['engagement'] = Low \\\\\\\\ 0 & \\\\text{if } therapy\\\\_details['engagement'] = Non-compliant \\\\end{cases}, \\\\text{and } therapy\\\\_details \\\\text{ is the JSONB column in the treatmentbasics table}\"\n}",
+        "cost": 0.5,
+        "budget_before": 17.5,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "CREATE OR REPLACE FUNCTION calculate_tes(\n    txkey INT\n)\nRETURNS FLOAT AS $ $\nDECLARE\n    total_engagement_score FLOAT;\n    total_sessions INT;\nBEGIN\n    -- Fetch the therapy details for the given treatment\n    SELECT\n        SUM(\n            CASE\n                WHEN therapy_details ->> 'engagement' = 'High' THEN 3\n                WHEN therapy_details ->> 'engagement' = 'Medium' THEN 2\n                WHEN therapy_details ->> 'engagement' = 'Low' THEN 1\n                WHEN therapy_details ->> 'engagement' = 'Non-compliant' THEN 0\n                ELSE 0 -- Default case for any unexpected values\n            END\n        ) AS total_score,\n        COUNT(*) AS session_count\n    INTO\n        total_engagement_score,\n        total_sessions\n    FROM\n        treatmentbasics\n    WHERE\n        txkey = txkey;\n\n    -- Calculate the average engagement score\n    IF total_sessions > 0 THEN\n        RETURN total_engagement_score / total_sessions;\n    ELSE\n        RETURN 0; -- Return 0 if no sessions found\n    END IF;\nEND;\n$ $ LANGUAGE plpgsql;"
+        },
+        "result": "SQL Error: Only SELECT queries allowed in execute_sql",
+        "cost": 1.0,
+        "budget_before": 17.0,
+        "budget_after": 16.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: mental\nTask ID: mental_M_4\n\nUser Query:\nMake a TES calculator function called `calculate_tes`. It needs to accept a treatment identifier and figure out the engagement rating from the therapy info, returning the score.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_e7hsv2w6kfpe",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_8k6xxscbvz84",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_rhg46n7agv5h",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_e7hsv2w6kfpe",
+              "response": "{\"result\": \"CREATE TABLE \\\"facilities\\\" (\\nfackey character varying NOT NULL,\\nrsource USER-DEFINED NULL,\\nenvstress USER-DEFINED NULL,\\nlifeimpact USER-DEFINED NULL,\\nseasonpat USER-DEFINED NULL,\\nleglissue USER-DEFINED NULL,\\nssystemchg USER-DEFINED NULL,\\nsupport_and_resources jsonb NULL,\\n    PRIMARY KEY (fackey)\\n);\\n\\nFirst 3 rows:\\nfackey    rsource    envstress    lifeimpact    seasonpat    leglissue    ssystemchg    support_and_resources\\n--------  ---------  -----------  ------------  -----------  -----------  ------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\nF306      Emergency  Severe       Mild          Winter       Ongoing      Variable      {'plans': {'crisis_plan_status': 'Needs Update', 'safety_plan_status': 'Not Needed'}, 'support_services': 'Housing,Employment,Case Management', 'emergency_contact': '3', 'community_resources': 'Limited'}\\nF492      Court      Mild         Mild          Winter       Resolved     Variable      {'plans': {'crisis_plan_status': 'Not Needed', 'safety_plan_status': 'Needs Update'}, 'support_services': '', 'emergency_contact': '1', 'community_resources': 'Limited'}\\nF562      Emergency  Moderate     Severe        Variable     Resolved     Improved      {'plans': {'crisis_plan_status': 'In Place', 'safety_plan_status': 'In Place'}, 'support_services': 'Case Management,Employment,None', 'emergency_contact': '1', 'community_resources': 'Adequate'}\\n...\\n\\n\\nCREATE TABLE \\\"treatmentbasics\\\" (\\ntxkey integer NOT NULL DEFAULT nextval('treatmentbasics_txkey_seq'::regclass),\\nencref character varying NOT NULL,\\ncurmed text NULL,\\nmedadh USER-DEFINED NULL,\\nmedside USER-DEFINED NULL,\\nmedchg USER-DEFINED NULL,\\ncrisisint numeric NULL,\\ntherapy_details jsonb NULL,\\n    PRIMARY KEY (txkey),\\n    FOREIGN KEY (encref) REFERENCES encounters(enckey)\\n);\\n\\nFirst 3 rows:\\n  txkey  encref    curmed                             medadh         medside    medchg             crisisint  therapy_details\\n-------  --------  ---------------------------------  -------------  ---------  ---------------  -----------  -----------------------------------------------------------------------------------------------------------------------------\\n     17  MH485293  Antipsychotic,Antidepressant,None  Low            Moderate   Augmentation               3  {'type': 'Group', 'changes': 'Therapist Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 35}\\n     18  MH600211  Antipsychotic,None                 Medium         Severe     Dose Adjustment            1  {'type': 'CBT', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Low', 'duration_months': 49}\\n     19  MH821921  Antipsychotic                      Non-compliant  Moderate   Switch                     3  {'type': 'Psychodynamic', 'changes': 'Modality Change', 'frequency': 'Weekly', 'engagement': 'Medium', 'duration_months': 55}\\n...\\n\\n\\nCREATE TABLE \\\"clinicians\\\" (\\nclinkey character varying NOT NULL,\\nclinconf USER-DEFINED NULL,\\nassesslim USER-DEFINED NULL,\\ndocustat USER-DEFINED NULL,\\nbillcode character varying NULL,\\nnxtrevdt date NULL,\\ncarecoord USER-DEFINED NULL,\\nrefneed USER-DEFINED NULL,\\nfuptype USER-DEFINED NULL,\\nfupfreq USER-DEFINED NULL,\\nfacconnect character varying NULL,\\n    PRIMARY KEY (clinkey),\\n    FOREIGN KEY (facconnect) REFERENCES facilities(fackey)\\n);\\n\\nFirst 3 rows:\\nclinkey    clinconf    assesslim    docustat    billcode    nxtrevdt    carecoord    refneed    fuptype    fupfreq    facconnect\\n---------  ----------  -----------  ----------  ----------  ----------  -----------  ---------  ---------  ---------  ------------\\nC8738      Medium      Cognitive    Complete    CPT90511    2025-05-09  Intensive    Services   Therapy    Weekly     F801\\nC6837      Low         Cognitive    Incomplete  CPT90696    2025-08-14  Regular   ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_8k6xxscbvz84",
+              "response": "{\"result\": \"{\\n  \\\"mental|facilities|fackey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the facility (e.g., 'FAC001').\\\",\\n  \\\"mental|facilities|rsource\\\": \\\"An enum (referralsource_enum) for how the patient was referred (Self, Court, Physician, Emergency, Family).\\\",\\n  \\\"mental|facilities|envstress\\\": \\\"An enum (environmentalstressors_enum) describing stressors in the environment (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|lifeimpact\\\": \\\"An enum (lifeeventsimpact_enum) showing how life events impact the patient (Mild, Moderate, Severe).\\\",\\n  \\\"mental|facilities|seasonpat\\\": \\\"An enum (seasonalpattern_enum) capturing any seasonal pattern in symptoms (Summer, Winter, Variable).\\\",\\n  \\\"mental|facilities|leglissue\\\": \\\"An enum (legalissues_enum) describing the patient's legal issues (Resolved, Pending, Ongoing).\\\",\\n  \\\"mental|facilities|ssystemchg\\\": \\\"An enum (supportsystemchanges_enum) describing changes in support system (Variable, Improved, Declined).\\\",\\n  \\\"mental|facilities|leadclin\\\": \\\"A VARCHAR(20) referencing the lead clinician\\\\u2019s ID (not a foreign key here).\\\",\\n  \\\"mental|clinicians|clinkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying the clinician (e.g., 'CLN001').\\\",\\n  \\\"mental|clinicians|clinconf\\\": \\\"An enum (clinicianconfidence_enum) capturing the clinician's confidence (Medium, Low, High).\\\",\\n  \\\"mental|clinicians|assesslim\\\": \\\"An enum (assessmentlimitations_enum) describing any limitations (Cognitive, Engagement, Language).\\\",\\n  \\\"mental|clinicians|docustat\\\": \\\"An enum (documentationstatus_enum) for documentation status (Complete, Incomplete, Pending).\\\",\\n  \\\"mental|clinicians|billcode\\\": \\\"A VARCHAR(15) storing billing or service code (e.g., '99214').\\\",\\n  \\\"mental|clinicians|nxtrevdt\\\": \\\"A DATE indicating next planned review date (e.g., '2025-06-01').\\\",\\n  \\\"mental|clinicians|carecoord\\\": \\\"An enum (carecoordination_enum) describing care coordination level (Intensive, Regular, Limited).\\\",\\n  \\\"mental|clinicians|refneed\\\": \\\"An enum (referralneeds_enum) capturing referral needs (Services, Testing, Specialist).\\\",\\n  \\\"mental|clinicians|fuptype\\\": \\\"An enum (followuptype_enum) describing follow-up type (Therapy, Routine, Urgent, Medication Check).\\\",\\n  \\\"mental|clinicians|fupfreq\\\": \\\"An enum (followupfrequency_enum) describing follow-up frequency (Weekly, Quarterly, Biweekly, Monthly).\\\",\\n  \\\"mental|clinicians|facconnect\\\": \\\"A VARCHAR(20) FK referencing Facilities(FacKey), linking this clinician to a facility.\\\",\\n  \\\"mental|patients|patkey\\\": \\\"A VARCHAR(20) primary key uniquely identifying each patient (e.g., 'PAT001').\\\",\\n  \\\"mental|patients|patage\\\": \\\"A SMALLINT indicating the patient's age in years.\\\",\\n  \\\"mental|patients|patgender\\\": \\\"An enum (patientgender_enum) for the patient's gender (Other, F, M).\\\",\\n  \\\"mental|patients|pateth\\\": \\\"An enum (patientethnicity_enum) indicating the patient's ethnicity (Other, Hispanic, African, Asian, Caucasian).\\\",\\n  \\\"mental|patients|edulevel\\\": \\\"An enum (educationlevel_enum) describing highest education achieved (High School, Other, Bachelor, Master, Doctorate).\\\",\\n  \\\"mental|patients|empstat\\\": \\\"An enum (employmentstatus_enum) capturing employment status (Retired, Employed, Unemployed, Disabled, Student).\\\",\\n  \\\"mental|patients|maristat\\\": \\\"An enum (maritalstatus_enum) describing marital status (Widowed, Married, Single, Divorced).\\\",\\n  \\\"mental|patients|livingarr\\\": \\\"An enum (livingarrangement_enum) for living arrangement (Alone, Partner, Family, Group Home, Homeless).\\\",\\n  \\\"mental|patients|insurtype\\\": \\\"An enum (insurancetype_enum) referencing type of insurance (Medicaid, Medicare, Private).\\\",\\n  \\\"mental|patients|insurstat\\\": \\\"An enum (insurancestatus_enum) describing insurance status (Pending, Approved, Denied).\\\",\\n  \\\"mental|patients|disabstat\\\": \\\"An enum (disabilitystatus_enum) indicating disability status (Pending, Permanent, Temporary).\\\",\\n  \\\"mental|patients|housestable\\\": \\\"An enum (housin...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_rhg46n7agv5h",
+              "response": "{\"result\": \"[\\\"Average PHQ-9 Score by Facility (APSF)\\\", \\\"Average GAD-7 Score by Facility (AGSF)\\\", \\\"Treatment Adherence Rate (TAR)\\\", \\\"Suicide Risk Prevalence (SRP)\\\", \\\"Therapy Engagement Score (TES)\\\", \\\"Facility Resource Adequacy Index (FRAI)\\\", \\\"Patient Functional Impairment Score (PFIS)\\\", \\\"Crisis Intervention Frequency (CIF)\\\", \\\"Social Support Effectiveness (SSE)\\\", \\\"Missed Appointment Rate (MAR)\\\", \\\"High-Risk Patient\\\", \\\"Treatment-Resistant Patient\\\", \\\"Complex Care Needs\\\", \\\"Stable Recovery Patient\\\", \\\"Low Engagement Risk\\\", \\\"Resource-Supported Facility\\\", \\\"High Social Support Patient\\\", \\\"Frequent Crisis Patient\\\", \\\"Non-Compliant Patient\\\", \\\"High Appointment Adherence\\\", \\\"PHQ-9 Score (Depression)\\\", \\\"GAD-7 Score (Anxiety)\\\", \\\"Suicide Risk Level\\\", \\\"Therapy Engagement\\\", \\\"Community Resources\\\", \\\"Functional Impairment\\\", \\\"Treatment Adherence\\\", \\\"Crisis Intervention Count\\\", \\\"Social Support Level\\\", \\\"Missed Appointment Count\\\", \\\"Symptom Severity Index (SSI)\\\", \\\"Engagement-Adherence Score (EAS)\\\", \\\"Facility Risk Profile Index (FRPI)\\\", \\\"Patient Stability Metric (PSM)\\\", \\\"Resource-Demand Differential (RDD)\\\", \\\"Socio-Environmental Support Index (SESI)\\\", \\\"Adherence Effectiveness Ratio (AER)\\\", \\\"Engagement Deficit Index (EDI)\\\", \\\"Comprehensive Facility Risk Score (CFRS)\\\", \\\"Support System Pressure Index (SSPI)\\\", \\\"High-Need, Under-Resourced Facility\\\", \\\"Facility with Engaged but High-Impairment Population\\\", \\\"Patient with Strong Recovery Capital\\\", \\\"Facility Attrition Risk Indicator\\\", \\\"Well-Resourced High-Support Environment\\\", \\\"Patient with Severe Comorbid Distress Profile\\\", \\\"Facility with Potential Treatment Inertia\\\", \\\"Patient with High Crisis & Low Support Profile\\\", \\\"Facility Demonstrating Strong Patient Retention\\\", \\\"High Severity, High Risk Patient Group\\\", \\\"Clinical Improvement Potential Index (CIPI)\\\", \\\"Facility Efficiency Index (FEI)\\\", \\\"Therapeutic Alliance & Engagement Score (TAES)\\\", \\\"Recovery Trajectory Index (RTI)\\\", \\\"Crisis Adherence Ratio (CAR)\\\", \\\"Facility with High Clinical Leverage Potential\\\", \\\"Patient Exhibiting Fragile Stability\\\", \\\"Resource-Intensive High-Risk Patient Cohort\\\", \\\"Facility with Potential Engagement-Outcome Disconnect\\\", \\\"Systemically Stressed Facility Environment\\\", \\\"Correlation Between Resource Adequacy and Adherence (CRAA)\\\", \\\"Facility Performance Quadrant (FPQ)\\\", \\\"Stale Treatment Outcome Records\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 17.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_36naxgn17hgk",
+              "args": {
+                "knowledge_name": "Therapy Engagement Score (TES)"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_36naxgn17hgk",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 4,\\n  \\\"knowledge\\\": \\\"Therapy Engagement Score (TES)\\\",\\n  \\\"description\\\": \\\"Computes an average engagement score across therapy sessions.\\\",\\n  \\\"definition\\\": \\\"TES = \\\\\\\\frac{\\\\\\\\sum_{i \\\\\\\\in treatmentbasics} (therapy\\\\\\\\_details_i['engagement\\\\\\\\_score'])} {|treatmentbasics|}, \\\\\\\\text{where } engagement\\\\\\\\_score = \\\\\\\\begin{cases} 3 & \\\\\\\\text{if } therapy\\\\\\\\_details['engagement'] = High \\\\\\\\\\\\\\\\ 2 & \\\\\\\\text{if } therapy\\\\\\\\_details['engagement'] = Medium \\\\\\\\\\\\\\\\ 1 & \\\\\\\\text{if } therapy\\\\\\\\_details['engagement'] = Low \\\\\\\\\\\\\\\\ 0 & \\\\\\\\text{if } therapy\\\\\\\\_details['engagement'] = Non-compliant \\\\\\\\end{cases}, \\\\\\\\text{and } therapy\\\\\\\\_details \\\\\\\\text{ is the JSONB column in the treatmentbasics table}\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_sf8sk8w4xmxq",
+              "args": {
+                "sql": "CREATE OR REPLACE FUNCTION calculate_tes(\n    txkey INT\n)\nRETURNS FLOAT AS $ $\nDECLARE\n    total_engagement_score FLOAT;\n    total_sessions INT;\nBEGIN\n    -- Fetch the therapy details for the given treatment\n    SELECT\n        SUM(\n            CASE\n                WHEN therapy_details ->> 'engagement' = 'High' THEN 3\n                WHEN therapy_details ->> 'engagement' = 'Medium' THEN 2\n                WHEN therapy_details ->> 'engagement' = 'Low' THEN 1\n                WHEN therapy_details ->> 'engagement' = 'Non-compliant' THEN 0\n                ELSE 0 -- Default case for any unexpected values\n            END\n        ) AS total_score,\n        COUNT(*) AS session_count\n    INTO\n        total_engagement_score,\n        total_sessions\n    FROM\n        treatmentbasics\n    WHERE\n        txkey = txkey;\n\n    -- Calculate the average engagement score\n    IF total_sessions > 0 THEN\n        RETURN total_engagement_score / total_sessions;\n    ELSE\n        RETURN 0; -- Return 0 if no sessions found\n    END IF;\nEND;\n$ $ LANGUAGE plpgsql;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_sf8sk8w4xmxq",
+              "response": "{\"result\": \"SQL Error: Only SELECT queries allowed in execute_sql\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-7c008fd1-d6b2-4e1a-971b-0a109ea9ba3f",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I am unable to create a function in the database. However, I have found the formula for calculating the Therapy Engagement Score (TES):\n\nTES = (sum of engagement scores) / (total number of sessions)\n\nWhere the engagement score is:\n-.::Box:::::::"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I am unable to create a function in the database. However, I have found the formula for calculating the Therapy Engagement Score (TES):\n\nTES = (sum of engagement scores) / (total number of sessions)\n\nWhere the engagement score is:\n-.::Box:::::::"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "89748062d52c4e19b40bb6189c75d995",
+      "client": "mental_M_4",
+      "database": "mental",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/1ef65bb60ab44baea16be0167ccbe939/0",
+      "at": 1793840408.6172113,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.207999994221609,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "c7facb3941cd46319d810259254a5ee8",
+      "client": "mental_M_4",
+      "database": "mental",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/1ef65bb60ab44baea16be0167ccbe939/0",
+      "at": 1793840432.7745953,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.5877000003238209,
+      "response_bytes": 13171,
+      "response_digest": "4d624f54977ca0b05f4744953e99122eb45df948f6bbc61d5e01754eb53ec4ce"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "bdf5c6359c1a45d3ba37f78e7af28f8d",
+      "client": "mental_M_4",
+      "database": "mental",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/1ef65bb60ab44baea16be0167ccbe939/0",
+      "at": 1793840622.8111904,
+      "sql": "CREATE OR REPLACE FUNCTION calculate_tes(\n    txkey INT\n)\nRETURNS FLOAT AS $ $\nDECLARE\n    total_engagement_score FLOAT;\n    total_sessions INT;\nBEGIN\n    -- Fetch the therapy details for the given treatment\n    SELECT\n        SUM(\n            CASE\n                WHEN therapy_details ->> 'engagement' = 'High' THEN 3\n                WHEN therapy_details ->> 'engagement' = 'Medium' THEN 2\n                WHEN therapy_details ->> 'engagement' = 'Low' THEN 1\n                WHEN therapy_details ->> 'engagement' = 'Non-compliant' THEN 0\n                ELSE 0 -- Default case for any unexpected values\n            END\n        ) AS total_score,\n        COUNT(*) AS session_count\n    INTO\n        total_engagement_score,\n        total_sessions\n    FROM\n        treatmentbasics\n    WHERE\n        txkey = txkey;\n\n    -- Calculate the average engagement score\n    IF total_sessions > 0 THEN\n        RETURN total_engagement_score / total_sessions;\n    ELSE\n        RETURN 0; -- Return 0 if no sessions found\n    END IF;\nEND;\n$ $ LANGUAGE plpgsql;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.6581000018049963,
+      "response_bytes": 82,
+      "response_digest": "aede9b8ea77a5fb18a6af8dd4fb207f1ee0e3c92b09c11fe28826e6750b7e42f",
+      "successful": false
+    }
+  ]
+}

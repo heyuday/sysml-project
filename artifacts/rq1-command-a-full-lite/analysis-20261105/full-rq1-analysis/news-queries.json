@@ -1,0 +1,1997 @@
+{
+  "version": 2,
+  "database": "news",
+  "queries": {
+    "6b7dd4451ec01fc1f893f517bed1e3251e4cf91f96078c92c6cee732a959034f": {
+      "sql": "SELECT\n    DATE_TRUNC('month', regmoment) AS registration_month,\n    testgrp AS ab_test_group,\n    COUNT(*) AS total_registrations,\n    (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY DATE_TRUNC('month', regmoment))) AS percentage_in_month\nFROM\n    users\nGROUP BY\n    registration_month,\n    ab_test_group\nORDER BY\n    registration_month, ab_test_group;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2992448798c96eba444e3f2e7c99e9b7d4808c3bbc02fa5c702ea7e4ceb5e2e6",
+      "ordered": true,
+      "columns": [
+        [
+          "registration_month",
+          1184,
+          -1
+        ],
+        [
+          "ab_test_group",
+          18093,
+          -1
+        ],
+        [
+          "total_registrations",
+          20,
+          -1
+        ],
+        [
+          "percentage_in_month",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 101,
+      "bag_digest": "f713df38cda58ae839227129d911b9ac01bf70eb2190b548e450b14779fd88b1",
+      "values_digest": "1709b63349eed26e267ef47505285c10e6e9d08f04a2ab245287073562ed9f54",
+      "ordered_digest": "f713df38cda58ae839227129d911b9ac01bf70eb2190b548e450b14779fd88b1"
+    },
+    "aa843b601883942e2bdf9ef133abf86ac6b80151fc0d022bfd14a9c2109a5b1e": {
+      "sql": "SELECT\n    catlabel AS article_topic,\n    JSON_AGG(\n        JSON_BUILD_OBJECT(\n            'article_details', artkey,\n            'engagement_score', (engagement_metrics->>'engagement_rate')::NUMERIC,\n            'accessibility_score', accscore\n        )\n    ) AS article_info\nFROM\n    articles\nGROUP BY\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "da68a6b020ee5bf0830857ec82f50fe433b916cbdf7d591b3712e83e35a61d2e",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic",
+          18108,
+          -1
+        ],
+        [
+          "article_info",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "2dca42ab68d843c73fee31652364cb6afd2872646d282bc6474a3b913ab7d1dc",
+      "values_digest": "46403bd00350f3a444d61ea7d9a8a6c7adf65cf98b20bf6d008fd6e5934c0c37",
+      "ordered_digest": "a54f642dc5e1c37de6d0b69d0231f182f381761a17efc26419e60d750136b6d8"
+    },
+    "afcdece9ca3b4702fde8e35d51a2170c0dd0b9105846deb12af9a30138b3fdf7": {
+      "sql": "SELECT\n    catlabel AS article_topic,\n    JSON_AGG(\n        JSON_BUILD_OBJECT(\n            'article_details', artkey,\n            'engagement_score', engagement_metrics->>'engagement_rate',\n            'accessibility_score', accscore\n        \n        )\n    ) AS article_info\nFROM\n    articles\nGROUP BY\n    catlabel\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "1b17d90c4c1c1ec19d415060abc28cb0c14514cdb9d3d52bf45de1de9bf8250d",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic",
+          18108,
+          -1
+        ],
+        [
+          "article_info",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "666dbb3e0469310e077e047a4bd10e8c29237e4fc9936b84bb4070eb6fd86a32",
+      "values_digest": "9d282b09f53e70498b4d23d149309d82e06971cf0965b0453ced5919ee226e2f",
+      "ordered_digest": "2359519c7768f7b97e389b2323e11d7dac4fa27251b27051e580deac3b7d0595"
+    },
+    "6f96c6c35ecd4fda5577669122283443d067f05c5667bca9c3f011f79f405876": {
+      "sql": "SELECT\n    catlabel AS article_topic_name,\n    JSON_AGG(\n        JSON_BUILD_OBJECT(\n            'article_id', artkey,\n            'category', catlabel,\n            'engagement_metrics', engagement_metrics,\n            'readability', difflevel\n        )\n    ) AS article_info\nFROM\n    articles\nGROUP BY\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a8effba23483da0210aa7ad54c9309add452d39d6e9cb10bb5d520985d1530a2",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic_name",
+          18108,
+          -1
+        ],
+        [
+          "article_info",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "c337803d454bb7fb8ad2c7062a65b50b6d825a0e0a801049a0f34e4e3cf7abd7",
+      "values_digest": "3574d2e9d4d422f037055fa2ec78e882e1d6153545bfa13c920c6e315c220ba7",
+      "ordered_digest": "d200788ae6ec826c4ed89e8e070150ecc439888eb10fe94bd29d5b7e7e358d1f"
+    },
+    "35abd04a72f49caa19bd258ea47d21c1fa920131d61427866f703200382c1c38": {
+      "sql": "SELECT\n    catlabel AS article_topic_name,\n    JSON_AGG(\n        JSON_BUILD_OBJECT(\n            'article_id', artkey,\n            'category', catlabel,\n            'engagement_score', engagement_metrics->>'engagement_rate',\n            'accessibility_score', accscore\n        )\n    ) AS article_info\nFROM\n    articles\nGROUP BY\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6c366fb49d0ff7c46e442127644a7c437e649d732dbdfce8651b3488d94415ce",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic_name",
+          18108,
+          -1
+        ],
+        [
+          "article_info",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "038c23596c99378b4cca05c98bf272982fc3aec2a6d13c68c24558c6ac21aad1",
+      "values_digest": "2849ff3e8586c625cd993629ec8be234b68a75aa060bea65e7793595bd16d37a",
+      "ordered_digest": "d0b927be166cf2796d34060853e7e01cc1957c196bf5d309641567d4e83d0138"
+    },
+    "0e89dff806f48f26258d5d485ecab4cd06b552842cadefb24bbace8c72085bd8": {
+      "sql": "SELECT\n    catlabel AS article_topic_name,\n    json_agg(\n        json_build_object(\n            'article_details', artkey,\n            'engagement_score', engagement_metrics ->> 'engagement_rate',\n            'readability_score', accscore\n        )\n    ) AS article_info\nFROM\n    articles\nGROUP BY\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0d30836792e65604a58f8ec347130a49627ba49639640d9185a09ceba2e9fa77",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic_name",
+          18108,
+          -1
+        ],
+        [
+          "article_info",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "98efec4432fd69da272456b104ce12350c57eb0cb503061eb9827795db0c7f7a",
+      "values_digest": "ca479b2e8b11df71bfc4ac81929bb006665843b132a7d909aa1496905cbe11f0",
+      "ordered_digest": "b34855d0301ef6159f9e7742fee42d2cc3ed3d46b79f09861d979b723bf835a8"
+    },
+    "a9987a867e0b8e9acf69d3fbe58b73ca10111b3ce46b1ba695f0fc738af0fe57": {
+      "sql": "SELECT\n    catlabel AS article_topic_name,\n    json_agg(\n        json_build_object(\n            'article_id', artkey,\n            'category', catlabel,\n            'engagement_rate', engagement_metrics->>'engagement_rate',\n            'popularity_score', engagement_metrics->>'popularity_score',\n            'accessibility_score', accscore\n        )\n    )\nFROM\n    articles\nGROUP BY\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4bb38a1919ae14f65ee6120aeb89fad5b0a491192c4d78a890f9cc6db622c0a6",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic_name",
+          18108,
+          -1
+        ],
+        [
+          "json_agg",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "cf42a90f37e2d866843803bd43ba329e77ea5b0a26930981e26be09398314f80",
+      "values_digest": "abd29eebc40628b5b59abf982980bc1701c9bd6af8d03a832af444e421aff9d1",
+      "ordered_digest": "e9f80f01e111f7aa48b8d8d96f14f6ca6156d1884ccc172b5d4137c2841e4d37"
+    },
+    "fc0b70a49b54c94fb209604ddf2046d0fb633ff0e4aa7f101f873ca7b440aaf7": {
+      "sql": "SELECT\n    r.posval AS position,\n    COUNT(*) AS total_num,\n    SUM(s.seshclicks) AS total_clicks,\n    (SUM(s.seshclicks) * 1.0 / COUNT(*)) AS rec_ctr\nFROM\n    recommendations r\nJOIN\n    interactions i ON r.reckey = i.reclink\nJOIN\n    sessions s ON i.seshlink2 = s.seshkey\nGROUP BY\n    r.posval\nORDER BY\n    r.posval;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "403b5483fc45d749ed3bbff7a349c61f618f1094039b64ecca8be0329f6932b6",
+      "ordered": true,
+      "columns": [
+        [
+          "position",
+          23,
+          -1
+        ],
+        [
+          "total_num",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "rec_ctr",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "928808a46d1c858150aad81fd7ad17274747c10a35e1debf7bc4fb5d0dcbc835",
+      "values_digest": "68e03e0048b2404b20a7e78ea2b40988b9bcb4fe6855127609a78d5771a9ee68",
+      "ordered_digest": "9657588c162eabce6f0b6cd7459485b2d04a95892acdc513d0c4077accb08560"
+    },
+    "4bf508384df14d762ffd9988f9e924d83f3c34011afc209140f62e536da15768": {
+      "sql": "SELECT\n    r.posval AS position,\n    COUNT(r.reckey) AS total_num,\n    COUNT(i.intkey) FILTER (WHERE i.evttype = 'click') AS total_clicks,\n    (COUNT(i.intkey) FILTER (WHERE i.evttype = 'click')::DECIMAL / COUNT(r.reckey)) AS ctr\nFROM \n    recommendations AS r\nLEFT JOIN \n    interactions AS i ON r.reckey = i.reclink\nGROUP BY \n    r.posval\nORDER BY \n    r.posval;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f753e86de6e4a3e536d294077452e6fdfd1c4797e29818049828ab763fd0fc01",
+      "ordered": true,
+      "columns": [
+        [
+          "position",
+          23,
+          -1
+        ],
+        [
+          "total_num",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "ctr",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "902c4c69350f9e0779a6e072562ad89d5f1b4f6fc85964243c41ae391d95fce1",
+      "values_digest": "154d672e1f1bfd4f7740039a70694007a89b059832e3ead45e01181c69215803",
+      "ordered_digest": "9ef9e55cc9201bcfdc725047cd6a7e6681765a1ef5c5d4609d8eae0c4996c2d4"
+    },
+    "4e90c6735a1955d90ee0443e9e4eae7fc046125c46bc64830b8f1dff843c3bb6": {
+      "sql": "SELECT\r\n    catlabel AS article_topic_name,\r\n    json_agg(\r\n        json_build_object(\r\n            'article_id', artkey,\r\n            'category', catlabel,\r\n            'engagement_score', engagement_metrics->>'engagement_rate',\r\n            'popularity_score', engagement_metrics->>'popularity_score',\r\n            'accessibility_score', accscore\r\n        )\r\n    ) AS article_metrics\r\nFROM\r\n    articles\r\nGROUP BY\r\n    catlabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a5e16f2b770d1c98d7ecd5bf647742038d83e9690efb3f79c6f657057fab7ad1",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic_name",
+          18108,
+          -1
+        ],
+        [
+          "article_metrics",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "73bae1c7e7a75d2d6d3f4f6ed5c334adcd6051687cfc8a0fdd5a86aa47f3efa6",
+      "values_digest": "447d044962cfc2ebf8b28324405903dcd6f2a0ab2ab9f1efcd9af342513e331e",
+      "ordered_digest": "2f0f4522ffd5614556a2330368b62fa0642d2bcbe53c9dab11223656e8483949"
+    },
+    "9a97f1f63a8cb87d3114d2fdec840ff881d3857bd04cd6921793269ea5dff3db": {
+      "sql": "SELECT\r\n    r.posval AS position,\r\n    COUNT(DISTINCT s.seshkey) AS total_num,\r\n    COUNT(i.intkey) AS total_clicks,\r\n    (COUNT(i.intkey) * 1.0 / COUNT(DISTINCT s.seshkey)) AS ctr\r\nFROM \r\n    recommendations AS r\r\nLEFT JOIN \r\n    interactions AS i ON r.reckey = i.reclink AND i.clkts IS NOT NULL\r\nLEFT JOIN \r\n    sessions AS s ON i.seshlink2 = s.seshkey\r\nGROUP BY \r\n    r.posval\r\nORDER BY \r\n    position;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f2959fe916a6ff2ad7afc075465bfe3d32f9239bba38fd343680fd4857205df5",
+      "ordered": true,
+      "columns": [
+        [
+          "position",
+          23,
+          -1
+        ],
+        [
+          "total_num",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "ctr",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "26bfc81ceb1e766a6d3ad8eff6f0a664538be2266bf356f08eb1be6b80025d58",
+      "values_digest": "b0ba347feb2493e36be6a53ff4d48d5bfbfc376fb875f7c11da6637c86421c22",
+      "ordered_digest": "0d61d731c7082099db3a9ddf641d7fa5e119efc0b688b0a4527e8831ccebfc83"
+    },
+    "426b3d41aa6936bd3515ca1452fc3a47fb8f75ba5f10d7679d39f42cd574f34c": {
+      "sql": "SELECT \n    DATE_TRUNC('month', regmoment) AS registration_month,\n    testgrp AS ab_test_group,\n    COUNT(*) AS total_registrations,\n    (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY DATE_TRUNC('month', regmoment))) AS percentage_within_month\nFROM \n    users\nGROUP BY \n    registration_month, ab_test_group\nORDER BY \n    registration_month, ab_test_group;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bf987a3d9ea68ba2b3f166761f111614e0b0decfdefc8bd3f4d155c5f0d9b0a2",
+      "ordered": true,
+      "columns": [
+        [
+          "registration_month",
+          1184,
+          -1
+        ],
+        [
+          "ab_test_group",
+          18093,
+          -1
+        ],
+        [
+          "total_registrations",
+          20,
+          -1
+        ],
+        [
+          "percentage_within_month",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 101,
+      "bag_digest": "b7e79498d0eac0c44b4e9a138c2db9f1f9f3706a671cdad6a031253a3e7c77b0",
+      "values_digest": "1709b63349eed26e267ef47505285c10e6e9d08f04a2ab245287073562ed9f54",
+      "ordered_digest": "b7e79498d0eac0c44b4e9a138c2db9f1f9f3706a671cdad6a031253a3e7c77b0"
+    },
+    "a2dcb9d8f7cc0edac6e8d31d001a0f9f4b127502a37c2e8369467facc51b804b": {
+      "sql": "SELECT \n    DATE_TRUNC('month', u.regmoment) AS registration_month,\n    u.testgrp AS ab_test_group,\n    COUNT(u.userkey) AS total_registrations,\n    (COUNT(u.userkey) * 100.0 / SUM(COUNT(u.userkey)) OVER (PARTITION BY DATE_TRUNC('month', u.regmoment))) AS percentage_in_month\nFROM \n    users AS u\nGROUP BY \n    registration_month, u.testgrp\nORDER BY \n    registration_month, percentage_in_month DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5bd6914939d3f14ecab60943bbdab612ca6d89a029e7afa49f50dc7476c10288",
+      "ordered": true,
+      "columns": [
+        [
+          "registration_month",
+          1184,
+          -1
+        ],
+        [
+          "ab_test_group",
+          18093,
+          -1
+        ],
+        [
+          "total_registrations",
+          20,
+          -1
+        ],
+        [
+          "percentage_in_month",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 101,
+      "bag_digest": "f713df38cda58ae839227129d911b9ac01bf70eb2190b548e450b14779fd88b1",
+      "values_digest": "1709b63349eed26e267ef47505285c10e6e9d08f04a2ab245287073562ed9f54",
+      "ordered_digest": "4b1bbd11e02c5ee796894f290a82887746a1ab7696d5702d3ce6eb70ab7adf95"
+    },
+    "574843d6a184975ebcd54c1f4929e9b085813c268473898bb4891823809b813e": {
+      "sql": "SELECT \n    catlabel AS article_topic,\n    JSON_AGG(\n        JSON_BUILD_OBJECT(\n            'article_id', artkey,\n            'category', catlabel,\n            'engagement_score', engagement_metrics ->> 'engagement_rate',\n            'popularity_score', engagement_metrics ->> 'popularity_score',\n            'accessibility_score', accscore\n        )\n    ) AS article_metrics\nFROM \n    articles\nGROUP BY \n    catlabel\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "612af3df998e76feb520fae9de8f0a7550e157d24bcb8941a7c4709b80cb272b",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic",
+          18108,
+          -1
+        ],
+        [
+          "article_metrics",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "621cfbf6a202b8d7e715845c762724be5f41c3544fa73bd8920225ebe52b9108",
+      "values_digest": "447d044962cfc2ebf8b28324405903dcd6f2a0ab2ab9f1efcd9af342513e331e",
+      "ordered_digest": "c90c5840017c7b13ed24275879f4f44eadc6ae37c9b79c0b324f227c6f9f1a70"
+    },
+    "851c3c6abe1626692f1259c02bd76ee06c9ca66e13b03f4d53e528538f0822ab": {
+      "sql": "SELECT \n    catlabel AS article_topic,\n    json_agg(\n        json_build_object(\n            'article_details', json_build_object(\n                'artkey', artkey,\n                'catlabel', catlabel,\n                'subcatlbl', subcatlbl,\n                'pubtime', pubtime,\n                'authname', authname,\n                'srcref', srcref,\n                'wordlen', wordlen,\n                'readsec', readsec,\n                'difflevel', difflevel,\n                'freshscore', freshscore,\n                'qualscore', qualscore,\n                'sentscore', sentscore,\n                'contrscore', contrscore,\n                'tagset', tagset,\n                'conttype', conttype,\n                'contformat', contformat,\n                'accscore', accscore,\n                'mediacount', mediacount,\n                'vidsec', vidsec,\n                'paywall', paywall,\n                'authref', authref\n            ),\n            'engagement_scores', engagement_metrics\n        )\n    ) AS articles_with_scores\nFROM \n    articles\nGROUP BY \n    catlabel\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8e17635b4ac0784a8f5603c47b74db081dc98eb443af279f5b9aa33433e7ae1e",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic",
+          18108,
+          -1
+        ],
+        [
+          "articles_with_scores",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "901c8df6531e85df4e8a4caa5c7090a4b8f7a382c11c71b2ce888ab771a80760",
+      "values_digest": "7a6110007739604e8d237e323e104bcb157a9b8bc6bcff596531be34770ecd45",
+      "ordered_digest": "6984e165170a9a5a3a4fb611a4edf9fbe79a5154b1afc6cf6f012ce0595ca696"
+    },
+    "3c6e1a193f7f2ce63e6833fe2771182b1628a36dbb2cdf99176f8cbd3dc4203f": {
+      "sql": "SELECT \n    r.posval AS position,\n    COUNT(DISTINCT r.reckey) AS total_num,\n    COUNT(i.intkey) AS total_clicks,\n    (COUNT(i.intkey) * 1.0 / COUNT(DISTINCT r.reckey)) AS ctr\nFROM \n    Recommendations r\nLEFT JOIN \n    Interactions i ON r.reckey = i.reclink\nGROUP BY \n    r.posval\nORDER BY \n    r.posval;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bb8d5d603636a35590fbcf512c31ae935104b9285428e66ee38da933b760e8e0",
+      "ordered": true,
+      "columns": [
+        [
+          "position",
+          23,
+          -1
+        ],
+        [
+          "total_num",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "ctr",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "828c7cfdd375cc765afa5a234a779d551f4b3a5b180ec795b089e1e6ea1b485a",
+      "values_digest": "d4979f0c39b20f68666f6162dbef8722eab3ecdc6b1c9c283ed6811a7ed6ba6d",
+      "ordered_digest": "551b5453ddf1a718231070442266c3e97d718d95dc54ec342a3263ddbec762e1"
+    },
+    "bc9000261d196a3ea39a7e8a3a888b9b0f7d23d22dfd5abc1e33917154e4088b": {
+      "sql": "SELECT \n    typelabel AS user_type,\n    seglabel AS user_segment,\n    AVG((bncrate * (1 - (ctrval / 100)))) AS sbra\nFROM \n    users u\nJOIN \n    sessions s ON u.userkey = s.userel\nGROUP BY \n    typelabel, seglabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e02b79695fb4961148fe19379f324d3ceb929d659f44b96c296abfb27ed136f4",
+      "ordered": false,
+      "columns": [
+        [
+          "user_type",
+          18482,
+          -1
+        ],
+        [
+          "user_segment",
+          18472,
+          -1
+        ],
+        [
+          "sbra",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 12,
+      "bag_digest": "4ddc3d34da36ce3be17475264c3e93453a9bda971bc146c0d4bd9929d634e7df",
+      "values_digest": "14da975fa3505320d4a8537747855ec17d1b894a85743dec2b2fee5bec7c4f5b",
+      "ordered_digest": "03be6aeee2a450cb88836bf243ef438d19b0fd235b06e15f8f514550699b91b6"
+    },
+    "ebbb13f4b2ccb0bd9676dd501c213708ec17a541f7651bcff5205a3d1ba7842c": {
+      "sql": "SELECT \n  userel, \n  SUM(seshclicks) AS total_clicks, \n  SUM(seshviews) AS total_views, \n  AVG(engscore) AS avg_engagement_score, \n  (SUM(seshclicks) + SUM(seshviews) + AVG(engscore)) AS interaction_score \nFROM \n  sessions \nGROUP BY \n  userel \nORDER BY \n  interaction_score DESC \nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e5762e9b1035c4420a7632e9bf6e5e5684b5a3e4dcc841adcac34d36cd83b259",
+      "ordered": true,
+      "columns": [
+        [
+          "userel",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "total_views",
+          20,
+          -1
+        ],
+        [
+          "avg_engagement_score",
+          1700,
+          -1
+        ],
+        [
+          "interaction_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "e93f75e1cb7b5791abffb0e9ffc3b6559a6425086d3d6097f33f63e35b6dc8b9",
+      "values_digest": "022a24271dac46f2281d1a9313beb949cd19075a0310732b535a5ca8e85e9984",
+      "ordered_digest": "e5daba9fa3b2a89872e3c9aaea6ee0fa54de98868e3ab305a1772daad96302ea"
+    },
+    "32563e15794d1a0a671bada64447550fdaba0c9a274cfa3340d6d83f1005dcb9": {
+      "sql": "SELECT \r\n    DATE_TRUNC('month', regmoment) AS registration_month,\r\n    testgrp AS ab_test_group,\r\n    COUNT(*) AS total_registrations,\r\n    (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY DATE_TRUNC('month', regmoment))) AS percentage_in_month\r\nFROM \r\n    users\r\nGROUP BY \r\n    registration_month, ab_test_group\r\nORDER BY \r\n    registration_month, ab_test_group;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2992448798c96eba444e3f2e7c99e9b7d4808c3bbc02fa5c702ea7e4ceb5e2e6",
+      "ordered": true,
+      "columns": [
+        [
+          "registration_month",
+          1184,
+          -1
+        ],
+        [
+          "ab_test_group",
+          18093,
+          -1
+        ],
+        [
+          "total_registrations",
+          20,
+          -1
+        ],
+        [
+          "percentage_in_month",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 101,
+      "bag_digest": "f713df38cda58ae839227129d911b9ac01bf70eb2190b548e450b14779fd88b1",
+      "values_digest": "1709b63349eed26e267ef47505285c10e6e9d08f04a2ab245287073562ed9f54",
+      "ordered_digest": "f713df38cda58ae839227129d911b9ac01bf70eb2190b548e450b14779fd88b1"
+    },
+    "b2f36239d43f51c69bb656542f53eee3ba54683227d888e888728fe4f78eaa37": {
+      "sql": "SELECT \r\n    EXTRACT(MONTH FROM regmoment) AS registration_month,\r\n    testgrp AS ab_test_group,\r\n    COUNT(*) AS total_registrations,\r\n    (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY EXTRACT(MONTH FROM regmoment))) AS percentage_in_month\r\nFROM \r\n    users\r\nGROUP BY \r\n    EXTRACT(MONTH FROM regmoment), testgrp\r\nORDER BY \r\n    registration_month, ab_test_group;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4276061565e4c226a665aab0e03ad996539abba587ff49082ff76cf506f1a3ce",
+      "ordered": true,
+      "columns": [
+        [
+          "registration_month",
+          1700,
+          -1
+        ],
+        [
+          "ab_test_group",
+          18093,
+          -1
+        ],
+        [
+          "total_registrations",
+          20,
+          -1
+        ],
+        [
+          "percentage_in_month",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 36,
+      "bag_digest": "4d2fd08f3bbde76f6fb347fe729a2ec84cab84e45686a65f5f2e87b061c63e8f",
+      "values_digest": "900d4a81f5fbf286eddc4dcb1f0e99011318300ac81dfa90fefef51f6ec89ca4",
+      "ordered_digest": "451c465acaafded517c671fd928d77978ea75acaf9aa6805ebd599077a833fe8"
+    },
+    "bfe662ecd93ab4cd6368dbe5403611e51bda1f7daf1e8def21ae2d667877fcd7": {
+      "sql": "SELECT \r\n    catlabel AS article_topic,\r\n    JSON_AGG(\r\n        JSON_BUILD_OBJECT(\r\n            'article_details', JSON_BUILD_OBJECT(\r\n                'artkey', artkey,\r\n                'catlabel', catlabel,\r\n                'subcatlbl', subcatlbl,\r\n                'pubtime', pubtime,\r\n                'authname', authname,\r\n                'srcref', srcref,\r\n                'wordlen', wordlen,\r\n                'readsec', readsec,\r\n                'difflevel', difflevel,\r\n                'freshscore', freshscore,\r\n                'qualscore', qualscore,\r\n                'sentscore', sentscore,\r\n                'contrscore', contrscore,\r\n                'tagset', tagset,\r\n                'conttype', conttype,\r\n                'contformat', contformat,\r\n                'accscore', accscore,\r\n                'mediacount', mediacount,\r\n                'vidsec', vidsec,\r\n                'paywall', paywall,\r\n                'authref', authref\r\n            ),\r\n            'engagement_scores', engagement_metrics\r\n        )\r\n    ) AS articles_with_scores\r\nFROM \r\n    articles\r\nGROUP BY \r\n    catlabel\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8e17635b4ac0784a8f5603c47b74db081dc98eb443af279f5b9aa33433e7ae1e",
+      "ordered": false,
+      "columns": [
+        [
+          "article_topic",
+          18108,
+          -1
+        ],
+        [
+          "articles_with_scores",
+          114,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "901c8df6531e85df4e8a4caa5c7090a4b8f7a382c11c71b2ce888ab771a80760",
+      "values_digest": "7a6110007739604e8d237e323e104bcb157a9b8bc6bcff596531be34770ecd45",
+      "ordered_digest": "6984e165170a9a5a3a4fb611a4edf9fbe79a5154b1afc6cf6f012ce0595ca696"
+    },
+    "392f8752696553d5b0864ccf0ac44e7bcc5f2edb167db4a7c58375a47c0813a1": {
+      "sql": "SELECT \r\n    userel AS user_id,\r\n    seshclicks AS clicks,\r\n    seshviews AS views,\r\n    engscore AS engagement_score,\r\n    (seshclicks + seshviews + engscore) AS custom_interaction_score\r\nFROM \r\n    sessions\r\nORDER BY \r\n    custom_interaction_score DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "00f3d600448e6a1b01271cfb4bba3141d4bd036ed29b767a3ebc6cdc526b6136",
+      "ordered": true,
+      "columns": [
+        [
+          "user_id",
+          20,
+          -1
+        ],
+        [
+          "clicks",
+          23,
+          -1
+        ],
+        [
+          "views",
+          23,
+          -1
+        ],
+        [
+          "engagement_score",
+          1700,
+          327686
+        ],
+        [
+          "custom_interaction_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "c3d015ed65a3b90ab6644b237ff041fd162ac8f5b5e17bb14da9746eee454efd",
+      "values_digest": "777fe2f8d295e0175dd79e5a44bba807b248cf63793eafa56d384d956a35ee60",
+      "ordered_digest": "d878e1131c2c5d3f0f3acd2cf28048a6c9ea5970535e51136e0db042b31b11b9"
+    },
+    "46f704f7b833019798164518531a4fce22bd6da0c463e81914faa46d7b2bf8cf": {
+      "sql": "WITH ArticleMetrics AS (\r\n    SELECT \r\n        catlabel AS article_category,\r\n        -- Calculate ARS using the provided formula\r\n        (readsec * LN(wordlen)) / \r\n        CASE \r\n            WHEN difflevel = 'Basic' THEN 1\r\n            WHEN difflevel = 'Intermediate' THEN 1.5\r\n            WHEN difflevel = 'Advanced' THEN 2\r\n            ELSE 1.2 \r\n        END AS readability_score,\r\n        -- Extract engagement rate from JSON\r\n        (engagement_metrics->>'engagement_rate')::NUMERIC AS engagement_rate,\r\n        difflevel AS complexity_level\r\n    FROM \r\n        articles\r\n),\r\nComplexityCounts AS (\r\n    SELECT \r\n        complexity_level, \r\n        COUNT(*) AS article_count\r\n    FROM \r\n        ArticleMetrics\r\n    GROUP BY \r\n        complexity_level\r\n),\r\nAverageMetrics AS (\r\n    SELECT \r\n        article_category,\r\n        AVG(readability_score) AS avg_readability_score,\r\n        AVG(engagement_rate) AS avg_engagement_rate\r\n    FROM \r\n        ArticleMetrics\r\n    GROUP BY \r\n        article_category\r\n),\r\nCorrelationMetrics AS (\r\n    SELECT \r\n        article_category,\r\n        CORR(readability_score, engagement_rate) AS correlation_coefficient\r\n    FROM \r\n        ArticleMetrics\r\n    GROUP BY \r\n        article_category\r\n)\r\nSELECT \r\n    am.article_category,\r\n    am.avg_readability_score,\r\n    am.avg_engagement_rate,\r\n    cm.correlation_coefficient,\r\n    cc.article_count\r\nFROM \r\n    AverageMetrics am\r\nJOIN \r\n    CorrelationMetrics cm ON am.article_category = cm.article_category\r\nCROSS JOIN \r\n    ComplexityCounts cc\r\nGROUP BY \r\n    am.article_category, am.avg_readability_score, am.avg_engagement_rate, cm.correlation_coefficient, cc.article_count;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "efec6500b2d4f8aca9bd627ccf2cbe30b5b03b49b92e7e51420d5e6ca97a9e3d",
+      "ordered": false,
+      "columns": [
+        [
+          "article_category",
+          18108,
+          -1
+        ],
+        [
+          "avg_readability_score",
+          701,
+          -1
+        ],
+        [
+          "avg_engagement_rate",
+          1700,
+          -1
+        ],
+        [
+          "correlation_coefficient",
+          701,
+          -1
+        ],
+        [
+          "article_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 15,
+      "bag_digest": "e95690e598e7357792f61743a7de3cb6a907dba6099ff56ed14e871b26f3ad77",
+      "values_digest": "1319d379e75ece53b5b70fb3116504adf6914d907666ffc797799e1d778f8aad",
+      "ordered_digest": "e68da422c59abb6f3cddb2c45ceb2660807317613b5bd2339caa5f4a9ca47b63"
+    },
+    "1952f9a9e797d28c866b99285e814eea034db613ba95861031da7b8e95195349": {
+      "sql": "WITH SessionMetrics AS (\r\n    SELECT \r\n        i.seshlink2 AS session_id,\r\n        AVG(i.seqval) AS avg_seq_value\r\n    FROM \r\n        interactions i\r\n    GROUP BY \r\n        i.seshlink2\r\n),\r\nBounceAdjustments AS (\r\n    SELECT \r\n        s.seshkey AS session_id,\r\n        s.bncrate * (1 - s.ctrval / 100.0) AS bounce_adjustment\r\n    FROM \r\n        sessions s\r\n),\r\nSessionEfficiency AS (\r\n    SELECT \r\n        sm.session_id,\r\n        ba.bounce_adjustment,\r\n        sm.avg_seq_value AS avg_seq_value,\r\n        CASE \r\n            WHEN ba.bounce_adjustment = 0 THEN NULL\r\n            ELSE sm.avg_seq_value / ba.bounce_adjustment \r\n        END AS efficiency_score\r\n    FROM \r\n        SessionMetrics sm\r\n    JOIN \r\n        BounceAdjustments ba ON sm.session_id = ba.session_id\r\n)\r\nSELECT \r\n    se.session_id,\r\n    s.seshstart AS start_time,\r\n    s.bncrate AS bounce_impact,\r\n    se.avg_seq_value,\r\n    se.efficiency_score\r\nFROM \r\n    SessionEfficiency se\r\nJOIN \r\n    sessions s ON se.session_id = s.seshkey\r\nORDER BY \r\n    se.session_id;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8c230d6628416379ac685454baf127f1dfa6dfd09698149dceb1975db5ad64bb",
+      "ordered": true,
+      "columns": [
+        [
+          "session_id",
+          20,
+          -1
+        ],
+        [
+          "start_time",
+          1114,
+          -1
+        ],
+        [
+          "bounce_impact",
+          1700,
+          327686
+        ],
+        [
+          "avg_seq_value",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "fb4e6a3558558a01bf77482ee5ec1b91137312927e80d784a2a7a8c3041451a6",
+      "values_digest": "f6307d1cbdba8bfb51c64a9d245a4d4f3f9b6bd3250b872f39e1ee940e1bd8e5",
+      "ordered_digest": "4135ff5c7e4924aff5709773360f17db711b1d4c2cc25e483f738c20128d3f0f"
+    },
+    "e74992a2c5a2e915a75159489cdd03456f02f15801564ec1b98b71575bebd954": {
+      "sql": "WITH SessionMetrics AS (\r\n    SELECT \r\n        i.seshlink2 AS session_id,\r\n        AVG(i.seqval) AS avg_seqval\r\n    FROM \r\n        interactions i\r\n    GROUP BY \r\n        i.seshlink2\r\n),\r\nBounceAdjustment AS (\r\n    SELECT \r\n        s.seshkey AS session_id,\r\n        s.bncrate * (1 - s.ctrval / 100.0) AS sbra\r\n    FROM \r\n        sessions s\r\n),\r\nSessionEfficiency AS (\r\n    SELECT \r\n        sm.session_id,\r\n        sm.avg_seqval AS cie,\r\n        ba.sbra,\r\n        CASE \r\n            WHEN ba.sbra = 0 THEN NULL\r\n            ELSE sm.avg_seqval / ba.sbra \r\n        END AS rtse\r\n    FROM \r\n        SessionMetrics sm\r\n    JOIN \r\n        BounceAdjustment ba ON sm.session_id = ba.session_id\r\n)\r\nSELECT \r\n    s.seshkey AS session_id,\r\n    s.seshstart AS start_time,\r\n    s.bncrate AS bounce_impact,\r\n    sm.avg_seqval AS avg_sequence_value,\r\n    se.rtse AS efficiency_score\r\nFROM \r\n    sessions s\r\nJOIN \r\n    SessionEfficiency se ON s.seshkey = se.session_id\r\nJOIN\r\n    SessionMetrics sm ON s.seshkey = sm.session_id;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3725f2c8b7138281dce49df4b47c0920dc7b4803abdf9a8e2665a6dca8ede9bc",
+      "ordered": false,
+      "columns": [
+        [
+          "session_id",
+          20,
+          -1
+        ],
+        [
+          "start_time",
+          1114,
+          -1
+        ],
+        [
+          "bounce_impact",
+          1700,
+          327686
+        ],
+        [
+          "avg_sequence_value",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "832b6b9f3dd64cd48ca5279ab66290a5911042dbf9cc6cc7dfa9cb2b477da563",
+      "values_digest": "f6307d1cbdba8bfb51c64a9d245a4d4f3f9b6bd3250b872f39e1ee940e1bd8e5",
+      "ordered_digest": "87dfa5cbd9cb43280cf3449607f0adade46cdfc5d727b36a58e25f77ed3e8500"
+    },
+    "2fc89174dbd55793e9c90398709cfa1b167c0d6b886674f4d9825a37a605655a": {
+      "sql": "WITH UserMetrics AS (\n    SELECT \n        u.typelabel AS subscription_type,\n        u.seglabel AS demographic_segment,\n        u.ageval AS age,\n        u.gendlbl AS gender,\n        u.occulbl AS occupation,\n        u.testgrp AS ab_test_group,\n        (u.subdays * 0.1) + (u.ageval * 0.2) + \n        CASE u.gendlbl \n            WHEN 'M' THEN 0.3 \n            WHEN 'F' THEN 0.25 \n            ELSE 0.2 \n        END + \n        CASE u.occulbl \n            WHEN 'Professional' THEN 0.25 \n            WHEN 'Student' THEN 0.15 \n            ELSE 0.1 \n        END AS user_subscription_value,\n        (u.ageval * 0.3) + \n        CASE u.gendlbl \n            WHEN 'M' THEN 0.2 \n            WHEN 'F' THEN 0.25 \n            ELSE 0.15 \n        END + \n        CASE u.occulbl \n            WHEN 'Professional' THEN 0.25 \n            WHEN 'Student' THEN 0.1 \n            ELSE 0.1 \n        END AS user_demographic_score,\n        u.user_preferences ->> 'interests' AS interests\n    FROM users u\n),\nGroupedMetrics AS (\n    SELECT \n        subscription_type,\n        demographic_segment,\n        AVG(user_subscription_value) AS avg_usv,\n        AVG(user_demographic_score) AS avg_uds,\n        COUNT(*) AS user_count\n    FROM UserMetrics\n    GROUP BY subscription_type, demographic_segment\n)\nSELECT \n    gm.subscription_type,\n    gm.demographic_segment,\n    gm.avg_usv,\n    gm.avg_uds,\n    STRING_AGG(um.interests, ', ' ORDER BY um.interests) AS shared_interests,\n    gm.user_count\nFROM GroupedMetrics gm\nJOIN UserMetrics um ON gm.subscription_type = um.subscription_type AND gm.demographic_segment = um.demographic_segment\nGROUP BY gm.subscription_type, gm.demographic_segment, gm.avg_usv, gm.avg_uds, gm.user_count\nORDER BY gm.user_count DESC, gm.avg_uds DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e892933997f8f9b9cd8db222295a7d6574b774c95e0c1ba8c726e58b21466d7f",
+      "ordered": true,
+      "columns": [
+        [
+          "subscription_type",
+          18482,
+          -1
+        ],
+        [
+          "demographic_segment",
+          18472,
+          -1
+        ],
+        [
+          "avg_usv",
+          1700,
+          -1
+        ],
+        [
+          "avg_uds",
+          1700,
+          -1
+        ],
+        [
+          "shared_interests",
+          25,
+          -1
+        ],
+        [
+          "user_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 12,
+      "bag_digest": "3f244d89cf485bc4cd147a6a04653c7a072dc90288d9c16d5d261c46a91c1d65",
+      "values_digest": "454d5e6170d1d5aecd6ac15edcff232925abbcbae313b10aa80a375ce4045431",
+      "ordered_digest": "eedebe9eba57e91b45f43be799a117ab5a9f484d2daac9037c587d9f9e938ad7"
+    },
+    "3b6ca745251ea727936b81f59714355c07d7fc9510238fe30f5aee6b1367541b": {
+      "sql": "WITH article_metrics AS (\r\n    SELECT \r\n        t1.catlabel AS article_category,\r\n        t1.difflevel AS complexity_level,\r\n        -- Calculate ARS using the formula provided\r\n        (\r\n            t1.readsec * LOG(t1.wordlen) / \r\n            CASE \r\n                WHEN t1.difflevel = 'Basic' THEN 1\r\n                WHEN t1.difflevel = 'Intermediate' THEN 1.5\r\n                WHEN t1.difflevel = 'Advanced' THEN 2\r\n                ELSE 1.2\r\n            END\r\n        ) AS ars,\r\n        -- Extract engagement rate from the JSONB column\r\n        (t1.engagement_metrics->>'engagement_rate')::NUMERIC AS engagement_rate\r\n    FROM \r\n        articles AS t1\r\n),\r\naverage_metrics AS (\r\n    SELECT \r\n        article_category,\r\n        AVG(ars) AS avg_ars,\r\n        AVG(engagement_rate) AS avg_engagement_rate\r\n    FROM \r\n        article_metrics\r\n    GROUP BY \r\n        article_category\r\n),\r\ncomplexity_counts AS (\r\n    SELECT \r\n        article_category,\r\n        complexity_level,\r\n        COUNT(*) AS article_count\r\n    FROM \r\n        article_metrics\r\n    GROUP BY \r\n        article_category, complexity_level\r\n),\r\ncorrelation_metrics AS (\r\n    SELECT \r\n        am.article_category,\r\n        CORR(am.ars, am.engagement_rate) AS correlation_coefficient\r\n    FROM \r\n        article_metrics AS am\r\n    GROUP BY \r\n        am.article_category\r\n)\r\nSELECT \r\n    am.article_category,\r\n    am.avg_ars,\r\n    am.avg_engagement_rate,\r\n    cm.correlation_coefficient,\r\n    cc.complexity_level,\r\n    cc.article_count\r\nFROM \r\n    average_metrics AS am\r\nJOIN \r\n    correlation_metrics AS cm ON am.article_category = cm.article_category\r\nJOIN \r\n    complexity_counts AS cc ON am.article_category = cc.article_category\r\nORDER BY \r\n    am.article_category;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d1210d675f3184a3c03d9b1217a133033928854a8a08dd3da6114a55bcd5b89a",
+      "ordered": true,
+      "columns": [
+        [
+          "article_category",
+          18108,
+          -1
+        ],
+        [
+          "avg_ars",
+          701,
+          -1
+        ],
+        [
+          "avg_engagement_rate",
+          1700,
+          -1
+        ],
+        [
+          "correlation_coefficient",
+          701,
+          -1
+        ],
+        [
+          "complexity_level",
+          18120,
+          -1
+        ],
+        [
+          "article_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 15,
+      "bag_digest": "87da700aa0f20af38c1647c8d8c0dbba043f51e5bdca02d7fe998565f70e7ebb",
+      "values_digest": "82ec8a7b3cc62f15f069fa15ed3acbd82ed597814d18240eba44626a3ed8a7d6",
+      "ordered_digest": "57708dad3bf79fa8cad1bc054ebe6560cf7710418d44020ce4906fd115adf1ae"
+    },
+    "caae13fc927f01c9d23c0daa58e5d881d825a9dbaa6c763004517ff958fb9598": {
+      "sql": "WITH cie AS (\r\n    SELECT \r\n        i.seshlink2 AS seshkey, \r\n        AVG(i.seqval) OVER (PARTITION BY i.seshlink2) AS avg_seqval\r\n    FROM interactions AS i\r\n),\r\nsbra AS (\r\n    SELECT \r\n        s.seshkey, \r\n        s.bncrate * (1 - s.ctrval/100) AS bounce_impact\r\n    FROM sessions AS s\r\n)\r\nSELECT \r\n    s.seshkey AS session_id,\r\n    s.seshstart AS start_time,\r\n    sb.bounce_impact,\r\n    ci.avg_seqval AS avg_seq_value,\r\n    ci.avg_seqval / sb.bounce_impact AS rtse\r\nFROM sessions AS s\r\nJOIN cie AS ci ON s.seshkey = ci.seshkey\r\nJOIN sbra AS sb ON s.seshkey = sb.seshkey\r\nWHERE sb.bounce_impact != 0;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c7293e55dfae20dd56ef02abdb6786818d3e7796e431d53f25c2629d4c795859",
+      "ordered": false,
+      "columns": [
+        [
+          "session_id",
+          20,
+          -1
+        ],
+        [
+          "start_time",
+          1114,
+          -1
+        ],
+        [
+          "bounce_impact",
+          1700,
+          -1
+        ],
+        [
+          "avg_seq_value",
+          1700,
+          -1
+        ],
+        [
+          "rtse",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 998,
+      "bag_digest": "620f8be386789044ae2d8090e22bee6ffcaa205ebd54896736051bbf60881706",
+      "values_digest": "8e64f1f6d027669688245872b5c13412ffd1fe3cc6a60edb502b7f16665d70db",
+      "ordered_digest": "bf97cbe95e751f908d85c64a26acf26b4b515e496ed00af03821b00168eddbe3"
+    },
+    "708a59255fbc9aa1b11c03fbdaedf8334ca7df68dab876b4fa58e183a2e26b91": {
+      "sql": "WITH daily_avg AS (\r\n    SELECT \r\n        DATE(seshstart) AS session_date, \r\n        AVG(engscore) AS daily_avg_uer\r\n    FROM \r\n        sessions\r\n    GROUP BY \r\n        session_date\r\n)\r\nSELECT \r\n    s.seshstart AS session_date,\r\n    s.engscore AS calculated_uer,\r\n    d.daily_avg_uer\r\nFROM \r\n    sessions s\r\nJOIN \r\n    daily_avg d ON DATE(s.seshstart) = d.session_date\r\nWHERE \r\n    s.engscore > d.daily_avg_uer\r\nORDER BY \r\n    session_date;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "98e12df10d9a6d3dde808ff4e889b6c199befc727ebc5fe084be5993e4317444",
+      "ordered": true,
+      "columns": [
+        [
+          "session_date",
+          1114,
+          -1
+        ],
+        [
+          "calculated_uer",
+          1700,
+          327686
+        ],
+        [
+          "daily_avg_uer",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 500,
+      "bag_digest": "502a0883d32d9cf1266522ac002c079c73b0cb55ad098d39f55a1b4f6ac058d6",
+      "values_digest": "31623322442a510600ffde29ec7c475a4e9f6c009e542a444de2bcbbbfdec6c8",
+      "ordered_digest": "5509fabd08ec8906c2bf229a315cfe03f4e578f51032210a7e41c2abb6e2d289"
+    },
+    "655c73c8208837a9f422c82bc641ade38bb9e9887065b1e750075e49f28ff19b": {
+      "sql": "WITH daily_avg AS (\r\n  SELECT \r\n    date(seshstart) AS session_date, \r\n    AVG(engscore) AS daily_avg_uer\r\n  FROM \r\n    sessions\r\n  GROUP BY \r\n    session_date\r\n)\r\nSELECT \r\n  s.seshstart AS session_date,\r\n  s.engscore AS calculated_uer,\r\n  d.daily_avg_uer\r\nFROM \r\n  sessions s\r\nJOIN \r\n  daily_avg d ON date(s.seshstart) = d.session_date\r\nWHERE \r\n  s.engscore > d.daily_avg_uer\r\nORDER BY \r\n  session_date;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "98e12df10d9a6d3dde808ff4e889b6c199befc727ebc5fe084be5993e4317444",
+      "ordered": true,
+      "columns": [
+        [
+          "session_date",
+          1114,
+          -1
+        ],
+        [
+          "calculated_uer",
+          1700,
+          327686
+        ],
+        [
+          "daily_avg_uer",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 500,
+      "bag_digest": "502a0883d32d9cf1266522ac002c079c73b0cb55ad098d39f55a1b4f6ac058d6",
+      "values_digest": "31623322442a510600ffde29ec7c475a4e9f6c009e542a444de2bcbbbfdec6c8",
+      "ordered_digest": "5509fabd08ec8906c2bf229a315cfe03f4e578f51032210a7e41c2abb6e2d289"
+    },
+    "4401f82f69d94ccd65eb4570b9e02b3deb64147d3abdc94bb7f0a1f4aa6fb9ff": {
+      "sql": "WITH daily_uer AS (\r\n    SELECT \r\n        seshkey, \r\n        DATE(seshstart) AS session_date, \r\n        (seshviews * engscore) / seshdur AS calculated_uer\r\n    FROM \r\n        sessions\r\n),\r\ndaily_avg_uer AS (\r\n    SELECT \r\n        session_date, \r\n        AVG(calculated_uer) AS daily_avg_uer\r\n    FROM \r\n        daily_uer\r\n    GROUP BY \r\n        session_date\r\n)\r\nSELECT \r\n    d.session_date, \r\n    d.calculated_uer, \r\n    a.daily_avg_uer\r\nFROM \r\n    daily_uer d\r\nJOIN \r\n    daily_avg_uer a ON d.session_date = a.session_date\r\nWHERE \r\n    d.calculated_uer > a.daily_avg_uer\r\nORDER BY \r\n    d.session_date;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "19122b6a3f717432f8bfc2303d4d4a67afd14643f129fdf245d57bca3b7959d2",
+      "ordered": true,
+      "columns": [
+        [
+          "session_date",
+          1082,
+          -1
+        ],
+        [
+          "calculated_uer",
+          1700,
+          -1
+        ],
+        [
+          "daily_avg_uer",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 161,
+      "bag_digest": "e7051be5071ce4aede29806ab57b3cdc435df68daf5d3ecc39723e2df9edcd97",
+      "values_digest": "43f7dc54295cf27a2bd5d058b7aacdbb2b5b5561169df639cff7b8785b28f16d",
+      "ordered_digest": "1552d1a6f56f4b0472a1d9d8b0aa0d79655db213e55ea713482fad8f488c48ae"
+    },
+    "7cf6a503bbbf13f393808083852b239c3b9086f8accdc20485b2935bcadd4556": {
+      "sql": "WITH readability_scores AS (\r\n    SELECT \r\n        catlabel AS article_category,\r\n        difflevel::TEXT AS complexity_level,\r\n        (\r\n            readsec * LOG(wordlen) / \r\n            CASE \r\n                WHEN difflevel::TEXT ILIKE 'Basic' THEN 1\r\n                WHEN difflevel::TEXT ILIKE 'Intermediate' THEN 1.5\r\n                WHEN difflevel::TEXT ILIKE 'Advanced' THEN 2\r\n                ELSE 1.2\r\n            END\r\n        ) AS readability_score,\r\n        (engagement_metrics ->> 'engagement_rate')::NUMERIC AS engagement_rate\r\n    FROM \r\n        articles\r\n),\r\naverage_scores AS (\r\n    SELECT \r\n        article_category,\r\n        complexity_level,\r\n        AVG(readability_score) AS avg_readability_score,\r\n        AVG(engagement_rate) AS avg_engagement_rate,\r\n        COUNT(*) AS article_count\r\n    FROM \r\n        readability_scores\r\n    GROUP BY \r\n        article_category, complexity_level\r\n),\r\ncorrelation_scores AS (\r\n    SELECT \r\n        article_category,\r\n        CORR(avg_readability_score, avg_engagement_rate) AS correlation_score\r\n    FROM \r\n        average_scores\r\n    GROUP BY \r\n        article_category\r\n)\r\nSELECT \r\n    a.article_category,\r\n    a.complexity_level,\r\n    a.avg_readability_score,\r\n    a.avg_engagement_rate,\r\n    c.correlation_score,\r\n    a.article_count\r\nFROM \r\n    average_scores a\r\nJOIN \r\n    correlation_scores c ON a.article_category = c.article_category;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c3be9881827e1742f817d6f06a5445ad25c245166d02581c49121da2f5bf5e68",
+      "ordered": false,
+      "columns": [
+        [
+          "article_category",
+          18108,
+          -1
+        ],
+        [
+          "complexity_level",
+          25,
+          -1
+        ],
+        [
+          "avg_readability_score",
+          701,
+          -1
+        ],
+        [
+          "avg_engagement_rate",
+          1700,
+          -1
+        ],
+        [
+          "correlation_score",
+          701,
+          -1
+        ],
+        [
+          "article_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 15,
+      "bag_digest": "dee365f1d72c43fc758ad22d9367b1709cc2438bd4c1555f7c99004dd70b0b92",
+      "values_digest": "d25dec83e2367f7b5f6a258759105772dd05f51e440a405792880426e17ab1cd",
+      "ordered_digest": "7c2467eb330947c1fd8a63127050d6f27cd0174812a5b49b01310c9434de908a"
+    },
+    "8a1f403d9d746b3b7259138f18a6c781b28bd8ed44e95e84bc47b7a7195e749d": {
+      "sql": "WITH sbra_calc AS (\r\n    SELECT \r\n        u.typelabel AS user_type,\r\n        u.seglabel AS user_segment,\r\n        a.catlabel AS performance_category,\r\n        (s.bncrate * (1 - (s.ctrval / 100))) AS sbra\r\n    FROM \r\n        users u\r\n    JOIN \r\n        sessions s ON u.userkey = s.userel\r\n    JOIN \r\n        interactions i ON s.seshkey = i.seshlink2\r\n    JOIN \r\n        articles a ON i.artval = a.artkey\r\n)\r\nSELECT \r\n    user_type, user_segment, performance_category, AVG(sbra) as avg_sbra\r\nFROM \r\n    sbra_calc\r\nGROUP BY \r\n    user_type, user_segment, performance_category\r\nHAVING \r\n    COUNT(user_segment) > 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2a43ea7eadf5fd8287a5133deab0d921dde03a6b85668e1e8d539a4246ff479e",
+      "ordered": false,
+      "columns": [
+        [
+          "user_type",
+          18482,
+          -1
+        ],
+        [
+          "user_segment",
+          18472,
+          -1
+        ],
+        [
+          "performance_category",
+          18108,
+          -1
+        ],
+        [
+          "avg_sbra",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "7b9989ed8b7ec39e1023e0a6bff91c525cb778cf9f08af0f002d1db15acc5721",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "7b9989ed8b7ec39e1023e0a6bff91c525cb778cf9f08af0f002d1db15acc5721"
+    },
+    "a35c125e1ad767bdb7213d7c4f7b752f7a50067942cf17ab8dfc103865154080": {
+      "sql": "WITH sbra_calc AS (\r\n    SELECT \r\n        u.typelabel AS user_type, \r\n        u.seglabel AS user_segment, \r\n        a.catlabel AS performance_category, \r\n        (s.bncrate * (1 - (s.ctrval / 100))) AS sbra\r\n    FROM \r\n        users u\r\n    JOIN \r\n        sessions s ON u.userkey = s.userel\r\n    JOIN \r\n        interactions i ON s.seshkey = i.seshlink2\r\n    JOIN \r\n        articles a ON i.artval = a.artkey\r\n)\r\nSELECT \r\n    user_type, \r\n    user_segment, \r\n    performance_category, \r\n    AVG(sbra) AS avg_sbra, \r\n    COUNT(sbra) AS session_count\r\nFROM \r\n    sbra_calc\r\nGROUP BY \r\n    user_type, \r\n    user_segment, \r\n    performance_category\r\nHAVING \r\n    COUNT(sbra) >= 10\r\nORDER BY \r\n    user_type, \r\n    user_segment, \r\n    performance_category;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ddce82d953e1a4fb5b08226e047f98189fc0b4d2aed7224ae03ca39a850ce0a8",
+      "ordered": true,
+      "columns": [
+        [
+          "user_type",
+          18482,
+          -1
+        ],
+        [
+          "user_segment",
+          18472,
+          -1
+        ],
+        [
+          "performance_category",
+          18108,
+          -1
+        ],
+        [
+          "avg_sbra",
+          1700,
+          -1
+        ],
+        [
+          "session_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "cdd7aac40e97f1d88aa942dd2b43c0e54448535d95ea14676e8bdc92399df5bc",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "cdd7aac40e97f1d88aa942dd2b43c0e54448535d95ea14676e8bdc92399df5bc"
+    },
+    "da274717c3b4085aa664700906cc5f8432d7d2c08349ac93be7cd6104b8a6b78": {
+      "sql": "WITH uer_calc AS (\r\n    SELECT \r\n        seshstart,\r\n        (seshviews * engscore / seshdur) AS uer\r\n    FROM \r\n        sessions\r\n),\r\ndaily_avg_uer AS (\r\n    SELECT \r\n        DATE(seshstart) AS session_date,\r\n        AVG(uer) AS avg_uer\r\n    FROM \r\n        uer_calc\r\n    GROUP BY \r\n        session_date\r\n)\r\nSELECT \r\n    uer_calc.seshstart AS session_date,\r\n    uer_calc.uer AS calculated_uer,\r\n    daily_avg_uer.avg_uer AS daily_avg_uer\r\nFROM \r\n    uer_calc\r\nJOIN \r\n    daily_avg_uer ON DATE(uer_calc.seshstart) = daily_avg_uer.session_date\r\nWHERE \r\n    uer_calc.uer > daily_avg_uer.avg_uer\r\nORDER BY \r\n    uer_calc.seshstart;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a3fcd3d1d338c33bc1f738a0b35bcc48a2196dcd2ecda24d8bf7a555b6c5b3dc",
+      "ordered": true,
+      "columns": [
+        [
+          "session_date",
+          1114,
+          -1
+        ],
+        [
+          "calculated_uer",
+          1700,
+          -1
+        ],
+        [
+          "daily_avg_uer",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 161,
+      "bag_digest": "3d495c4686f443f931de811e65620571a23f0326b53b5bdee21686ab81af011e",
+      "values_digest": "be15a2e20d3353728a7a3831e360f2bf1f4260630853d8e6d711d0ebae4e23d5",
+      "ordered_digest": "796e237c5d714ffc3e354af9b9b9d7df85cece0190e42bb5351471dccd31562b"
+    },
+    "6312020eb8cf3ec0b3a466f840c1b607fe350bbd6ca8efa455915e6d829e68a9": {
+      "sql": "WITH user_demo AS (\n    SELECT \n        substatus AS subscription_status,\n        (user_preferences->>'interests')::text AS shared_interests,\n        (user_preferences->>'activity_level')::text AS activity_level,\n        (user_preferences->>'satisfaction_score')::decimal AS satisfaction_score,\n        ageval AS age,\n        gendlbl AS gender,\n        occulbl AS occupation\n    FROM users\n),\nuser_scores AS (\n    SELECT\n        ud.subscription_status,\n        ud.shared_interests,\n        ud.activity_level,\n        ud.satisfaction_score,\n        ud.age,\n        ud.gender,\n        ud.occupation,\n        u.subdays * \n            CASE u.substatus\n                WHEN 'Premium' THEN 3\n                WHEN 'Enterprise' THEN 2\n                WHEN 'Basic' THEN 1\n            END AS usv,\n        u.ageval * \n            CASE u.gendlbl\n                WHEN 'M' THEN 1.2\n                WHEN 'F' THEN 1.5\n                ELSE 1\n            END * \n            CASE u.occulbl\n                WHEN 'Professional' THEN 1.3\n                WHEN 'Student' THEN 0.8\n                ELSE 1\n            END AS uds\n    FROM user_demo AS ud\n    INNER JOIN users AS u ON u.substatus = ud.subscription_status\n),\ngrouped_users AS (\n    SELECT\n        subscription_status,\n        shared_interests,\n        activity_level,\n        satisfaction_score,\n        age,\n        gender,\n        occupation,\n        AVG(usv) AS avg_usv,\n        AVG(uds) AS avg_uds,\n        COUNT(*) AS user_count,\n        STRING_AGG(shared_interests, ',') AS aggregated_interests\n    FROM user_scores\n    GROUP BY subscription_status, shared_interests, activity_level, satisfaction_score, age, gender, occupation\n)\nSELECT\n    subscription_status,\n    shared_interests,\n    activity_level,\n    satisfaction_score,\n    age,\n    gender,\n    occupation,\n    avg_usv,\n    avg_uds,\n    aggregated_interests\nFROM grouped_users\nWHERE user_count > 10\nORDER BY avg_uds DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ad315bdd97f7f63427ab7bc73a71c4016f5795b767357fd9dc516f87885360a2",
+      "ordered": true,
+      "columns": [
+        [
+          "subscription_status",
+          18410,
+          -1
+        ],
+        [
+          "shared_interests",
+          25,
+          -1
+        ],
+        [
+          "activity_level",
+          25,
+          -1
+        ],
+        [
+          "satisfaction_score",
+          1700,
+          -1
+        ],
+        [
+          "age",
+          23,
+          -1
+        ],
+        [
+          "gender",
+          18454,
+          -1
+        ],
+        [
+          "occupation",
+          18462,
+          -1
+        ],
+        [
+          "avg_usv",
+          1700,
+          -1
+        ],
+        [
+          "avg_uds",
+          1700,
+          -1
+        ],
+        [
+          "aggregated_interests",
+          25,
+          -1
+        ]
+      ],
+      "rows": 994,
+      "bag_digest": "44d77ad6496288c04f187fe5e0bb9d7498928b607794a7766f86b9d7333669ee",
+      "values_digest": "1263934a2a4f7ec62eb0afb42008ad243dee2ea0e0bf7d3398c8350c2f47a3c6",
+      "ordered_digest": "3bc70e11988ca9e232d017bc99bfe572b96e53db4dac57e1657ad2891e7d578d"
+    },
+    "a2326f347afd86c54fc38b3072df8402550c8366255e7df3aaa868c07b72f9f6": {
+      "sql": "WITH user_interaction_scores AS (\r\n    SELECT \r\n        userel AS user_id,\r\n        SUM(seshclicks) AS total_clicks,\r\n        SUM(seshviews) AS total_views,\r\n        AVG(engscore) AS avg_engagement_score,\r\n        SUM(seshclicks) + SUM(seshviews) + AVG(engscore) AS custom_interaction_score\r\n    FROM \r\n        sessions\r\n    GROUP BY \r\n        userel\r\n),\r\nranked_users AS (\r\n    SELECT \r\n        user_id,\r\n        total_clicks,\r\n        total_views,\r\n        avg_engagement_score,\r\n        custom_interaction_score,\r\n        RANK() OVER (ORDER BY custom_interaction_score DESC) AS rank\r\n    FROM \r\n        user_interaction_scores\r\n)\r\nSELECT \r\n    user_id,\r\n    total_clicks,\r\n    total_views,\r\n    avg_engagement_score,\r\n    custom_interaction_score\r\nFROM \r\n    ranked_users\r\nORDER BY \r\n    rank\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3b37e0f4920dfe151a4a185a605f1a0966caa220978e9a5208c1415ea9ff21e7",
+      "ordered": true,
+      "columns": [
+        [
+          "user_id",
+          20,
+          -1
+        ],
+        [
+          "total_clicks",
+          20,
+          -1
+        ],
+        [
+          "total_views",
+          20,
+          -1
+        ],
+        [
+          "avg_engagement_score",
+          1700,
+          -1
+        ],
+        [
+          "custom_interaction_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "a7e61fa28fc26b43b2e267b67ea57b8a0526e2a9ee0a83e817ce0c82ddaf3b4f",
+      "values_digest": "022a24271dac46f2281d1a9313beb949cd19075a0310732b535a5ca8e85e9984",
+      "ordered_digest": "3383604b07a1bd4d5eb428f2f653cd876a8b4bbfc8c163c876f4691013637a7b"
+    },
+    "459caa71aada65611d33d734e5cfcb10d6d97b9728e790a9a4bcebffaf8d79a9": {
+      "sql": "WITH usv_uds AS (\r\n    SELECT \r\n        substatus, \r\n        (\r\n            CASE \r\n                WHEN substatus = 'Premium' THEN 1.5\r\n                WHEN substatus = 'Enterprise' THEN 1.2\r\n                WHEN substatus = 'Basic' THEN 1.0\r\n                ELSE 0\r\n            END\r\n        ) * subdays AS usv,\r\n        ageval * 1.1 * 1.3 AS uds,\r\n        user_preferences\r\n    FROM users\r\n)\r\nSELECT \r\n    usv,\r\n    uds,\r\n    (user_preferences ->> 'interests') AS interests\r\nFROM usv_uds\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "34c8934437e140c955bd4462da3bf3a8f5ce328d1fab08aa76292094550c527f",
+      "ordered": false,
+      "columns": [
+        [
+          "usv",
+          1700,
+          -1
+        ],
+        [
+          "uds",
+          1700,
+          -1
+        ],
+        [
+          "interests",
+          25,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "a613f05ed647ac73324de81be15bd96bf386e5c6e38a627558a287faba851d57",
+      "values_digest": "4ef72a48006d3615ed3b645d611341735061903efeca1913afa03f33db801023",
+      "ordered_digest": "3c455cf741d6476bc0f4abc8a8bc3a86499a2fb39003c20d32b22b89db13a5e5"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "interactionmetrics": {
+      "intmetkey": "int8",
+      "interaction_behavior": "jsonb"
+    }
+  }
+}

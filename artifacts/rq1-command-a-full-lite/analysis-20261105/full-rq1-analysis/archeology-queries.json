@@ -1,0 +1,3421 @@
+{
+  "version": 2,
+  "database": "archeology",
+  "queries": {
+    "a7a892a502ce4b69145c15e4b10f0b309e25f17ffb3d483b430606bb1aea52f1": {
+      "sql": "SELECT\n    s.zoneregistry AS site_code,\n    s.zonelabel AS site_name,\n    sc.structstate AS structural_condition,\n    s.presstat AS status,\n    CASE \n        WHEN s.envhaz = 'High' THEN 'Degradation Risk Zone'\n        ELSE 'Not in Risk Zone'\n    END AS risk_category\nFROM \n    sites s\nJOIN \n    scanconservation sc ON s.zoneregistry = sc.zoneref\nWHERE \n    s.envhaz = 'High';",
+      "decisions": {
+        "N0": {
+          "key": "08f50087a3622fb94c7c453676b8445ae9372e6da0b57d857b10fff198f0bb50",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "443400ca2542955bff89856475a5053a5bd1c952075fc0a98dc1972a694b2d89",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "4d2c4734ed419e77964779d395caa866123be365ac484994d11f266aeea82150",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "37edb408b3a0a764a4c9089fa9c46756bac734be37654b73ab5a79a9e40f4e8f",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "fcc895ae04d44d8ae9f6be54db01f031a661343d3480e14e9268cf9493167c28",
+      "ordered": false,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "structural_condition",
+          1043,
+          19
+        ],
+        [
+          "status",
+          1043,
+          29
+        ],
+        [
+          "risk_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 347,
+      "bag_digest": "db0f3b5c4a846c84a03ffb7c19ab3f6e82f9741f2290b7ff3ac77e8088e8a907",
+      "values_digest": "089af9e9ff02db55546be7749e63889f61436443da3a9fd91201b73bd66f27b3",
+      "ordered_digest": "b7c2e8b7fe706ee156f175d64f4d851c7aa069e5b8884d10581b22017f2e895a"
+    },
+    "6318c5377a465e37899776cba47430aaf5b5d3c0f5c95979ad65cc1220603918": {
+      "sql": "SELECT\n    sp.flowsoft AS processing_software,\n    sp.flowstage AS processing_stage,\n    AVG(sp.flowhrs) AS avg_processing_hours,\n    AVG(sp.proccpu) AS avg_cpu_usage_percent,\n    AVG(sp.procgpu) AS avg_gpu_usage_percent,\n    AVG(sp.remaingb) AS avg_data_size_gb,\n    AVG((sp.proccpu + sp.procgpu) / 2) AS avg_efficiency_value,\n    CASE\n        WHEN AVG((sp.proccpu + sp.procgpu) / 2) < 5.0 THEN 'Optimized'\n        WHEN AVG((sp.proccpu + sp.procgpu) / 2) BETWEEN 5.0 AND 10.0 THEN 'Acceptable'\n        ELSE 'Needs Optimization'\n    END AS efficiency_status,\n    COUNT(*) AS total_workflow_count\nFROM\n    scanprocessing AS sp\nJOIN\n    equipment AS eq ON sp.equipref = eq.equipregistry\nGROUP BY\n    sp.flowsoft, sp.flowstage;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "347ffea3f2f6a5d84045cbd33764734a0b3e197f636427556043ddd8c56d79c6",
+      "ordered": false,
+      "columns": [
+        [
+          "processing_software",
+          1043,
+          29
+        ],
+        [
+          "processing_stage",
+          1043,
+          22
+        ],
+        [
+          "avg_processing_hours",
+          1700,
+          -1
+        ],
+        [
+          "avg_cpu_usage_percent",
+          1700,
+          -1
+        ],
+        [
+          "avg_gpu_usage_percent",
+          1700,
+          -1
+        ],
+        [
+          "avg_data_size_gb",
+          1700,
+          -1
+        ],
+        [
+          "avg_efficiency_value",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_status",
+          25,
+          -1
+        ],
+        [
+          "total_workflow_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "10f19efdf9534e8531508e394b42db20de10b2bd823e3e14713fd3b54df1da6a",
+      "values_digest": "e4525839925f346485952f08f62a6f1bc93080af7a48e41e89d10177be14b4f1",
+      "ordered_digest": "c1feecfcc530508d2680bed861a8fe27c1ca5c6dbea7b76d8b7be88308d27955"
+    },
+    "35b8d6008d1ae53acc7613132b9335327e7d9ee7a27b4891cd6d67afcdced9d3": {
+      "sql": "SELECT\r\n    sf.zoneref AS site_code,\r\n    AVG(spc.pointdense) AS avg_density_value,\r\n    AVG(sf.traitcount) AS avg_extraction_value\r\nFROM\r\n    Scanfeatures sf\r\nJOIN\r\n    Scanpointcloud spc\r\n    ON sf.zoneref = spc.arcref\r\nGROUP BY\r\n    sf.zoneref;",
+      "decisions": {
+        "N0": {
+          "key": "d5b5f5ba5272b97b7079a4e132f875cc22234286d28d91ac6c85a69e5988e009",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "f3c4e5857be4705e9998467d866153ffa2183a970a5e6320aed1e82a6bc67c3b",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "1f35b764dc39cc159718d092c19682218bdec384c395f9aa01806f802bbafa3d",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "28eea3d1924793adcc89ce210424a2973b00b9b5ddd28ee130c5fe138eae4826",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "8cdd3b31bd187f29b848ba7b567d8fde750cb6b9cf131127700e286546750bad",
+      "ordered": false,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "avg_density_value",
+          1700,
+          -1
+        ],
+        [
+          "avg_extraction_value",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca"
+    },
+    "4baedeb85e0bcf05589486543c7dbb442b496188106af0f5c3b61ede09d00bd7": {
+      "sql": "SELECT \n  logregistry AS registration_id,\n  arcref AS project_id,\n  logaccumm AS accuracy_measurements,\n  errscale AS error_metrics,\n  errvalmm AS error_value,\n  logaccumm / errvalmm AS calculated_ratio\nFROM scanregistration;",
+      "decisions": {
+        "N0": {
+          "key": "a84b3e3f087192cf2b8649578d4b93f89c688f7965af8089be9faeea1cc87382",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "fe763ae60a2478753d2a1c86a3a3e7538f872ffffe3e30b400f28e96350a47ee",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "77445ffd45c61c16cb98999e9e7659d577a6c3a21038c045f5c8d33f6257cadd",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "a114c79b61d7a41ded95861fce7939456b03b96daf558d63dfb37d0b17b329cc",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "c569e2a57980c2f28504d5a29c7a57394cb12989c8366fe34beb1712a945333f",
+      "ordered": false,
+      "columns": [
+        [
+          "registration_id",
+          20,
+          -1
+        ],
+        [
+          "project_id",
+          1043,
+          54
+        ],
+        [
+          "accuracy_measurements",
+          1700,
+          327687
+        ],
+        [
+          "error_metrics",
+          1043,
+          24
+        ],
+        [
+          "error_value",
+          1700,
+          393223
+        ],
+        [
+          "calculated_ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "75b3c5beaf80f5d50d245c20f2df02b1c4774d4bbdadadab91e8ad2bbddd6e5b",
+      "values_digest": "1f9308978e5ea2dda1959eeca8ef4365d543d7d2fc071d1341571c8d0c96d87e",
+      "ordered_digest": "c6ff3de3ad576d303ee821e2ba7c21cef93cf7ec79f116ba2b91c709f204fc08"
+    },
+    "e7c97130e8d8af34683849982633294209d38959502cfed9b1dbc96e9a52614e": {
+      "sql": "SELECT \r\n    e.equipregistry AS equipment_id,\r\n    AVG(sp.proccpu * sp.procgpu) AS utilization_value,\r\n    AVG(sp.flowhrs) AS avg_processing_time_hours,\r\n    CASE \r\n        WHEN AVG(sp.proccpu * sp.procgpu) < 5.0 THEN 'Optimized' \r\n        WHEN AVG(sp.proccpu * sp.procgpu) BETWEEN 5.0 AND 10.0 THEN 'Acceptable' \r\n        ELSE 'Needs Optimization' \r\n    END AS efficiency_ranking,\r\n    CASE \r\n        WHEN sp.safebak = 'Completed' THEN 'Completed' \r\n        WHEN sp.safebak = 'In Progress' THEN 'In Progress' \r\n        ELSE 'Pending' \r\n    END AS workflow_status,\r\n    CONCAT(e.equipform, ' - ', e.equipdesign, ' - ', e.equipstatus) AS resource_details\r\nFROM \r\n    equipment e\r\nJOIN \r\n    scanprocessing sp ON e.equipregistry = sp.equipref\r\nGROUP BY \r\n    e.equipregistry, sp.safebak, e.equipform, e.equipdesign, e.equipstatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "57f2782e1d489b4c1aba4143ced59a9e90aa72525e81128966646d9fe6c24231",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment_id",
+          1042,
+          54
+        ],
+        [
+          "utilization_value",
+          1700,
+          -1
+        ],
+        [
+          "avg_processing_time_hours",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_ranking",
+          25,
+          -1
+        ],
+        [
+          "workflow_status",
+          25,
+          -1
+        ],
+        [
+          "resource_details",
+          25,
+          -1
+        ]
+      ],
+      "rows": 996,
+      "bag_digest": "6d062079bb296eec705e46116408bfe13e45b9da104ae571cc3f0faa2a723709",
+      "values_digest": "d371da3094c56bb13fc1af74883f8f057fb76eea79d8d6e4552672452cb6c4ad",
+      "ordered_digest": "08f8e2a47895a76354f8c4aa9eb41e6bbe90603024d9088cff97d2d1be5b2df0"
+    },
+    "c5ac54448b1182f6fd0cb9ba7744d5f5fafdae1797827cf1ebde5b1e2812edcf": {
+      "sql": "SELECT \r\n    s.questregistry AS scan_id,\r\n    p.vesseltag AS project,\r\n    st.zonelabel AS site,\r\n    s.chronotag AS timestamp,\r\n    spc.scanresolmm AS resolution,\r\n    spc.pointdense AS density,\r\n    spc.coverpct AS coverage,\r\n    spc.noisedb AS noise_level\r\nFROM \r\n    scans s\r\nJOIN \r\n    projects p ON s.arcref = p.arcregistry\r\nJOIN \r\n    sites st ON s.zoneref = st.zoneregistry\r\nJOIN \r\n    scanpointcloud spc ON s.arcref = spc.arcref\r\nWHERE \r\n    spc.noisedb < 1.5;",
+      "decisions": {
+        "N0": {
+          "key": "b54cb48d2b22013082b1a37f864cc4daa65f6824bcc645f5570378715f54d955",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "ebfd54df8ba8b6efbb2e88f43829f6a0c014f04cb1121565cbefa7ef2deb4ff5",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "1f7b95e2aec838336ee00c8f05f7e110f4ade2b98fbd57fa90007792215743db",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "83a91f1eb49b2c03bede582e16f774dbee1538067785cc43041e8e39252de063",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "8d7e5c2d3fe5f3ac3cd4cacf30c841e411a21e47b0a2341c577af9a9bb368275",
+      "ordered": false,
+      "columns": [
+        [
+          "scan_id",
+          1043,
+          20
+        ],
+        [
+          "project",
+          1043,
+          64
+        ],
+        [
+          "site",
+          25,
+          -1
+        ],
+        [
+          "timestamp",
+          1114,
+          -1
+        ],
+        [
+          "resolution",
+          1700,
+          327686
+        ],
+        [
+          "density",
+          23,
+          -1
+        ],
+        [
+          "coverage",
+          1700,
+          262149
+        ],
+        [
+          "noise_level",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 808,
+      "bag_digest": "cbb30bf6b8c6665ffe9f8faa46c190721e07fefe7cda30823ef8787dfce7b8ce",
+      "values_digest": "bca79d97d70ecca60c9ad98781eccab6e1b4f69234f84a0195a0bdaa9d660594",
+      "ordered_digest": "86d656cafa35ee2bafcd31aa44792f2c2c05fc2ccc70343840eecb3139374fd9"
+    },
+    "a48a11525bb4835abbcedb86dc1d09083e61369dc71f5439a84cf39450b15e66": {
+      "sql": "SELECT \r\n    s.zonelabel AS site_name,\r\n    COUNT(sm.facetregistry) AS total_mesh_count,\r\n    SUM(CASE \r\n        WHEN sm.geomdeltamm < 0.5 AND sm.facetresmm < 1.0 THEN 1\r\n        ELSE 0\r\n    END) AS high_fidelity_mesh_count,\r\n    (SUM(CASE \r\n        WHEN sm.geomdeltamm < 0.5 AND sm.facetresmm < 1.0 THEN 1\r\n        ELSE 0\r\n    END) * 100.0 / COUNT(sm.facetregistry)) AS high_fidelity_proportion,\r\n    AVG(sm.geomdeltamm) AS avg_geometric_accuracy,\r\n    AVG(sm.facetresmm) AS avg_resolution_params,\r\n    AVG(sm.geomdeltamm) AS avg_complexity_ratio,\r\n    sm.uvmapqual AS mesh_quality\r\nFROM \r\n    sites s\r\nJOIN \r\n    scanmesh sm ON s.zoneregistry = sm.zoneref\r\nGROUP BY \r\n    s.zonelabel, sm.uvmapqual\r\nORDER BY \r\n    high_fidelity_proportion DESC;",
+      "decisions": {
+        "N0": {
+          "key": "a58a12ed41c75e53d0363f482deef2a3fad041f1ba5224aa8627e6b130150694",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "64e2f9c60a4942a403833fe57d73defa74f8f253817697559a67a8ea51a7eaa1",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "01e24c45f99977f6b4e8d92f3b9049dec892319b24f84378994c6f6024773d66",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "ee0400e65775dd2be6b3d2b6f65db2337f0cf947eef71c36404296832073820c",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "d9c29788baeb696d1499229b07d90392482e06974b7710db8e8123aea55458fe",
+      "ordered": true,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_proportion",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy",
+          1700,
+          -1
+        ],
+        [
+          "avg_resolution_params",
+          1700,
+          -1
+        ],
+        [
+          "avg_complexity_ratio",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          1043,
+          54
+        ]
+      ],
+      "rows": 970,
+      "bag_digest": "fd2117f6e27eefd65980b93681e53c5e40aeceb96bfeb633660f1bc57cbed7e3",
+      "values_digest": "2c1e9132107cf36b3a082e1ba7b28efe446a22a5aa574ccce5d5111fb1fe6770",
+      "ordered_digest": "c8640ad1a9997766b7bc87afa3d909d47f69032a32343e4fccc92e4537870bda"
+    },
+    "494e3f286b80594b3796063345030dfef2daef1391420feff263575c5fe913a3": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    AVG(sf.traitcount) AS avg_density_value,\r\n    AVG(sf.traitcount * spc.coverpct * ss.aream2) AS avg_extraction_value\r\nFROM \r\n    sites s\r\nJOIN \r\n    scanfeatures sf ON s.zoneregistry = sf.zoneref\r\nJOIN \r\n    scanpointcloud spc ON s.zoneregistry = spc.arcref\r\nJOIN \r\n    scanspatial ss ON s.zoneregistry = ss.arcref\r\nGROUP BY \r\n    s.zoneregistry;",
+      "decisions": {
+        "N0": {
+          "key": "9e15d98b5bf762a9e889653c71a39550531a5fb11fa76351d6e82d0e975692c8",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "841335e0b416777bfeb0114bbad73cc91197765d6cbd3f7259330faf805dee2f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "9e64cc8ca30276441cfd415a2c1d7af2cf6ee788d07f0ad7e5390c2962c20f98",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "f6c8d317109a3e8896f7f81f16ee4e14f8543346e62f06c38a780019fdfd3b0f",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "0d7a64b443fecc59bf5864e87083f01acde5d0887f036cfd569b16ddcf155fa2",
+      "ordered": false,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "avg_density_value",
+          1700,
+          -1
+        ],
+        [
+          "avg_extraction_value",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca"
+    },
+    "167e3d7366ed04128ee2175292c1a278522242b53e04ae195a462ee69793d9b3": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_designation,\r\n    (CASE \r\n        WHEN sc.harmassess = 'None' THEN 10\r\n        WHEN sc.harmassess = 'Moderate' THEN 5\r\n        WHEN sc.harmassess = 'Severe' THEN 1\r\n    END) * (\r\n    CASE \r\n        WHEN sc.curerank = 'Critical' THEN 1\r\n        WHEN sc.curerank = 'High' THEN 5\r\n        WHEN sc.curerank = 'Low' THEN 10\r\n    END) * (\r\n    CASE \r\n        WHEN sc.structstate = 'Stable' THEN 10\r\n        WHEN sc.structstate = 'Moderate' THEN 5\r\n        WHEN sc.structstate = 'Unstable' THEN 1\r\n    END) AS quality_index\r\nFROM \r\n    sites s\r\nJOIN \r\n    scanconservation sc ON s.zoneregistry = sc.zoneref\r\nORDER BY \r\n    quality_index DESC;",
+      "decisions": {
+        "N0": {
+          "key": "20b6f4d16135bdc82efd709034f4374c00ae3c1b1cfaeaf0f3f3234599ef53be",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "f99594010f4f417f017678fdd070377ea535892c7e98334aa33c00394520f5e9",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "761f8cc988deecaf8de1dca8df2331fa52f81a9560714464588234bc570dcb44",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "4808df76d5d3c04734802fd26b7fb91b11283950cef56e6c62d97a778478979a",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "8960dcb2b6a1a006d2f92945449413aef13f17abe5bfd7416b3df2d0f5734381",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_designation",
+          25,
+          -1
+        ],
+        [
+          "quality_index",
+          23,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "b06e9b7802899318eed5947db828607898dcff3ac1383f25369b22a540e471d8",
+      "values_digest": "2d18c853ba0a3e7a6c3db778ccf54777389e4212c98aca380a84ed343708acf2",
+      "ordered_digest": "267f8f53f1bed639000f5a196763485997a9baa5f614c12751d0c918ba6e401d"
+    },
+    "be9d5ead3512324c377a6388d0baa21902b6cfc1c0289fd1a8625da5d20c1339": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_name,\r\n    COUNT(sm.facetregistry) AS total_mesh_count,\r\n    SUM(CASE WHEN sm.uvmapqual = 'High' THEN 1 ELSE 0 END) AS high_fidelity_mesh_count,\r\n    (SUM(CASE WHEN sm.uvmapqual = 'High' THEN 1 ELSE 0 END) * 100.0 / COUNT(sm.facetregistry)) AS high_fidelity_proportion,\r\n    AVG(sm.facetverts / sm.facetfaces) AS avg_complexity_ratio,\r\n    AVG(sm.facetresmm) AS avg_resolution_mm,\r\n    AVG(sm.geomdeltamm) AS avg_geometric_accuracy_mm,\r\n    sm.uvmapqual AS mesh_quality\r\nFROM \r\n    scanmesh sm\r\nJOIN \r\n    sites s ON sm.zoneref = s.zoneregistry\r\nGROUP BY \r\n    s.zoneregistry, s.zonelabel, sm.uvmapqual\r\nORDER BY \r\n    site_code DESC;",
+      "decisions": {
+        "N0": {
+          "key": "253d13234d7561bab6597e8862b8978578cb4c3cbe71a15820a68b68f5c718fa",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "621f184ea5321f6b57e031ce9d3b6d75c91d464db23168f29fe08442fafc24a4",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "be155c590e961e3e3144d36a3cb41aa3afba1576d0065f9201be30419d3fb1bc",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "7d5bf9b1d11059639c81325d1fc26a29ef004b58ee0d45b01dfd16ae15bee896",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "bd6e525d3d6582b39f3897b3898a1b46f518c47932d1ba36e405c218c46ee6aa",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_proportion",
+          1700,
+          -1
+        ],
+        [
+          "avg_complexity_ratio",
+          1700,
+          -1
+        ],
+        [
+          "avg_resolution_mm",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy_mm",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          1043,
+          54
+        ]
+      ],
+      "rows": 979,
+      "bag_digest": "405a9140aa57aaf215bcc4cc871071d42fc038671c72d285716234a3e553dd38",
+      "values_digest": "a8871d9f4def91ad60bc5cbcdd4401c8547025c57089b0ebb5dcf1caf8b5bc43",
+      "ordered_digest": "21e328a787e43a92f0251784d87609d0adb3f1df9984fe64dfc0617399522a29"
+    },
+    "79b83e43f62b80bff17431077934766e1db22b39581d1a390db27b5097054ff5": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_name,\r\n    COUNT(sm.facetregistry) AS total_mesh_count,\r\n    SUM(CASE WHEN sm.uvmapqual = 'High' THEN 1 ELSE 0 END) AS high_fidelity_mesh_count,\r\n    ROUND(CAST((SUM(CASE WHEN sm.uvmapqual = 'High' THEN 1 ELSE 0 END) * 100.0 / COUNT(sm.facetregistry)) AS DECIMAL), 2) AS high_fidelity_proportion,\r\n    AVG(sm.facetverts / sm.facetfaces) AS avg_complexity_ratio,\r\n    AVG(sm.facetresmm) AS avg_resolution_mm,\r\n    AVG(sm.geomdeltamm) AS avg_geometric_accuracy,\r\n    m.mesh_quality\r\nFROM \r\n    sites s\r\nJOIN \r\n    scanmesh sm ON s.zoneregistry = sm.zoneref\r\nJOIN \r\n    (SELECT zoneref, 'High Quality' AS mesh_quality FROM scanmesh WHERE uvmapqual = 'High'\r\n    UNION ALL\r\n    SELECT zoneref, 'Standard Quality' AS mesh_quality FROM scanmesh WHERE uvmapqual <> 'High') m\r\nON \r\n    s.zoneregistry = m.zoneref\r\nGROUP BY \r\n    s.zoneregistry, s.zonelabel, m.mesh_quality\r\nORDER BY \r\n    site_code DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "set operation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "add0a5eb9d6071b35640afbb34983d8359cb8ae5ff7bf7446b3bf931583f1607",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_proportion",
+          1700,
+          -1
+        ],
+        [
+          "avg_complexity_ratio",
+          1700,
+          -1
+        ],
+        [
+          "avg_resolution_mm",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          25,
+          -1
+        ]
+      ],
+      "rows": 968,
+      "bag_digest": "092b593de2befdd6e80b506b1bae819f4ce96f8ac821eb20e415c4d40f1f1f0a",
+      "values_digest": "b19d2bcc1050b1e4cbc71eeb2e2f188fe31f1d7be49bd2e2da6df8ea35234564",
+      "ordered_digest": "205cbb3395dd1115ccfa38f1cd34858c917ce9f5802174f180ea7025e956b947"
+    },
+    "8981ae6099b339acbe78d7260843782afd038aae6f233e3f4050262d025c1ede": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_name,\r\n    sm.uvmapqual AS scan_quality\r\nFROM \r\n    scanmesh sm\r\nJOIN \r\n    sites s ON sm.zoneref = s.zoneregistry\r\nORDER BY \r\n    sm.uvmapqual;",
+      "decisions": {
+        "N0": {
+          "key": "19239e5d32c0246d9f51fa4b82710e8c20aeeee6b89fd5f4d32ee1ad4bb78efe",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "d3450b64edfb8655a83e23e2eb75433c285fe08808adaa7dc56ff7861288dc77",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "5289ce6ad55e9e7f8c2abfc71e61e4b20201e46ff68c402682fc4fe4f02e307d",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "532869c61cdc031feae3b01ff1e6e8cca912bffccf2b11a3820e187ac459be54",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "331e791600e746564ee196ca2b4696064043c0388fa424806cabc52145611239",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "scan_quality",
+          1043,
+          54
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "23e1203ecd5c956bba492d5a7c430acb1ceb3a94c7b780e008559829efe30739",
+      "values_digest": "700296efe9f9fdcd13476d4b49766ac8120cfbc304fa0376f5df367b56b43055",
+      "ordered_digest": "a83141b61d1481642869473cbc83cfa09dc23b42815113974e487587d98b569a"
+    },
+    "dbde9c0906e1f81d1e2984a10d682454b92fba4e02fc009cfa91fdeb42f5762a": {
+      "sql": "SELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_name,\r\n    sp.uvmapqual AS scan_quality,\r\n    RANK() OVER (ORDER BY sp.uvmapqual DESC) AS quality_rank\r\nFROM \r\n    sites s\r\nJOIN \r\n    scanmesh sp ON s.zoneregistry = sp.zoneref\r\nORDER BY \r\n    quality_rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e3231980d2c53196bdff20230356eabdb27c67f11ea11b511116da2ba140a8dd",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "scan_quality",
+          1043,
+          54
+        ],
+        [
+          "quality_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "94e4ef7423d36a7baa5d44522623cc8d7e548086b36f53eca2b591d40d965317",
+      "values_digest": "3fd2701c4eb559f3c1088f9c1aeb54cbaaff4b1e8a5fedbc41480df416c5b261",
+      "ordered_digest": "56a645ec69c2c9595dd625a9228bb990da39b43e87ac8387ebb95927b4773994"
+    },
+    "8946916f5c8a244a2754a47db1cfaff01d3eba6d6dfc37f030c1d3bd8907142d": {
+      "sql": "SELECT \r\n    se.zoneref AS location_id,\r\n    s.zonelabel AS location_name,\r\n    AVG(\r\n        (\r\n            CASE \r\n                WHEN se.ambictemp BETWEEN 20 AND 30 THEN 100\r\n                WHEN se.ambictemp BETWEEN 10 AND 40 THEN \r\n                    CASE \r\n                        WHEN se.ambictemp < 20 THEN 100 - (20 - se.ambictemp) * 2.5\r\n                        ELSE 100 - (se.ambictemp - 30) * 2.5\r\n                    END\r\n                ELSE 0\r\n            END\r\n        ) * 0.4\r\n        + (\r\n            CASE \r\n                WHEN se.humepct BETWEEN 40 AND 60 THEN 100\r\n                WHEN se.humepct BETWEEN 20 AND 80 THEN \r\n                    CASE \r\n                        WHEN se.humepct < 40 THEN 100 - (40 - se.humepct) * 2.5\r\n                        ELSE 100 - (se.humepct - 60) * 2.5\r\n                    END\r\n                ELSE 0\r\n            END\r\n        ) * 0.3\r\n        + (\r\n            CASE \r\n                WHEN se.illumelux > 50000 THEN 100\r\n                WHEN se.illumelux > 10000 THEN \r\n                    100 - (50000 - se.illumelux) * 0.2\r\n                ELSE 0\r\n            END\r\n        ) * 0.3\r\n    ) AS average_scanning_suitability\r\nFROM \r\n    scanenvironment se\r\nJOIN \r\n    sites s ON se.zoneref = s.zoneregistry\r\nGROUP BY \r\n    se.zoneref, s.zonelabel\r\nORDER BY \r\n    average_scanning_suitability DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c65d1491e94314ec2a2b073c1630fc7a3fb5c0bed27063c7d8eea42596d14263",
+      "ordered": true,
+      "columns": [
+        [
+          "location_id",
+          1043,
+          16
+        ],
+        [
+          "location_name",
+          25,
+          -1
+        ],
+        [
+          "average_scanning_suitability",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "d97b5fdad1c6808dc532e3c1dc6c032cdfc7cb16e0cb3ab2d30146cfa695c690",
+      "values_digest": "4955fe9439282adfe20ddda6e773e4af3021eb664cb1f5ca3124786a32f27d3e",
+      "ordered_digest": "5da8834e144f471f1eedf12a485f9074a2f126a3001599d0e0468bad38ed4cd5"
+    },
+    "a77e8077be5b526135e5a384f58e986dfb88598d9979ed69bfccfd7888f2764e": {
+      "sql": "SELECT \r\n    sr.logregistry AS registration_id,\r\n    p.arcregistry AS project_id,\r\n    sr.logaccumm AS accuracy_measurements,\r\n    sr.errscale AS error_metrics,\r\n    sr.errvalmm AS error_value,\r\n    (sr.logaccumm / sr.errvalmm) AS calculated_ratio,\r\n    CASE \r\n        WHEN (sr.logaccumm / sr.errvalmm) > 0.8 THEN 'High'\r\n        WHEN (sr.logaccumm / sr.errvalmm) BETWEEN 0.5 AND 0.8 THEN 'Medium'\r\n        ELSE 'Low'\r\n    END AS confidence_level\r\nFROM \r\n    scanregistration AS sr\r\nJOIN \r\n    projects AS p ON sr.arcref = p.arcregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2a71a396af847b96d0fbaa6854173bbb966693be178f8b4f31e90129b3431f33",
+      "ordered": false,
+      "columns": [
+        [
+          "registration_id",
+          20,
+          -1
+        ],
+        [
+          "project_id",
+          1043,
+          54
+        ],
+        [
+          "accuracy_measurements",
+          1700,
+          327687
+        ],
+        [
+          "error_metrics",
+          1043,
+          24
+        ],
+        [
+          "error_value",
+          1700,
+          393223
+        ],
+        [
+          "calculated_ratio",
+          1700,
+          -1
+        ],
+        [
+          "confidence_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ec9c23170e7f613210c4029e9dbd1d1a8659c40dbe8daaa0eafb07e97ffbb1d1",
+      "values_digest": "ebb961fea507c5f96e797189216cb9772bc37f4930ae48c11c28613a57418fc5",
+      "ordered_digest": "d3cfd35773689c1e0570c6bb3f0c36e783f8b86d0ea47b42a4a2333a2c00ce43"
+    },
+    "f38ff76a515b3111e65fbac28e5694bd5bfa2215ca3b8385837a027ab43e7b89": {
+      "sql": "SELECT \r\n    sr.logregistry AS registration_id,\r\n    p.arcregistry AS project_id,\r\n    sr.logaccumm AS accuracy_measurements,\r\n    sr.errvalmm AS error_values,\r\n    (sr.logaccumm / sr.errvalmm) AS calculated_ratio,\r\n    CASE \r\n        WHEN (sr.logaccumm / sr.errvalmm) >= 0.9 THEN 'High'\r\n        WHEN (sr.logaccumm / sr.errvalmm) BETWEEN 0.7 AND 0.89 THEN 'Medium'\r\n        ELSE 'Low'\r\n    END AS confidence_level\r\nFROM \r\n    scanregistration sr\r\nJOIN \r\n    projects p ON sr.arcref = p.arcregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "83893195a52895d81175e3101baf0a2b65ac264a7e88ef80ff960057f3a552ee",
+      "ordered": false,
+      "columns": [
+        [
+          "registration_id",
+          20,
+          -1
+        ],
+        [
+          "project_id",
+          1043,
+          54
+        ],
+        [
+          "accuracy_measurements",
+          1700,
+          327687
+        ],
+        [
+          "error_values",
+          1700,
+          393223
+        ],
+        [
+          "calculated_ratio",
+          1700,
+          -1
+        ],
+        [
+          "confidence_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "bdc8e819ba50a80e53c05a93b6980f24424fc821ab6a71616fe7e21dbaa772bd",
+      "values_digest": "6de47b6f3b10f2e86792f83d2e82a623a0775ffc03fd0b39c8f987a475ee37e5",
+      "ordered_digest": "bc1f9da7e00dd1870335bbb34cea9056a3135cd64d4eaee863259edeffd9be62"
+    },
+    "8536355f5fc4144685ac5647b4fa07feeac7884d1bd70e30b31dc1dee170fadf": {
+      "sql": "SELECT \r\n    sr.logregistry AS registration_id,\r\n    sr.arcref AS project_id,\r\n    sr.logaccumm AS accuracy_measurements,\r\n    sr.errvalmm AS error_values,\r\n    (sr.logaccumm / sr.errvalmm) AS calculated_ratio\r\nFROM \r\n    scanregistration AS sr;",
+      "decisions": {
+        "N0": {
+          "key": "b49d635453b8c8dabea15d563978d5c2737d213a39860367b2a77f39fb8feea1",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "f2166337dd6ba964a001a50de2efb7476a8e4befd8053754f9a425fd9908a40f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "a8adf5b58389946302634f66a28af5203cba23627bd1ae06eff6a935121b828f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "c420e85e1f1708b0e886361ef1a7fc6110b5872c9971efdad9791690f4891e00",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "ada006679a848019ab95a7dec7837a6d4e90692ce6b3957b2935dd9522bb20aa",
+      "ordered": false,
+      "columns": [
+        [
+          "registration_id",
+          20,
+          -1
+        ],
+        [
+          "project_id",
+          1043,
+          54
+        ],
+        [
+          "accuracy_measurements",
+          1700,
+          327687
+        ],
+        [
+          "error_values",
+          1700,
+          393223
+        ],
+        [
+          "calculated_ratio",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "36e8bee13dd93e662b34da87d96b9473fda46488a952ed4da6858a16e8189d74",
+      "values_digest": "0304aa49fca94ddd71ca3341f79e1d93b39ed876053c1302b1f526b21bc6e5a7",
+      "ordered_digest": "6db28147a8a1383085563be4d8cf10684b60bb5ced77a1e939fc0219f64e6031"
+    },
+    "7aa4c2fb7a742a905318b6b52af670f99eb34875655b2efd1654e74222f4f5ec": {
+      "sql": "SELECT \r\n    sr.logregistry AS registration_id,\r\n    sr.arcref AS project_id,\r\n    sr.logaccumm AS accuracy_measurements,\r\n    sr.errvalmm AS error_values,\r\n    (sr.logaccumm / sr.errvalmm) AS calculated_ratio,\r\n    CASE \r\n        WHEN (sr.logaccumm / sr.errvalmm) > 1.5 THEN 'High Confidence' \r\n        WHEN (sr.logaccumm / sr.errvalmm) BETWEEN 1.0 AND 1.5 THEN 'Medium Confidence' \r\n        ELSE 'Low Confidence' \r\n    END AS confidence_level\r\nFROM \r\n    scanregistration AS sr\r\nJOIN \r\n    projects AS p ON sr.arcref = p.arcregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "be714c5291715953684522fe966d22dfe49b20ee95a5a234e9b7d39a3eb396a4",
+      "ordered": false,
+      "columns": [
+        [
+          "registration_id",
+          20,
+          -1
+        ],
+        [
+          "project_id",
+          1043,
+          54
+        ],
+        [
+          "accuracy_measurements",
+          1700,
+          327687
+        ],
+        [
+          "error_values",
+          1700,
+          393223
+        ],
+        [
+          "calculated_ratio",
+          1700,
+          -1
+        ],
+        [
+          "confidence_level",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "2bbb810ada36538071c467f7f5f9bdc9371ccff142cbd5b164691b84279a0e97",
+      "values_digest": "ef05b33eaa7a7d0328c565e2d3cff75e799b414d4b00e279d7d8e42a13e3704c",
+      "ordered_digest": "08f8b5b08472e0073ccc889088bd24993840885b766a058914ac5dde658357b2"
+    },
+    "31cab0311922b9f4d8807d7dd1e47e072764b987eeab0ec4d8eef777e04b894f": {
+      "sql": "SELECT \r\n    zoneregistry AS site_code,\r\n    zonelabel AS site_designation,\r\n    CASE \r\n        WHEN presstat = 'Excellent' THEN 5\r\n        WHEN presstat = 'Good' THEN 4\r\n        WHEN presstat = 'Fair' THEN 3\r\n        WHEN presstat = 'Poor' THEN 2\r\n        WHEN presstat = 'Critical' THEN 1\r\n        ELSE 0\r\n    END AS quality_index\r\nFROM \r\n    sites\r\nORDER BY \r\n    quality_index DESC;",
+      "decisions": {
+        "N0": {
+          "key": "1842c4c4f1cd0921dafe6113046e3aa6a8af6df1f579d20b6c31bcfae0ba27de",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "27e31be885de7077ec616e6ffdfb517ed2f3712efbebd337ce5586c7afec1ee0",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "ddf99fffdb3100b0fc7be64cf078c4ff6b6369233b45459887b89e090b15c1ec",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "8dd49c023128e4ca84a41d75408ce2d88a4e8124d7d6f92b9f1dfa6a6971d386",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "5913910b0b47ad402c4402fbe2797e3239bc89bcda25201f2f83ded9cbe65e8c",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_designation",
+          25,
+          -1
+        ],
+        [
+          "quality_index",
+          23,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "4d20ebf9040c8815c735b0cd366a103f7d4c995febe7b549a1f78a7fe2eecde9",
+      "values_digest": "29b6c4f00661c59c02d2d1beb252d7de8a7fe77734db8e08e401cd7bd64e4026",
+      "ordered_digest": "d76dc57c1dd97929b8033ed7e2e4f2fe3abab4ae1b5437be00ad86a253eb0766"
+    },
+    "24df09a840fbed9612fa9a7a37396151fbb13df24e4343b0f8bb617da838979d": {
+      "sql": "SELECT \r\n    zoneregistry AS site_code,\r\n    zonelabel AS site_designation,\r\n    CASE presstat \r\n        WHEN 'Excellent' THEN 5\r\n        WHEN 'Good' THEN 4\r\n        WHEN 'Fair' THEN 3\r\n        WHEN 'Poor' THEN 2\r\n        WHEN 'Critical' THEN 1\r\n    END AS quality_index\r\nFROM \r\n    sites\r\nORDER BY \r\n    quality_index DESC;",
+      "decisions": {
+        "N0": {
+          "key": "54c8b57b67b185ee5256e85539c928d0e41f7df5496726a188d76b52014baa00",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "15627ed5f894866db504014385fe038853d2a9e3b536e5d03e76687eac966e1c",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "8d1917ac9a99f8f31f1f5e01d312ce9c727dab19dbef07c301430e1c4984db07",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "bcc2c0c07b628092392a86254d924d42fb0c8420b52c97e31f6cd9039a535232",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "fa859853dda20690c74ee3df9a109e02b75940205e08c00b3bbdf8864bb93373",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_designation",
+          25,
+          -1
+        ],
+        [
+          "quality_index",
+          23,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "4d20ebf9040c8815c735b0cd366a103f7d4c995febe7b549a1f78a7fe2eecde9",
+      "values_digest": "29b6c4f00661c59c02d2d1beb252d7de8a7fe77734db8e08e401cd7bd64e4026",
+      "ordered_digest": "d76dc57c1dd97929b8033ed7e2e4f2fe3abab4ae1b5437be00ad86a253eb0766"
+    },
+    "2ace657171c3d45333cb7fbd7c28519cc41100abdb55f1bbfe6b4c71c0ca505d": {
+      "sql": "SELECT \r\n    zoneregistry AS site_code,\r\n    zonelabel AS site_designation,\r\n    COUNT(*) AS quality_index\r\nFROM \r\n    sites\r\nGROUP BY \r\n    zoneregistry, zonelabel, presstat\r\nORDER BY \r\n    quality_index DESC;",
+      "decisions": {
+        "N0": {
+          "key": "052970096314ca6dadad2c14f924906dd38a785ca43799f4ba740b221405c290",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "5a700ece6a43a30bcfb1f0a717d80264f2322e1e4dab4c20d57e98eb916772ee",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "923fdf4c1fd7ab4bb0cd56693679f1d51a5a7ba83a141b3c803bccbbe413bfb0",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "7ea3b9034bf1aa75278bc887116e47b563a89b5301d1c7ba5cb092527626ffe7",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "b8afd166a5cbb957341a05efd87690e1ca0461143928ca35bdce6136ccc32098",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_designation",
+          25,
+          -1
+        ],
+        [
+          "quality_index",
+          20,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "9f3a2cd6fb854141ef4d214c5a132c60322482d33918fbd0c4203df2f330a042",
+      "values_digest": "066212515d6b4574930f3dcfc933454f99c3bd05e04bf310b25e048454340816",
+      "ordered_digest": "cdc4eb7539b970025ebe15404055a637a052c38e99fde18f0411f4d71cac9254"
+    },
+    "30e4192fe5136b7fa2c8fcf2c5aeb97e88a0b28c022e69e13e5834c147650a17": {
+      "sql": "SELECT *\nFROM scanmesh\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "df9a889f548632499835da4ecfbb983575fbdd5aae60ebae95119f492e672dbe",
+      "ordered": false,
+      "columns": [
+        [
+          "facetregistry",
+          20,
+          -1
+        ],
+        [
+          "zoneref",
+          1043,
+          16
+        ],
+        [
+          "equipref",
+          1042,
+          54
+        ],
+        [
+          "facetverts",
+          20,
+          -1
+        ],
+        [
+          "facetfaces",
+          20,
+          -1
+        ],
+        [
+          "facetresmm",
+          1700,
+          327686
+        ],
+        [
+          "texdist",
+          1043,
+          9
+        ],
+        [
+          "texpix",
+          23,
+          -1
+        ],
+        [
+          "uvmapqual",
+          1043,
+          54
+        ],
+        [
+          "geomdeltamm",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "86b76e2eba024c485313dc2cae2e6e9a1f0467455e2024e7ecf615a8aecc7701",
+      "values_digest": "c9eada46b6af770141cbd69790ea92642570e626c8ba8b4eddd6bc36e98e697e",
+      "ordered_digest": "86b76e2eba024c485313dc2cae2e6e9a1f0467455e2024e7ecf615a8aecc7701"
+    },
+    "ad0281247caef984b7736bc5712ab831225fb0cd276dd1b7ce102ef91bc39c47": {
+      "sql": "SELECT *\nFROM scanregistration;",
+      "decisions": {
+        "N0": {
+          "key": "02596f46a90385dfef0a4486ef2c411ff4f2be5e3090149cfce837b6ef3db794",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "92cb589c300f85549bd89ed84cf8556aba1a34e4dbb27c39fbf427994c0c981a",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "95da7b686cd429c16db2db27c3535fd0f2c4e148c4892a598887aa3a7a895432",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "603ec4b0e081f727981a8e66f4199c2ca8dd1bb877a1e4af0fb55bfa3dd553e3",
+          "reason": "",
+          "proposal": "verified"
+        }
+      },
+      "tree_digest": "4659ed7be341f3682a9951cdfdc0e2e9ce51f578da4f8730b1f31282b0dc4789",
+      "ordered": false,
+      "columns": [
+        [
+          "logregistry",
+          20,
+          -1
+        ],
+        [
+          "crewref",
+          1042,
+          54
+        ],
+        [
+          "arcref",
+          1043,
+          54
+        ],
+        [
+          "logaccumm",
+          1700,
+          327687
+        ],
+        [
+          "refmark",
+          1043,
+          10
+        ],
+        [
+          "ctrlpts",
+          1043,
+          10
+        ],
+        [
+          "logmethod",
+          1043,
+          19
+        ],
+        [
+          "transform",
+          1043,
+          19
+        ],
+        [
+          "errscale",
+          1043,
+          24
+        ],
+        [
+          "errvalmm",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "aa50390cc597f41839ff832b57b08f4a016d7a297b4c1d7c55279d39f7a51043",
+      "values_digest": "13575e91668137136cb6f8e38d95acfe4cca0e78ae794f8456fcb7cb8166cfd5",
+      "ordered_digest": "b26dc84149988c081e77ff14794b9620296af848d67aa064b9d67a48ff90d34e"
+    },
+    "88177c336e2f3cf0e74947d7ffb71d955af058c048df939b698e769735f27910": {
+      "sql": "SELECT *\nFROM sites\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "072fbbfa1e1221a591fb5b671165a5c1155f104f291f610217de87c4baad60bc",
+      "ordered": false,
+      "columns": [
+        [
+          "zoneregistry",
+          1043,
+          16
+        ],
+        [
+          "zonelabel",
+          25,
+          -1
+        ],
+        [
+          "digunit",
+          1043,
+          54
+        ],
+        [
+          "gridtrace",
+          1043,
+          16
+        ],
+        [
+          "geox",
+          1700,
+          524297
+        ],
+        [
+          "geoy",
+          1700,
+          524297
+        ],
+        [
+          "heightm",
+          1700,
+          458757
+        ],
+        [
+          "depthc",
+          1700,
+          458757
+        ],
+        [
+          "phasefactor",
+          1043,
+          29
+        ],
+        [
+          "guessdate",
+          1043,
+          24
+        ],
+        [
+          "typesite",
+          1043,
+          29
+        ],
+        [
+          "presstat",
+          1043,
+          29
+        ],
+        [
+          "guardhint",
+          1042,
+          54
+        ],
+        [
+          "entrystat",
+          1043,
+          54
+        ],
+        [
+          "saferank",
+          1043,
+          19
+        ],
+        [
+          "insurstat",
+          1043,
+          19
+        ],
+        [
+          "riskeval",
+          25,
+          -1
+        ],
+        [
+          "healtheval",
+          1043,
+          16
+        ],
+        [
+          "envhaz",
+          1042,
+          54
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "9c701e73c126b2be4f60d352b483c2fdab84b9420dea1f941f67ffb2e7a2b00c",
+      "values_digest": "b80ef07f7b25c7cec5fd7079cf3f97763828736320586eec91c4d76af16b7c0f",
+      "ordered_digest": "5d92f895508320e0c40f2682888a538f89fb8eccad4cda8aaab8c4e909af3740"
+    },
+    "5ebf07155b4d6be22fe73b80eb0ccea15c26d237c3d7dbf18093c6987f1c4b0b": {
+      "sql": "SELECT * FROM scanmesh LIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9f8cbb2ca65dc482d9af12c8adda106cda76f91f16ff98d333fa6309ac21b153",
+      "ordered": false,
+      "columns": [
+        [
+          "facetregistry",
+          20,
+          -1
+        ],
+        [
+          "zoneref",
+          1043,
+          16
+        ],
+        [
+          "equipref",
+          1042,
+          54
+        ],
+        [
+          "facetverts",
+          20,
+          -1
+        ],
+        [
+          "facetfaces",
+          20,
+          -1
+        ],
+        [
+          "facetresmm",
+          1700,
+          327686
+        ],
+        [
+          "texdist",
+          1043,
+          9
+        ],
+        [
+          "texpix",
+          23,
+          -1
+        ],
+        [
+          "uvmapqual",
+          1043,
+          54
+        ],
+        [
+          "geomdeltamm",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "3e755098958c374e08f77a8150780f575fd9340001499f022920e36bf8ec8611",
+      "values_digest": "181f945238de5bb91b8af0895b73701a50dc5422a3dfe575920425892ffea109",
+      "ordered_digest": "c918e09708ddef927cb4bf96f79d2c9c579191f1ba5044cb791425cc51ed449b"
+    },
+    "d2898e19aaca43a8731868b2adda0f15b991d575530d602bf6b7adc368fde669": {
+      "sql": "SELECT DISTINCT riskeval\nFROM sites;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6efded8aae55cf065d38894b6d320156fba175bceb5dd8679e5f8e8a16f46214",
+      "ordered": false,
+      "columns": [
+        [
+          "riskeval",
+          25,
+          -1
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "60f6a4e8b6f52831f387eb21b1220460751bb08c7919aa2db0b325e96c5a039a",
+      "values_digest": "ff2f0682d8c03f0b59f8e19ff03357c927860f17668ebb055d91f8d790326283",
+      "ordered_digest": "cd3bd8ba0743a907616037f35ea788f843ae6ee3c9d38c55decfcf2900545def"
+    },
+    "a91e11e276572e0a585e3a39935c257888beb39572bff9f12cfd2554ef17be2d": {
+      "sql": "SELECT DISTINCT texdist\nFROM scanmesh;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "165ea861f90527f7afda6d87e8476e937bf1713cf753361f0fc12e1c0a507738",
+      "ordered": false,
+      "columns": [
+        [
+          "texdist",
+          1043,
+          9
+        ]
+      ],
+      "rows": 4,
+      "bag_digest": "c2bb7259b04df535e52abf8bbe125f5a77b70621ce40b43322e8dd5e48d9d822",
+      "values_digest": "f8a04513507fcb7ac44189220498d3c5581553a38310764a1280bdaa8acf80ea",
+      "ordered_digest": "ddf4d5822cc19084aedcb3223e28ecbd4a2b7e624919b77680aeda3d4407e28e"
+    },
+    "6860cbf4231ac4139a60858978488246fefa06a075b2abfab1cdeb8cab8fbd66": {
+      "sql": "SELECT DISTINCT(archstat)\nFROM scanqc;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c4f5e07d583d0e6e07ee73cc4a776fecb762a93216b440f6114c0349d0c4892c",
+      "ordered": false,
+      "columns": [
+        [
+          "archstat",
+          1043,
+          54
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "24e40cab1d06d670b9dc80effd348191270069c6e161643073cdb65b7d7e4596",
+      "values_digest": "37aa9a8dd8be1fab5dc7a5e14edae68b622e919fbebbac79da8d321472700f79",
+      "ordered_digest": "fd1199c4d3467a9db6db9849dc1c08b7c9e0eea8d3282756f09e917cc9722240"
+    },
+    "ec228fc116107c4223e71209d3e57934fbc196f6470e71fcafa016ca108b269b": {
+      "sql": "SELECT DISTINCT(valistate)\nFROM scanqc;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a5aa2e95a0593d3a299f3da2d30c900ce421526a15b36811fa0ff269cf6fc43e",
+      "ordered": false,
+      "columns": [
+        [
+          "valistate",
+          25,
+          -1
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "fb9222d1c14965c739b0d87020916e1f7d85de18e57ffdf61611ea05da81053c",
+      "values_digest": "c8de6355ef33a260a09c8e123b9f6182fe2749aab1b4702f34e68cceda336915",
+      "ordered_digest": "533125590fdf9cb4f96c063336e04d3370426902641483fbe8d8096d400e7563"
+    },
+    "bde977b5d30c9a74b2e60add33be59714ff46bb1545f95e538437171468cc2cf": {
+      "sql": "SELECT column_name\nFROM information_schema.columns\nWHERE table_name = 'sites';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8cbbdf0b5335f91a294d5c688a4f44716a54c97a1bcae125708f3c5e663f8c4b",
+      "ordered": false,
+      "columns": [
+        [
+          "column_name",
+          19,
+          -1
+        ]
+      ],
+      "rows": 19,
+      "bag_digest": "5d21adb3aa2ef138113ebea6f17f1c76be45ff89fecec46b79cc18cf888153d7",
+      "values_digest": "7e65097cccc22e7b1381904ad6e4c0a10803bea4b67292ee6b3861c48e37781d",
+      "ordered_digest": "221e2a1ce9dd885d32eaa6d9856e96415db5bf7c5eb48322290671e643a65f1c"
+    },
+    "5850b830150cf336700e11c0c05e2ef1ec7db9345194b89b89de3f430dd68b5f": {
+      "sql": "WITH MeshMetrics AS (\n    SELECT \n        sm.zoneref,\n        COUNT(*) AS total_mesh_count,\n        SUM(CASE WHEN sm.uvmapqual = 'High' THEN 1 ELSE 0 END) AS high_fidelity_mesh_count,\n        AVG(CAST(sm.facetverts AS FLOAT) / sm.facetfaces) AS avg_complexity_ratio,\n        AVG(sm.facetresmm) AS avg_resolution_mm,\n        AVG(sm.geomdeltamm) AS avg_geometric_accuracy_mm,\n        sm.uvmapqual AS mesh_quality\n    FROM \n        scanmesh AS sm\n    GROUP BY \n        sm.zoneref, sm.uvmapqual\n),\nSiteInfo AS (\n    SELECT \n        s.zoneregistry, \n        s.zonelabel\n    FROM \n        sites AS s\n)\nSELECT \n    si.zoneregistry AS site_code,\n    si.zonelabel AS site_name,\n    mm.total_mesh_count,\n    mm.high_fidelity_mesh_count,\n    ROUND((mm.high_fidelity_mesh_count * 100.0 / mm.total_mesh_count), 2) AS high_fidelity_proportion_percent,\n    mm.avg_complexity_ratio,\n    mm.avg_resolution_mm,\n    mm.avg_geometric_accuracy_mm,\n    mm.mesh_quality\nFROM \n    MeshMetrics AS mm\nJOIN \n    SiteInfo AS si ON mm.zoneref = si.zoneregistry\nORDER BY \n    site_code DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "052de5bcb190c00866ce580defb112b8cbc7cde63707bf6fcd165da8ab9b9777",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_proportion_percent",
+          1700,
+          -1
+        ],
+        [
+          "avg_complexity_ratio",
+          701,
+          -1
+        ],
+        [
+          "avg_resolution_mm",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy_mm",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          1043,
+          54
+        ]
+      ],
+      "rows": 979,
+      "bag_digest": "0a3df6700682d5832a109b47754500db63d0628a4219fefe9051aa78def6d169",
+      "values_digest": "0f91b094cb2870bb37debc2c3832ff4efa8844bafba63ef2ba419d9f6f3c6dd9",
+      "ordered_digest": "753d20d395bf204173441ed4476bb42ab851fc29747d98f486d9f226d97a7ff1"
+    },
+    "fc930584ffe5045edd0a8c153f28ce427ac156c3bbe60ca8c01790d2b1c6412e": {
+      "sql": "WITH RankedScans AS (\r\n    SELECT \r\n        arcref, \r\n        cloudregistry, \r\n        scanresolmm, \r\n        coverpct, \r\n        noisedb, \r\n        (\r\n            (10.0 / scanresolmm) ^ 1.5 \r\n            * (coverpct / 100.0) \r\n            * (1 - (noisedb / 30.0)) ^ 2\r\n        ) AS sqs, \r\n        RANK() OVER (PARTITION BY arcref ORDER BY (\r\n            (10.0 / scanresolmm) ^ 1.5 \r\n            * (coverpct / 100.0) \r\n            * (1 - (noisedb / 30.0)) ^ 2\r\n        ) DESC) AS rank\r\n    FROM \r\n        scanpointcloud\r\n)\r\nSELECT \r\n    arcref, \r\n    cloudregistry, \r\n    scanresolmm, \r\n    coverpct, \r\n    noisedb, \r\n    sqs\r\nFROM \r\n    RankedScans\r\nWHERE \r\n    rank > 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cebb341a15ec00b8ffaa03f934461b1a73c54ea697544d23b471ce2d1fb08190",
+      "ordered": false,
+      "columns": [
+        [
+          "arcref",
+          1043,
+          54
+        ],
+        [
+          "cloudregistry",
+          20,
+          -1
+        ],
+        [
+          "scanresolmm",
+          1700,
+          327686
+        ],
+        [
+          "coverpct",
+          1700,
+          262149
+        ],
+        [
+          "noisedb",
+          1700,
+          393223
+        ],
+        [
+          "sqs",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 53,
+      "bag_digest": "d1561544e358c041d2776eaa0dbd15832dafdabc026e5f4d4638ed1aaa2079df",
+      "values_digest": "8e8c07390f50c5b4e8f14cba579cbb891b62422748339e685f1078c7ce10d570",
+      "ordered_digest": "c9eeebc698dfd1fa42deed7c48f5733bf7b6d81f89d95e041c194257df8a3ba6"
+    },
+    "a508d7a200c800cc62cf0ec52ee5d87df7400db90fd91554a7236630a5fd7457": {
+      "sql": "WITH SiteAverages AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        AVG(se.ambictemp) AS avg_temperature,\r\n        AVG(se.humepct) AS avg_humidity,\r\n        AVG(se.illumelux) AS avg_illumination\r\n    FROM \r\n        scanenvironment AS se\r\n    GROUP BY \r\n        se.zoneref\r\n),\r\nSiteSuitability AS (\r\n    SELECT \r\n        sa.site_code,\r\n        NTILE(4) OVER (ORDER BY (sa.avg_temperature + sa.avg_humidity + sa.avg_illumination) / 3) AS suitability_quartile\r\n    FROM \r\n        SiteAverages AS sa\r\n),\r\nEnvironmentalConditions AS (\r\n    SELECT \r\n        ss.site_code,\r\n        CASE \r\n            WHEN ss.avg_temperature BETWEEN -5 AND 5 THEN 'Cold' \r\n            WHEN ss.avg_temperature BETWEEN 6 AND 15 THEN 'Cool' \r\n            WHEN ss.avg_temperature BETWEEN 16 AND 25 THEN 'Mild' \r\n            ELSE 'Hot' \r\n        END AS temperature_category,\r\n        CASE \r\n            WHEN ss.avg_humidity < 30 THEN 'Dry' \r\n            WHEN ss.avg_humidity BETWEEN 30 AND 60 THEN 'Moderate' \r\n            ELSE 'Humid' \r\n        END AS humidity_category,\r\n        CASE \r\n            WHEN ss.avg_illumination < 10000 THEN 'Low Light' \r\n            WHEN ss.avg_illumination BETWEEN 10000 AND 50000 THEN 'Moderate Light' \r\n            ELSE 'High Light' \r\n        END AS illumination_category\r\n    FROM \r\n        SiteAverages AS ss\r\n)\r\nSELECT \r\n    s.zonelabel AS site_name,\r\n    s.digunit AS excavation_unit,\r\n    s.gridtrace AS grid_reference,\r\n    s.geox AS latitude,\r\n    s.geoy AS longitude,\r\n    s.heightm AS altitude,\r\n    s.depthc AS depth,\r\n    s.phasefactor AS cultural_period,\r\n    s.guessdate AS estimated_date,\r\n    s.typesite AS site_type,\r\n    s.presstat AS preservation_status,\r\n    s.guardhint AS weather_protection,\r\n    s.entrystat AS site_access_status,\r\n    s.saferank AS security_level,\r\n    s.insurstat AS insurance_status,\r\n    s.riskeval AS risk_assessment_status,\r\n    s.healtheval AS health_safety_status,\r\n    s.envhaz AS environmental_risk,\r\n    sa.avg_temperature,\r\n    sa.avg_humidity,\r\n    sa.avg_illumination,\r\n    ss.suitability_quartile,\r\n    ec.temperature_category,\r\n    ec.humidity_category,\r\n    ec.illumination_category\r\nFROM \r\n    sites AS s\r\nJOIN \r\n    SiteAverages AS sa ON s.zoneregistry = sa.site_code\r\nLEFT JOIN \r\n    SiteSuitability AS ss ON sa.site_code = ss.site_code\r\nLEFT JOIN \r\n    EnvironmentalConditions AS ec ON sa.site_code = ec.site_code\r\nORDER BY \r\n    s.zonelabel;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0a9b32a7ab19008a58ef7e58eac496ee97212ab4adb85534759534df11125425",
+      "ordered": true,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "excavation_unit",
+          1043,
+          54
+        ],
+        [
+          "grid_reference",
+          1043,
+          16
+        ],
+        [
+          "latitude",
+          1700,
+          524297
+        ],
+        [
+          "longitude",
+          1700,
+          524297
+        ],
+        [
+          "altitude",
+          1700,
+          458757
+        ],
+        [
+          "depth",
+          1700,
+          458757
+        ],
+        [
+          "cultural_period",
+          1043,
+          29
+        ],
+        [
+          "estimated_date",
+          1043,
+          24
+        ],
+        [
+          "site_type",
+          1043,
+          29
+        ],
+        [
+          "preservation_status",
+          1043,
+          29
+        ],
+        [
+          "weather_protection",
+          1042,
+          54
+        ],
+        [
+          "site_access_status",
+          1043,
+          54
+        ],
+        [
+          "security_level",
+          1043,
+          19
+        ],
+        [
+          "insurance_status",
+          1043,
+          19
+        ],
+        [
+          "risk_assessment_status",
+          25,
+          -1
+        ],
+        [
+          "health_safety_status",
+          1043,
+          16
+        ],
+        [
+          "environmental_risk",
+          1042,
+          54
+        ],
+        [
+          "avg_temperature",
+          1700,
+          -1
+        ],
+        [
+          "avg_humidity",
+          1700,
+          -1
+        ],
+        [
+          "avg_illumination",
+          1700,
+          -1
+        ],
+        [
+          "suitability_quartile",
+          23,
+          -1
+        ],
+        [
+          "temperature_category",
+          25,
+          -1
+        ],
+        [
+          "humidity_category",
+          25,
+          -1
+        ],
+        [
+          "illumination_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "ae59264088508f8532a0343d5cfa8062273ce19e759e2df060eaeb2b3b900b35",
+      "values_digest": "6c6a38e5e035e9891a7cce0a2824539aa7aee67abbd52c03ed48f2c7d2679c2d",
+      "ordered_digest": "9dcd8d59600164c0f20f763a95fb92803a01e1aa9175a363bcdea577efc4a44b"
+    },
+    "ddad1e9dc00a9b1d97275c3925e538d78bf2a1b22b696643bf980dc1ab81d9d1": {
+      "sql": "WITH SiteAverages AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        AVG(se.ambictemp) AS avg_temperature,\r\n        AVG(se.humepct) AS avg_humidity,\r\n        AVG(se.illumelux) AS avg_illumination\r\n    FROM \r\n        scanenvironment se\r\n    GROUP BY \r\n        se.zoneref\r\n),\r\nSiteSuitability AS (\r\n    SELECT \r\n        sc.zoneref AS site_code,\r\n        NTILE(4) OVER (ORDER BY sc.curerank) AS suitability_quartile\r\n    FROM \r\n        scanconservation sc\r\n),\r\nEnvironmentalConditions AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        CASE \r\n            WHEN AVG(se.ambictemp) > 85 THEN 'Optimal Scanning Conditions'\r\n            WHEN AVG(se.ambictemp) BETWEEN 70 AND 85 THEN 'Good Scanning Conditions'\r\n            WHEN AVG(se.ambictemp) BETWEEN 50 AND 70 THEN 'Acceptable Scanning Conditions'\r\n            ELSE 'Challenging Scanning Conditions'\r\n        END AS environmental_condition\r\n    FROM \r\n        scanenvironment se\r\n    GROUP BY \r\n        se.zoneref\r\n)\r\nSELECT \r\n    s.zonelabel AS site_name,\r\n    s.digunit AS excavation_unit,\r\n    s.gridtrace AS grid_reference,\r\n    s.geox AS latitude,\r\n    s.geoy AS longitude,\r\n    s.heightm AS altitude,\r\n    s.depthc AS depth,\r\n    s.phasefactor AS cultural_period,\r\n    s.guessdate AS estimated_date,\r\n    s.typesite AS site_type,\r\n    s.presstat AS preservation_status,\r\n    s.guardhint AS weather_protection,\r\n    s.entrystat AS site_access_status,\r\n    s.saferank AS security_level,\r\n    s.insurstat AS insurance_status,\r\n    s.riskeval AS risk_assessment_status,\r\n    s.healtheval AS health_safety_status,\r\n    s.envhaz AS environmental_risk,\r\n    sa.avg_temperature,\r\n    sa.avg_humidity,\r\n    sa.avg_illumination,\r\n    ss.suitability_quartile,\r\n    ec.environmental_condition\r\nFROM \r\n    sites s\r\nJOIN \r\n    SiteAverages sa ON s.zoneregistry = sa.site_code\r\nLEFT JOIN \r\n    SiteSuitability ss ON s.zoneregistry = ss.site_code\r\nLEFT JOIN \r\n    EnvironmentalConditions ec ON s.zoneregistry = ec.site_code;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "812634eadb7acb0427236691f9e279d39a6d23379a8ff879e95438bebdb1b36e",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "excavation_unit",
+          1043,
+          54
+        ],
+        [
+          "grid_reference",
+          1043,
+          16
+        ],
+        [
+          "latitude",
+          1700,
+          524297
+        ],
+        [
+          "longitude",
+          1700,
+          524297
+        ],
+        [
+          "altitude",
+          1700,
+          458757
+        ],
+        [
+          "depth",
+          1700,
+          458757
+        ],
+        [
+          "cultural_period",
+          1043,
+          29
+        ],
+        [
+          "estimated_date",
+          1043,
+          24
+        ],
+        [
+          "site_type",
+          1043,
+          29
+        ],
+        [
+          "preservation_status",
+          1043,
+          29
+        ],
+        [
+          "weather_protection",
+          1042,
+          54
+        ],
+        [
+          "site_access_status",
+          1043,
+          54
+        ],
+        [
+          "security_level",
+          1043,
+          19
+        ],
+        [
+          "insurance_status",
+          1043,
+          19
+        ],
+        [
+          "risk_assessment_status",
+          25,
+          -1
+        ],
+        [
+          "health_safety_status",
+          1043,
+          16
+        ],
+        [
+          "environmental_risk",
+          1042,
+          54
+        ],
+        [
+          "avg_temperature",
+          1700,
+          -1
+        ],
+        [
+          "avg_humidity",
+          1700,
+          -1
+        ],
+        [
+          "avg_illumination",
+          1700,
+          -1
+        ],
+        [
+          "suitability_quartile",
+          23,
+          -1
+        ],
+        [
+          "environmental_condition",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "78ab6794ee29446dfe3012212f66473f99b1f67dfb07428c5d9e2f71a0110354",
+      "values_digest": "edb2886ca2daae7091aef40ced3a09664cc91a5dd6ba612959a9c17022322356",
+      "ordered_digest": "2b3afcc8e018d346933dd1a7aedfff4c1dec722e78e650ba1fbfe9b9b3769dd0"
+    },
+    "d59ceb2dc72984a1e2ce83e65c5e1266546b92140e3423a01bdbcb672e66283a": {
+      "sql": "WITH SiteAverages AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        AVG(se.ambictemp) AS avg_temperature,\r\n        AVG(se.humepct) AS avg_humidity,\r\n        AVG(se.illumelux) AS avg_illumination\r\n    FROM \r\n        scanenvironment se\r\n    GROUP BY \r\n        se.zoneref\r\n),\r\nSiteSuitability AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        NTILE(4) OVER (ORDER BY AVG(se.ambictemp) + AVG(se.humepct) + AVG(se.illumelux)) AS suitability_quartile\r\n    FROM \r\n        scanenvironment se\r\n    GROUP BY \r\n        se.zoneref\r\n),\r\nSiteECC AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        CASE \r\n            WHEN (AVG(se.ambictemp) + AVG(se.humepct) + AVG(se.illumelux)) > 85 THEN 'Optimal Scanning Conditions'\r\n            WHEN (AVG(se.ambictemp) + AVG(se.humepct) + AVG(se.illumelux)) BETWEEN 70 AND 85 THEN 'Good Scanning Conditions'\r\n            WHEN (AVG(se.ambictemp) + AVG(se.humepct) + AVG(se.illumelux)) BETWEEN 50 AND 70 THEN 'Acceptable Scanning Conditions'\r\n            ELSE 'Challenging Scanning Conditions'\r\n        END AS eccs_category\r\n    FROM \r\n        scanenvironment se\r\n    GROUP BY \r\n        se.zoneref\r\n)\r\nSELECT \r\n    s.zonelabel AS site_name,\r\n    s.digunit AS excavation_unit,\r\n    s.gridtrace AS grid_reference,\r\n    s.geox AS latitude,\r\n    s.geoy AS longitude,\r\n    s.heightm AS altitude,\r\n    s.depthc AS depth,\r\n    s.phasefactor AS cultural_period,\r\n    s.guessdate AS estimated_date,\r\n    s.typesite AS site_type,\r\n    s.presstat AS preservation_status,\r\n    s.guardhint AS weather_protection,\r\n    s.entrystat AS site_access_status,\r\n    s.saferank AS security_level,\r\n    s.insurstat AS insurance_status,\r\n    s.riskeval AS risk_assessment_status,\r\n    s.healtheval AS health_safety_status,\r\n    s.envhaz AS environmental_risk,\r\n    sa.avg_temperature,\r\n    sa.avg_humidity,\r\n    sa.avg_illumination,\r\n    ss.suitability_quartile,\r\n    sec.eccs_category\r\nFROM \r\n    sites s\r\nJOIN \r\n    SiteAverages sa ON s.zoneregistry = sa.site_code\r\nJOIN \r\n    SiteSuitability ss ON s.zoneregistry = ss.site_code\r\nJOIN \r\n    SiteECC sec ON s.zoneregistry = sec.site_code;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8046c1bd2293b09532bfeb4ff1f84d7850681b4fc88abe53358c292719277bec",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "excavation_unit",
+          1043,
+          54
+        ],
+        [
+          "grid_reference",
+          1043,
+          16
+        ],
+        [
+          "latitude",
+          1700,
+          524297
+        ],
+        [
+          "longitude",
+          1700,
+          524297
+        ],
+        [
+          "altitude",
+          1700,
+          458757
+        ],
+        [
+          "depth",
+          1700,
+          458757
+        ],
+        [
+          "cultural_period",
+          1043,
+          29
+        ],
+        [
+          "estimated_date",
+          1043,
+          24
+        ],
+        [
+          "site_type",
+          1043,
+          29
+        ],
+        [
+          "preservation_status",
+          1043,
+          29
+        ],
+        [
+          "weather_protection",
+          1042,
+          54
+        ],
+        [
+          "site_access_status",
+          1043,
+          54
+        ],
+        [
+          "security_level",
+          1043,
+          19
+        ],
+        [
+          "insurance_status",
+          1043,
+          19
+        ],
+        [
+          "risk_assessment_status",
+          25,
+          -1
+        ],
+        [
+          "health_safety_status",
+          1043,
+          16
+        ],
+        [
+          "environmental_risk",
+          1042,
+          54
+        ],
+        [
+          "avg_temperature",
+          1700,
+          -1
+        ],
+        [
+          "avg_humidity",
+          1700,
+          -1
+        ],
+        [
+          "avg_illumination",
+          1700,
+          -1
+        ],
+        [
+          "suitability_quartile",
+          23,
+          -1
+        ],
+        [
+          "eccs_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "990db1a562c8dd1a423ebe92e9af607260358d7e479caae2cb6a2b90cdb192b7",
+      "values_digest": "1adabe82b33ec9d798cf09f528cac45e9286b396a5423206fe114c5a3a385fdb",
+      "ordered_digest": "01f1cda3b2ddabe49b9bd0fac1ee57f44899bac5af42cfd05c8451acafe9cc88"
+    },
+    "bf11d0b4241768ef6c0cfc08750397e6522e17d466d27747643e387bee7b2639": {
+      "sql": "WITH SiteAverages AS (\r\n    SELECT \r\n        se.zoneref,\r\n        AVG(se.ambictemp) AS avg_temp,\r\n        AVG(se.humepct) AS avg_humidity,\r\n        AVG(se.illumelux) AS avg_illumination\r\n    FROM scanenvironment se\r\n    GROUP BY se.zoneref\r\n),\r\nSiteSuitability AS (\r\n    SELECT \r\n        sa.zoneref,\r\n        NTILE(4) OVER (ORDER BY (sa.avg_temp + sa.avg_humidity + sa.avg_illumination) / 3) AS suitability_quartile\r\n    FROM SiteAverages sa\r\n),\r\nSiteECCS AS (\r\n    SELECT \r\n        s.zoneregistry,\r\n        CASE \r\n            WHEN s.envhaz = 'Low' THEN 'Good'\r\n            WHEN s.envhaz = 'Medium' THEN 'Fair'\r\n            WHEN s.envhaz = 'High' THEN 'Poor'\r\n            ELSE 'Unknown'\r\n        END AS eccs_category\r\n    FROM sites s\r\n)\r\nSELECT \r\n    s.zonelabel AS site_name,\r\n    s.digunit AS excavation_unit,\r\n    s.gridtrace AS grid_reference,\r\n    s.geox AS latitude,\r\n    s.geoy AS longitude,\r\n    s.heightm AS altitude,\r\n    s.depthc AS depth,\r\n    s.phasefactor AS cultural_period,\r\n    s.guessdate AS estimated_date,\r\n    s.typesite AS site_type,\r\n    s.presstat AS preservation_status,\r\n    s.guardhint AS weather_protection,\r\n    s.entrystat AS site_access_status,\r\n    s.saferank AS security_level,\r\n    s.insurstat AS insurance_status,\r\n    s.riskeval AS risk_assessment_status,\r\n    s.healtheval AS health_safety_status,\r\n    s.envhaz AS environmental_risk,\r\n    sa.avg_temp AS average_temperature,\r\n    sa.avg_humidity AS average_humidity,\r\n    sa.avg_illumination AS average_illumination,\r\n    ss.suitability_quartile AS suitability_quartile,\r\n    se.eccs_category AS environmental_condition\r\nFROM \r\n    sites s\r\nJOIN \r\n    SiteAverages sa ON s.zoneregistry = sa.zoneref\r\nJOIN \r\n    SiteSuitability ss ON s.zoneregistry = ss.zoneref\r\nJOIN \r\n    SiteECCS se ON s.zoneregistry = se.zoneregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3ed0a56859f4899a984e4097b3e796883ce3ab4eae19a3bfdb83e63f1e8e865f",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "excavation_unit",
+          1043,
+          54
+        ],
+        [
+          "grid_reference",
+          1043,
+          16
+        ],
+        [
+          "latitude",
+          1700,
+          524297
+        ],
+        [
+          "longitude",
+          1700,
+          524297
+        ],
+        [
+          "altitude",
+          1700,
+          458757
+        ],
+        [
+          "depth",
+          1700,
+          458757
+        ],
+        [
+          "cultural_period",
+          1043,
+          29
+        ],
+        [
+          "estimated_date",
+          1043,
+          24
+        ],
+        [
+          "site_type",
+          1043,
+          29
+        ],
+        [
+          "preservation_status",
+          1043,
+          29
+        ],
+        [
+          "weather_protection",
+          1042,
+          54
+        ],
+        [
+          "site_access_status",
+          1043,
+          54
+        ],
+        [
+          "security_level",
+          1043,
+          19
+        ],
+        [
+          "insurance_status",
+          1043,
+          19
+        ],
+        [
+          "risk_assessment_status",
+          25,
+          -1
+        ],
+        [
+          "health_safety_status",
+          1043,
+          16
+        ],
+        [
+          "environmental_risk",
+          1042,
+          54
+        ],
+        [
+          "average_temperature",
+          1700,
+          -1
+        ],
+        [
+          "average_humidity",
+          1700,
+          -1
+        ],
+        [
+          "average_illumination",
+          1700,
+          -1
+        ],
+        [
+          "suitability_quartile",
+          23,
+          -1
+        ],
+        [
+          "environmental_condition",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "d5c66d5988700354f5c7c0b6f5998141a54c6d6b19b522f324d38ec98c2c61d1",
+      "values_digest": "a489365755b47c2079c6789fa22a9f48f91f81c1fe4c4031ca1afa41a9345297",
+      "ordered_digest": "bce055f1fcd1ee978b340a92b42785cd5d2e32319c04eede534da8be0d5dff26"
+    },
+    "ab2a97d721d431a9cdb49e0a366f0f3bfdc888240abb7af23135bb6e1c3a589e": {
+      "sql": "WITH SiteDensity AS (\n    SELECT \n        sf.zoneref AS site_code,\n        AVG(spc.pointdense) AS avg_density\n    FROM \n        scanfeatures sf\n    JOIN \n        scanpointcloud spc ON sf.zoneref = spc.arcref\n    GROUP BY \n        sf.zoneref\n),\nExtractionEfficiency AS (\n    SELECT \n        sf.zoneref AS site_code,\n        AVG(sf.traitcount) AS avg_extraction\n    FROM \n        scanfeatures sf\n    GROUP BY \n        sf.zoneref\n)\nSELECT \n    sd.site_code,\n    sd.avg_density AS avg_density_value,\n    ee.avg_extraction AS avg_extraction_value\nFROM \n    SiteDensity sd\nJOIN \n    ExtractionEfficiency ee ON sd.site_code = ee.site_code;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c91a9afd36f087c4f1590548b4c40b09877d5ece737bde17cc79e5b7c5a4dc9e",
+      "ordered": false,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "avg_density_value",
+          1700,
+          -1
+        ],
+        [
+          "avg_extraction_value",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "4bbe94a7949a660280b9c838f4a255af11ca48be5a74c01f0a14d2fb91c0d4ca"
+    },
+    "f9d796d71200791a642b0c5f990ead8f20d50b92c265e2a15e231317691879d1": {
+      "sql": "WITH WorkflowEfficiency AS (\r\n    SELECT \r\n        flowsoft AS processing_software,\r\n        flowstage AS processing_stage,\r\n        AVG(flowhrs) AS avg_processing_hours,\r\n        AVG(proccpu) AS avg_cpu_usage,\r\n        AVG(procgpu) AS avg_gpu_usage,\r\n        AVG(remaingb) AS avg_data_size_gb,\r\n        (AVG(flowhrs) / NULLIF(AVG(remaingb), 0)) AS efficiency_value,\r\n        COUNT(*) AS total_workflows\r\n    FROM scanprocessing\r\n    GROUP BY flowsoft, flowstage\r\n),\r\nEfficiencyStatus AS (\r\n    SELECT \r\n        *,\r\n        CASE \r\n            WHEN efficiency_value > 1 THEN 'Bottleneck'\r\n            ELSE 'Not a Bottleneck'\r\n        END AS efficiency_status\r\n    FROM WorkflowEfficiency\r\n)\r\nSELECT \r\n    processing_software,\r\n    processing_stage,\r\n    avg_processing_hours,\r\n    avg_cpu_usage,\r\n    avg_gpu_usage,\r\n    avg_data_size_gb,\r\n    efficiency_value,\r\n    efficiency_status,\r\n    total_workflows\r\nFROM EfficiencyStatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "0a6a959a9e65a7116bc961f1fe72d34d64b0a88256a1fc003a5a6eae4f2ec946",
+      "ordered": false,
+      "columns": [
+        [
+          "processing_software",
+          1043,
+          29
+        ],
+        [
+          "processing_stage",
+          1043,
+          22
+        ],
+        [
+          "avg_processing_hours",
+          1700,
+          -1
+        ],
+        [
+          "avg_cpu_usage",
+          1700,
+          -1
+        ],
+        [
+          "avg_gpu_usage",
+          1700,
+          -1
+        ],
+        [
+          "avg_data_size_gb",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_value",
+          1700,
+          -1
+        ],
+        [
+          "efficiency_status",
+          25,
+          -1
+        ],
+        [
+          "total_workflows",
+          20,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "25e5904f63623e6dfed8bf88fed4366a2aca5746be49b510dc98fb93e0e78060",
+      "values_digest": "124204f40ccf77bc017a44bf9214755d34c3d0ee8880d1b8b04e7482e7a1c562",
+      "ordered_digest": "859facb96ff5a551c5bfd6517220f62a7ac8fd1cc00ff8f4b8fe71494007314c"
+    },
+    "e42bdfc7f291ceef0e6d905e448199cc2a9fc9a43d80a0eb61aa6fb00ab6e54a": {
+      "sql": "WITH eccs AS (\r\n    SELECT \r\n        se.zoneref,\r\n        CASE \r\n            WHEN avg(esi) > 85 THEN 'Optimal Scanning Conditions'\r\n            WHEN avg(esi) BETWEEN 70 AND 85 THEN 'Good Scanning Conditions'\r\n            WHEN avg(esi) BETWEEN 50 AND 70 THEN 'Acceptable Scanning Conditions'\r\n            ELSE 'Challenging Scanning Conditions'\r\n        END AS avg_scanning_suitability\r\n    FROM \r\n        scanenvironment se,\r\n        LATERAL (\r\n            SELECT \r\n                (\r\n                    (\r\n                        CASE \r\n                            WHEN se.ambictemp BETWEEN -5 AND 40 THEN 100\r\n                            WHEN se.ambictemp BETWEEN -10 AND -5 OR se.ambictemp BETWEEN 40 AND 50 THEN 75\r\n                            ELSE 50\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.humepct BETWEEN 30 AND 70 THEN 100\r\n                            WHEN se.humepct BETWEEN 20 AND 30 OR se.humepct BETWEEN 70 AND 80 THEN 75\r\n                            ELSE 50\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.illumelux > 10000 THEN 100\r\n                            WHEN se.illumelux BETWEEN 5000 AND 10000 THEN 75\r\n                            ELSE 50\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.geosignal = 'Excellent' THEN 100\r\n                            WHEN se.geosignal = 'Good' THEN 75\r\n                            WHEN se.geosignal = 'Poor' THEN 50\r\n                            ELSE 25\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.trackstatus = 'Fixed' THEN 100\r\n                            WHEN se.trackstatus = 'None' THEN 50\r\n                            ELSE 25\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.linkstatus = 'Connected' THEN 100\r\n                            WHEN se.linkstatus = 'Disconnected' THEN 50\r\n                            ELSE 25\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.photomap = '90%' THEN 100\r\n                            WHEN se.photomap = '80%' THEN 80\r\n                            WHEN se.photomap = '60%' THEN 60\r\n                            ELSE 40\r\n                        END\r\n                    ) +\r\n                    (\r\n                        CASE \r\n                            WHEN se.imgcount > 500 THEN 100\r\n                            WHEN se.imgcount BETWEEN 200 AND 500 THEN 75\r\n                            WHEN se.imgcount BETWEEN 100 AND 200 THEN 50\r\n                            ELSE 25\r\n                        END\r\n                    )\r\n                ) AS esi\r\n        ) esi_calc\r\n    GROUP BY \r\n        se.zoneref\r\n) \r\nSELECT \r\n    s.zoneregistry AS location_id,\r\n    s.zonelabel AS location_name,\r\n    eccs.avg_scanning_suitability\r\nFROM \r\n    sites s\r\nJOIN \r\n    eccs ON s.zoneregistry = eccs.zoneref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6e78ac330a1a0b57ffad57611ea1e93fa1931a2ec31255ea6444384d4b8b70af",
+      "ordered": false,
+      "columns": [
+        [
+          "location_id",
+          1043,
+          16
+        ],
+        [
+          "location_name",
+          25,
+          -1
+        ],
+        [
+          "avg_scanning_suitability",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "7877129af92f6cca3356f833aabe4e198c43eb1da1d935df44b69c15643cde5f",
+      "values_digest": "658f905a65942e7f8a05130273cbf50741036c892ce0ca52c8ceb00645d17043",
+      "ordered_digest": "795ff89c9198addc14904feb045cbaf1a322fe5b70017460dd052142747a00f5"
+    },
+    "5a4e20d0429841068b41e62290f5918e5ff7cf0493a1a599cec3be9b7f983129": {
+      "sql": "WITH equipment_utilization AS (\r\n    SELECT \r\n        sp.equipref AS equipment_id,\r\n        (sp.flowhrs * (sp.proccpu + sp.procgpu) / 2.0 / (sp.remaingb * 10 * LN(sm.facetverts + 10000))) AS utilization_value,\r\n        sp.flowhrs AS average_processing_time,\r\n        CASE \r\n            WHEN (sp.flowhrs * (sp.proccpu + sp.procgpu) / 2.0 / (sp.remaingb * 10 * LN(sm.facetverts + 10000))) < 5.0 THEN 'Optimized' \r\n            WHEN (sp.flowhrs * (sp.proccpu + sp.procgpu) / 2.0 / (sp.remaingb * 10 * LN(sm.facetverts + 10000))) BETWEEN 5.0 AND 10.0 THEN 'Acceptable' \r\n            ELSE 'Needs Optimization' \r\n        END AS efficiency_ranking,\r\n        sp.flowstage AS workflow_status,\r\n        se.ambictemp AS resource_details\r\n    FROM \r\n        scanprocessing AS sp\r\n    JOIN \r\n        scanmesh AS sm ON sp.equipref = sm.equipref\r\n    JOIN \r\n        scanenvironment AS se ON sp.equipref = se.equipref\r\n) \r\nSELECT \r\n    equipment_id,\r\n    utilization_value,\r\n    average_processing_time,\r\n    efficiency_ranking,\r\n    workflow_status,\r\n    resource_details\r\nFROM \r\n    equipment_utilization;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d8128d88e05e6f1e5da620097bf964b36dc89a6dbe4f9c376a06314a8dfca90e",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment_id",
+          1042,
+          54
+        ],
+        [
+          "utilization_value",
+          701,
+          -1
+        ],
+        [
+          "average_processing_time",
+          1700,
+          327686
+        ],
+        [
+          "efficiency_ranking",
+          25,
+          -1
+        ],
+        [
+          "workflow_status",
+          1043,
+          22
+        ],
+        [
+          "resource_details",
+          1700,
+          327686
+        ]
+      ],
+      "rows": 1042,
+      "bag_digest": "a34623ca2f0dada7fc6e42e2935db0ceabc788c1c8ab7e3d74541ed40bb49834",
+      "values_digest": "3808b288d189a859e7550e65ea3274723bb9753218bf6b6d193f529ad2b44f31",
+      "ordered_digest": "03899a4dc2d7212c82460b517649a0de92377722ee371c9671c85703fe4c8903"
+    },
+    "174d8a5f9fecc29c93d693650caa0d95c70ffdd0edae591af1355e482e7a2406": {
+      "sql": "WITH high_fidelity_mesh AS (\r\n    SELECT \r\n        sm.zoneref AS site_code,\r\n        COUNT(*) AS total_mesh_count,\r\n        SUM(CASE WHEN sm.geomdeltamm < 0.5 AND sm.facetresmm < 1.0 THEN 1 ELSE 0 END) AS high_fidelity_mesh_count,\r\n        AVG(sm.geomdeltamm) AS avg_geometric_accuracy,\r\n        AVG(sm.facetresmm) AS avg_resolution_mm,\r\n        -- Assuming Mesh Quality is derived from uvmapqual\r\n        ARRAY_AGG(sm.uvmapqual) AS mesh_quality\r\n    FROM \r\n        scanmesh AS sm\r\n    JOIN \r\n        sites AS s ON sm.zoneref = s.zoneregistry\r\n    GROUP BY \r\n        sm.zoneref\r\n)\r\nSELECT \r\n    hfm.site_code,\r\n    s.zonelabel AS site_name,\r\n    hfm.total_mesh_count,\r\n    hfm.high_fidelity_mesh_count,\r\n    (hfm.high_fidelity_mesh_count * 100.0 / hfm.total_mesh_count) AS proportion_high_fidelity,\r\n    hfm.avg_geometric_accuracy,\r\n    hfm.avg_resolution_mm,\r\n    hfm.mesh_quality\r\nFROM \r\n    high_fidelity_mesh AS hfm\r\nJOIN \r\n    sites AS s ON hfm.site_code = s.zoneregistry\r\nORDER BY \r\n    proportion_high_fidelity DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9223e739ca1ab6e12b5bd2930cdb7f345417a417095772789e367dadae7324a4",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "proportion_high_fidelity",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy",
+          1700,
+          -1
+        ],
+        [
+          "avg_resolution_mm",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "d957c854a4107d77a593155653b338baaae0fd320869f64f3b0d8aec0582ba0b",
+      "values_digest": "9507966b8a629a4d3e056fa683f25c6bd69552d11ecb52a45ad2959f1c9b3810",
+      "ordered_digest": "a421700e8e703e604550ab9d478d641faaa9b1b19ee52d40d46c637415aefa88"
+    },
+    "5093d4eec1bae54dbc9c5897ecc24d9017bf3d448af1ccd9bdfb96950ee3c9d9": {
+      "sql": "WITH mesh_quality AS (\r\n    SELECT \r\n        sm.zoneref,\r\n        COUNT(*) AS total_mesh_count,\r\n        SUM(CASE WHEN uvmapqual = 'High' THEN 1 ELSE 0 END) AS high_fidelity_mesh_count,\r\n        AVG(facetverts / facetfaces) AS avg_complexity_ratio,\r\n        AVG(facetresmm) AS avg_resolution_mm,\r\n        AVG(geomdeltamm) AS avg_geometric_accuracy_mm,\r\n        CASE \r\n            WHEN AVG(facetresmm) < 1.0 AND AVG(geomdeltamm) < 0.1 THEN 'Premium'\r\n            WHEN AVG(facetresmm) < 2.0 AND AVG(geomdeltamm) < 0.5 THEN 'High'\r\n            WHEN AVG(facetresmm) < 5.0 AND AVG(geomdeltamm) < 1.0 THEN 'Standard'\r\n            ELSE 'Low'\r\n        END AS mesh_quality\r\n    FROM \r\n        scanmesh sm\r\n    GROUP BY \r\n        sm.zoneref\r\n)\r\nSELECT \r\n    s.zoneregistry AS site_code,\r\n    s.zonelabel AS site_name,\r\n    mq.total_mesh_count,\r\n    mq.high_fidelity_mesh_count,\r\n    (mq.high_fidelity_mesh_count * 100.0 / mq.total_mesh_count) AS high_fidelity_proportion,\r\n    mq.avg_complexity_ratio,\r\n    mq.avg_resolution_mm,\r\n    mq.avg_geometric_accuracy_mm,\r\n    mq.mesh_quality\r\nFROM \r\n    sites s\r\nJOIN \r\n    mesh_quality mq ON s.zoneregistry = mq.zoneref\r\nORDER BY \r\n    mq.mesh_quality DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "743356ecb6722ddfc5f27151e1aca18d9a5ac88f399f1a814c77a02cc70b182b",
+      "ordered": true,
+      "columns": [
+        [
+          "site_code",
+          1043,
+          16
+        ],
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "total_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_mesh_count",
+          20,
+          -1
+        ],
+        [
+          "high_fidelity_proportion",
+          1700,
+          -1
+        ],
+        [
+          "avg_complexity_ratio",
+          1700,
+          -1
+        ],
+        [
+          "avg_resolution_mm",
+          1700,
+          -1
+        ],
+        [
+          "avg_geometric_accuracy_mm",
+          1700,
+          -1
+        ],
+        [
+          "mesh_quality",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "a878af560e307f01a449d382ee4bcf18dbfc9a5c3c9cae4522d1178a116d0251",
+      "values_digest": "86c5ffeb1259a72eefb09aa7074081ecd341ca271839e4ab54f7497e3ff657e8",
+      "ordered_digest": "16732f0d5966efdb41ef31b5fad23691fbc0e49fc7d5b9ccf25b8c3463ee6a82"
+    },
+    "d4719fc665773f55b08d7db1af7d5d88f162354f91a3e7ed67395f2a513dc5f6": {
+      "sql": "WITH site_avg AS (\r\n    SELECT \r\n        se.zoneref AS site_code,\r\n        AVG(se.ambictemp) AS avg_temp,\r\n        AVG(se.humepct) AS avg_humidity,\r\n        AVG(se.illumelux) AS avg_illumination\r\n    FROM \r\n        scanenvironment AS se\r\n    GROUP BY \r\n        se.zoneref\r\n),\r\nsite_quartiles AS (\r\n    SELECT \r\n        sa.site_code,\r\n        sa.avg_temp,\r\n        sa.avg_humidity,\r\n        sa.avg_illumination,\r\n        NTILE(4) OVER (ORDER BY (sa.avg_temp + sa.avg_humidity + sa.avg_illumination) / 3) AS suitability_quartile\r\n    FROM \r\n        site_avg AS sa\r\n),\r\nenv_conditions AS (\r\n    SELECT \r\n        sq.site_code,\r\n        sq.avg_temp,\r\n        sq.avg_humidity,\r\n        sq.avg_illumination,\r\n        sq.suitability_quartile,\r\n        CASE \r\n            WHEN (sq.avg_temp + sq.avg_humidity + sq.avg_illumination) / 3 > 85 THEN 'Optimal Scanning Conditions'\r\n            WHEN (sq.avg_temp + sq.avg_humidity + sq.avg_illumination) / 3 BETWEEN 70 AND 85 THEN 'Good Scanning Conditions'\r\n            WHEN (sq.avg_temp + sq.avg_humidity + sq.avg_illumination) / 3 BETWEEN 50 AND 70 THEN 'Acceptable Scanning Conditions'\r\n            ELSE 'Challenging Scanning Conditions'\r\n        END AS env_condition\r\n    FROM \r\n        site_quartiles AS sq\r\n)\r\nSELECT \r\n    s.zonelabel AS site_name,\r\n    s.digunit AS excavation_unit,\r\n    s.gridtrace AS grid_reference,\r\n    s.geox AS latitude,\r\n    s.geoy AS longitude,\r\n    s.heightm AS altitude,\r\n    s.depthc AS depth,\r\n    s.phasefactor AS cultural_period,\r\n    s.guessdate AS estimated_date,\r\n    s.typesite AS site_type,\r\n    s.presstat AS preservation_status,\r\n    s.guardhint AS weather_protection,\r\n    s.entrystat AS site_access_status,\r\n    s.saferank AS security_level,\r\n    s.insurstat AS insurance_status,\r\n    s.riskeval AS risk_assessment_status,\r\n    s.healtheval AS health_safety_status,\r\n    s.envhaz AS environmental_risk,\r\n    ec.avg_temp AS avg_temperature,\r\n    ec.avg_humidity,\r\n    ec.avg_illumination,\r\n    ec.suitability_quartile,\r\n    ec.env_condition\r\nFROM \r\n    sites AS s\r\nJOIN \r\n    env_conditions AS ec ON s.zoneregistry = ec.site_code;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5d88d332a428c50c5cc557cdc8a53dd5639c0a0c710308a9ae028e6202c39532",
+      "ordered": false,
+      "columns": [
+        [
+          "site_name",
+          25,
+          -1
+        ],
+        [
+          "excavation_unit",
+          1043,
+          54
+        ],
+        [
+          "grid_reference",
+          1043,
+          16
+        ],
+        [
+          "latitude",
+          1700,
+          524297
+        ],
+        [
+          "longitude",
+          1700,
+          524297
+        ],
+        [
+          "altitude",
+          1700,
+          458757
+        ],
+        [
+          "depth",
+          1700,
+          458757
+        ],
+        [
+          "cultural_period",
+          1043,
+          29
+        ],
+        [
+          "estimated_date",
+          1043,
+          24
+        ],
+        [
+          "site_type",
+          1043,
+          29
+        ],
+        [
+          "preservation_status",
+          1043,
+          29
+        ],
+        [
+          "weather_protection",
+          1042,
+          54
+        ],
+        [
+          "site_access_status",
+          1043,
+          54
+        ],
+        [
+          "security_level",
+          1043,
+          19
+        ],
+        [
+          "insurance_status",
+          1043,
+          19
+        ],
+        [
+          "risk_assessment_status",
+          25,
+          -1
+        ],
+        [
+          "health_safety_status",
+          1043,
+          16
+        ],
+        [
+          "environmental_risk",
+          1042,
+          54
+        ],
+        [
+          "avg_temperature",
+          1700,
+          -1
+        ],
+        [
+          "avg_humidity",
+          1700,
+          -1
+        ],
+        [
+          "avg_illumination",
+          1700,
+          -1
+        ],
+        [
+          "suitability_quartile",
+          23,
+          -1
+        ],
+        [
+          "env_condition",
+          25,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "3e0bc407c2832750d633ee64fbdf51850a1567386b7760329e09e6226444c679",
+      "values_digest": "8ebd8c42106c1f2df5b4eff8e81eb9337ea269e26078f244bfe51464db7512a9",
+      "ordered_digest": "872916bf82569c6fc5ad23ee662710924b6f8425d1dbafe851cfc8a506906b49"
+    },
+    "d1216c34c4b247d519a865e4d7d23719dc56200a9e2f588a2f6d57c6973474b3": {
+      "sql": "WITH site_scan_suitability AS (\r\n    SELECT \r\n        t1.zoneregistry AS location_id,\r\n        t1.zonelabel AS location_name,\r\n        AVG(\r\n            (\r\n                CASE \r\n                    WHEN t2.ambictemp BETWEEN -5 AND 40 THEN 100\r\n                    WHEN t2.ambictemp BETWEEN -10 AND -5 THEN 75\r\n                    WHEN t2.ambictemp BETWEEN 40 AND 50 THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.humepct BETWEEN 30 AND 70 THEN 100\r\n                    WHEN t2.humepct BETWEEN 20 AND 30 THEN 75\r\n                    WHEN t2.humepct BETWEEN 70 AND 80 THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.illumelux > 50000 THEN 100\r\n                    WHEN t2.illumelux BETWEEN 30000 AND 50000 THEN 75\r\n                    WHEN t2.illumelux BETWEEN 10000 AND 30000 THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.geosignal = 'Excellent' THEN 100\r\n                    WHEN t2.geosignal = 'Good' THEN 75\r\n                    WHEN t2.geosignal = 'Poor' THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.trackstatus = 'Fixed' THEN 100\r\n                    WHEN t2.trackstatus = 'None' THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.linkstatus = 'Connected' THEN 100\r\n                    WHEN t2.linkstatus = 'Disconnected' THEN 50\r\n                    ELSE 0\r\n                END\r\n            ) + \r\n            (\r\n                CASE \r\n                    WHEN t2.photomap = '90%' THEN 100\r\n                    WHEN t2.photomap = '60%' THEN 75\r\n                    WHEN t2.photomap = '80%' THEN 50\r\n                    ELSE 0\r\n                END\r\n            )\r\n        ) / 7 AS average_scanning_suitability\r\n    FROM \r\n        sites AS t1\r\n    JOIN \r\n        scanenvironment AS t2 ON t1.zoneregistry = t2.zoneref\r\n    GROUP BY \r\n        t1.zoneregistry, t1.zonelabel\r\n)\r\nSELECT \r\n    location_id,\r\n    location_name,\r\n    average_scanning_suitability\r\nFROM \r\n    site_scan_suitability\r\nORDER BY \r\n    average_scanning_suitability DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9196cb15a0b9998a1c09aad70c1816bdbefb5c7488ac95728e551aadf82c5025",
+      "ordered": true,
+      "columns": [
+        [
+          "location_id",
+          1043,
+          16
+        ],
+        [
+          "location_name",
+          25,
+          -1
+        ],
+        [
+          "average_scanning_suitability",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 942,
+      "bag_digest": "4ecb73f98d6973726c650ba8ef1dbb7ced46611bd715b8e11b50207b3599dca7",
+      "values_digest": "a467d64c5ee813a6e68dc629bf7ce5377920b9e5b9505f6901a2c2a053db0e4c",
+      "ordered_digest": "81a4c03e5d88e6e23955235f2597cd60eefaa83f7e30f93c4e7e62c19cceef28"
+    },
+    "bb90f3128e3d8389218bdc8bfde4210aa3a5d3bf206a2e2755bafa7407c6073b": {
+      "sql": "WITH sqs AS (\r\n    SELECT \r\n        *,\r\n        (\r\n            (10 / scanresolmm) ^ 1.5\r\n        ) * (\r\n            (coverpct / 100)\r\n        ) * (\r\n            (1 - (noisedb / 30)) ^ 2\r\n        ) AS sqs\r\n    FROM scanpointcloud\r\n),\r\nranked_sqs AS (\r\n    SELECT \r\n        *,\r\n        RANK() OVER (PARTITION BY arcref ORDER BY sqs DESC) as sqs_rank\r\n    FROM sqs\r\n)\r\nSELECT \r\n    cloudregistry\r\nFROM ranked_sqs\r\nWHERE sqs_rank > 1;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "da9d59aaf1e54b146bd7b48a38ce33dc9008d64dac9bfbe727301a66005acc13",
+      "ordered": false,
+      "columns": [
+        [
+          "cloudregistry",
+          20,
+          -1
+        ]
+      ],
+      "rows": 53,
+      "bag_digest": "3d90fa4dfbc68d6e358e57ec326a5de651022f1ea4c784985920b93cc8b956f6",
+      "values_digest": "0283715ee6f2b8bb5c2dcde7f9eb75e0295af187755c70dfe455a6e1e3ad1887",
+      "ordered_digest": "e00a821ef84efd9df2dc998437a06da35abea6f7123a37cefd2641298f3be391"
+    },
+    "b9000a22851023ca56cca276837fd29a7e2d0d2af3a404ff979d73c50516c90a": {
+      "sql": "WITH sqs AS (\r\n  SELECT \r\n    spc.arcref, \r\n    (coverpct * (100 - noisedb)) AS sqs,\r\n    s.questregistry\r\n  FROM \r\n    scanpointcloud AS spc\r\n    JOIN scans AS s ON spc.arcref = s.arcref\r\n)\r\nSELECT \r\n  arcref, \r\n  MAX(sqs) AS max_sqs, \r\n  questregistry\r\nFROM \r\n  sqs\r\nGROUP BY \r\n  arcref, questregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3607ec4afe1c4d219fb50faa3ea174fa09bb909e8abf4ea72f030a90914ec925",
+      "ordered": false,
+      "columns": [
+        [
+          "arcref",
+          1043,
+          54
+        ],
+        [
+          "max_sqs",
+          1700,
+          -1
+        ],
+        [
+          "questregistry",
+          1043,
+          20
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "3f98ec7bbecb7016e24eb3490063592dc7a255146903cab077bdab923c3c055c",
+      "values_digest": "101db75006fb0035ea4f5f0d924c425f37e9ec472441bff5948ada9236871c9a",
+      "ordered_digest": "ffde461102486c8e8b8776f43fd99331b1726482d27b57196c8a5606280f6f56"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "projects": {
+      "arcregistry": "varchar",
+      "vesseltag": "varchar",
+      "fundflux": "text",
+      "authpin": "bpchar",
+      "authhalt": "date"
+    },
+    "scanmesh": {
+      "facetregistry": "int8",
+      "zoneref": "varchar",
+      "equipref": "bpchar",
+      "facetverts": "int8",
+      "facetfaces": "int8",
+      "facetresmm": "numeric",
+      "texdist": "varchar",
+      "texpix": "int4",
+      "uvmapqual": "varchar",
+      "geomdeltamm": "numeric"
+    },
+    "scanprocessing": {
+      "flowregistry": "int8",
+      "equipref": "bpchar",
+      "zoneref": "varchar",
+      "flowsoft": "varchar",
+      "flowhrs": "numeric",
+      "proccpu": "int2",
+      "memusagegb": "numeric",
+      "procgpu": "int2",
+      "stashloc": "varchar",
+      "safebak": "bpchar",
+      "datalevel": "text",
+      "metabench": "varchar",
+      "coordframe": "varchar",
+      "elevref": "varchar",
+      "remaingb": "numeric",
+      "stationlink": "bpchar",
+      "camcal": "text",
+      "lensdist": "varchar",
+      "colortune": "bpchar",
+      "flowstage": "varchar",
+      "fmtver": "bpchar"
+    },
+    "personnel": {
+      "crewregistry": "bpchar",
+      "crewlabel": "varchar",
+      "leadregistry": "bpchar",
+      "leadlabel": "varchar"
+    },
+    "scanspatial": {
+      "domainregistry": "int8",
+      "arcref": "varchar",
+      "crewref": "bpchar",
+      "aream2": "numeric",
+      "volm3": "numeric",
+      "boxx": "numeric",
+      "boxy": "numeric",
+      "boxz": "numeric",
+      "angleaz": "float4",
+      "angletilt": "float8",
+      "groundspan": "numeric"
+    },
+    "scanqc": {
+      "qualregistry": "int8",
+      "arcref": "varchar",
+      "crewref": "bpchar",
+      "accucheck": "varchar",
+      "ctrlstate": "bpchar",
+      "valimeth": "varchar",
+      "valistate": "text",
+      "archstat": "varchar",
+      "pubstat": "varchar",
+      "copystat": "bpchar",
+      "refmention": "varchar",
+      "remark": "text"
+    },
+    "sites": {
+      "zoneregistry": "varchar",
+      "zonelabel": "text",
+      "digunit": "varchar",
+      "gridtrace": "varchar",
+      "geox": "numeric",
+      "geoy": "numeric",
+      "heightm": "numeric",
+      "depthc": "numeric",
+      "phasefactor": "varchar",
+      "guessdate": "varchar",
+      "typesite": "varchar",
+      "presstat": "varchar",
+      "guardhint": "bpchar",
+      "entrystat": "varchar",
+      "saferank": "varchar",
+      "insurstat": "varchar",
+      "riskeval": "text",
+      "healtheval": "varchar",
+      "envhaz": "bpchar"
+    },
+    "scanfeatures": {
+      "traitregistry": "int8",
+      "zoneref": "varchar",
+      "equipref": "bpchar",
+      "traitextract": "varchar",
+      "traitcount": "int4",
+      "articount": "int4",
+      "structkind": "varchar",
+      "matkind": "varchar",
+      "huestudy": "varchar",
+      "texturestudy": "varchar",
+      "patternnote": "text"
+    },
+    "equipment": {
+      "equipregistry": "bpchar",
+      "equipform": "varchar",
+      "equipdesign": "varchar",
+      "equiptune": "date",
+      "equipstatus": "varchar",
+      "powerlevel": "int2"
+    },
+    "scanconservation": {
+      "cureregistry": "int8",
+      "arcref": "varchar",
+      "zoneref": "varchar",
+      "harmassess": "varchar",
+      "curerank": "varchar",
+      "structstate": "varchar",
+      "intervhistory": "text",
+      "priordocs": "text"
+    },
+    "scans": {
+      "questregistry": "varchar",
+      "chronotag": "timestamp",
+      "arcref": "varchar",
+      "crewref": "bpchar",
+      "zoneref": "varchar",
+      "scancount": "int2",
+      "climtune": "varchar",
+      "huecatch": "varchar",
+      "fmtfile": "bpchar",
+      "gbsize": "numeric",
+      "pressratio": "numeric",
+      "spanmin": "numeric"
+    },
+    "scanregistration": {
+      "logregistry": "int8",
+      "crewref": "bpchar",
+      "arcref": "varchar",
+      "logaccumm": "numeric",
+      "refmark": "varchar",
+      "ctrlpts": "varchar",
+      "logmethod": "varchar",
+      "transform": "varchar",
+      "errscale": "varchar",
+      "errvalmm": "numeric"
+    },
+    "scanenvironment": {
+      "airregistry": "int8",
+      "zoneref": "varchar",
+      "equipref": "bpchar",
+      "ambictemp": "numeric",
+      "humepct": "numeric",
+      "illumelux": "int4",
+      "geosignal": "varchar",
+      "trackstatus": "varchar",
+      "linkstatus": "varchar",
+      "photomap": "bpchar",
+      "imgcount": "int2"
+    },
+    "scanpointcloud": {
+      "cloudregistry": "int8",
+      "crewref": "bpchar",
+      "arcref": "varchar",
+      "scanresolmm": "numeric",
+      "pointdense": "int4",
+      "coverpct": "numeric",
+      "totalpts": "int8",
+      "clouddense": "int4",
+      "lappct": "numeric",
+      "noisedb": "numeric",
+      "refpct": "numeric"
+    }
+  }
+}

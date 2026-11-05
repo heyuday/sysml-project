@@ -1,0 +1,226 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "crypto_6",
+    "instance_id": "crypto_6",
+    "database": "crypto",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 276.1596145629883,
+    "budget_used": 3.5,
+    "budget_remaining": 12.5,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"users\" (\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\nuserstamp character NOT NULL,\nacctscope USER-DEFINED NULL,\n    PRIMARY KEY (usersnode)\n);\n\nFirst 3 rows:\n  usersnode  userstamp    acctscope\n-----------  -----------  -----------\n          1  U583322      Margin\n          2  U810391      Spot\n          3  U485932      Options\n...\n\n\nCREATE TABLE \"riskandmargin\" (\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\nordervault character NULL,\nrisk_margin_profile jsonb NULL,\n    PRIMARY KEY (riskandmarginpivot),\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\n);\n\nFirst 3 rows:\n  riskandmarginpivot  ordervault    risk_margin_profile\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"crypto|users|usersnode\": \"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\",\n  \"crypto|users|userstamp\": \"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\",\n  \"crypto|users|acctscope\": \"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\",\n  \"crypto|orders|orderspivot\": \"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\",\n  \"crypto|orders|recordvault\": \"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\",\n  \"crypto|orders|timecode\": \"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\",\n  \"crypto|orders|exchspot\": \"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\",\n  \"crypto|orders|mktnote\": \"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\",\n  \"crypto|orders|orderstamp\": \"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\",\n  \"crypto|orders|userlink\": \"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\",\n  \"crypto|orders|ordertune\": \"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\",\n  \"crypto|orders|dealedge\": \"An enum (DealEdge_enum) indicating side (Sell, Buy).\",\n  \"crypto|orders|dealquote\": \"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\",\n  \"crypto|orders|dealcount\": \"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\",\n  \"crypto|orders|notionsum\": \"A DECIMAL(12,3) notional value (price \\u00d7 quantity) (e.g., '3475.063').\",\n  \"crypto|orders|orderflow\": \"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\",\n  \"crypto|orders|timespan\": \"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\",\n  \"crypto|orders|orderbase\": \"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\",\n  \"crypto|orders|clientmark\": \"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXt...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Spread Percentage\", \"Slippage Impact\", \"Position Value at Risk (PVaR)\", \"Arbitrage Opportunity Score (AOS)\", \"Market Impact Cost (MIC)\", \"Liquidity Ratio\", \"Realized Risk Ratio (RRR)\", \"Margin Utilization\", \"Order Fill Rate\", \"Market Efficiency Ratio (MER)\", \"Whale Order\", \"Liquidation Risk Level\", \"Arbitrage Window\", \"Over-Leveraged Position\", \"Market Maker Activity\", \"Smart Money Flow\", \"Liquidity Crisis\", \"Momentum Divergence\", \"Margin Call Risk\", \"Technical Breakout\", \"dealedge\", \"orderflow\", \"timespan\", \"posedge\", \"posmagn\", \"mktfeel\", \"techmeter\", \"whalemotion\", \"makermotion\", \"exectune\", \"Risk-Adjusted Return\", \"True Cost of Execution\", \"Order Book Imbalance Ratio\", \"Effective Leverage\", \"Profit Factor\", \"Arbitrage ROI\", \"Market Depth Ratio\", \"Volatility-Adjusted Spread\", \"Risk-to-Reward Ratio\", \"Technical Signal Strength\", \"Critically Over-Leveraged Position\", \"High-Quality Arbitrage Opportunity\", \"Technical Reversal Signal\", \"Liquidity Constrained Position\", \"Optimal Trading Window\", \"Risk-Efficient Position\", \"Whale-Driven Market\", \"Liquidation Cascade Risk\", \"Perfect Technical Setup\", \"Flash Crash Vulnerability\", \"Flow Dominance\", \"Smart Money Accuracy\", \"Effective Leverage Risk Classification\"]",
+        "cost": 0.5,
+        "budget_before": 14.0,
+        "budget_after": 13.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "WITH MarketMood AS (\r\n    SELECT \r\n        m.marketdatanode,\r\n        m.quote_depth_snapshot#>'{metadata, mktcombo}' AS market_pair,\r\n        (m.quote_depth_snapshot#>'{spread, spreadrate}')::float AS spread_percentage,\r\n        a.market_sentiment_indicators#>'{momentum, mktfeel}' AS overall_market_mood,\r\n        (a.market_sentiment_indicators#>'{momentum, buyforce}')::float AS buy_force\r\n    FROM \r\n        marketdata AS m\r\n    JOIN \r\n        analyticsindicators AS a ON m.marketdatanode = a.mdataref\r\n),\r\nMoodAvgSpread AS (\r\n    SELECT \r\n        overall_market_mood, \r\n        AVG(spread_percentage) AS avg_spread_percentage\r\n    FROM \r\n        MarketMood\r\n    GROUP BY \r\n        overall_market_mood\r\n),\r\nPercentileRank AS (\r\n    SELECT \r\n        marketdatanode,\r\n        PERCENT_RANK() OVER (ORDER BY spread_percentage) AS percentile_rank\r\n    FROM \r\n        MarketMood\r\n)\r\nSELECT \r\n    mm.market_pair,\r\n    mm.spread_percentage,\r\n    mm.overall_market_mood,\r\n    mm.buy_force,\r\n    mas.avg_spread_percentage,\r\n    pr.percentile_rank\r\nFROM \r\n    MarketMood AS mm\r\nLEFT JOIN \r\n    MoodAvgSpread AS mas ON mm.overall_market_mood = mas.overall_market_mood\r\nLEFT JOIN \r\n    PercentileRank AS pr ON mm.marketdatanode = pr.marketdatanode;"
+        },
+        "result": "market_pair | spread_percentage | overall_market_mood | buy_force | avg_spread_percentage | percentile_rank ----------------------------------------------------------------------------------------------------------- ETH-USDT | 0.1199 | Bearish | 0.926 | 0.09945134328358202 | 0.6736736736736737 ADA-USDC | 0.1403 | Bearish | 0.253 | 0.09945134328358202 | 0.8288288288288288 BTC-USDT | 0.0904 | Bearish | 0.328 | 0.09945134328358202 | 0.4064064064064064 SOL-USDC | 0.047 | Bullish | 0.317 | 0.10118099688473524 | 0.0970970970970971 ETH-USDC | 0.1497 | Bearish | 0.38 | 0.09945134328358202 | 0.8668668668668669 BTC-USD | 0.1118 | Bullish | 0.527 | 0.10118099688473524 | 0.6056056056056056 SOL-USDC | 0.0718 | Bearish | 0.462 | 0.09945134328358202 | 0.2502502502502503 ADA-USDC | 0.0204 | Bullish | 0.376 | 0.10118099688473524 | 0.02002002002002002 SOL-USDC | 0.0622 | Neutral | 0.726 | 0.1005098837209302 | 0.18118118118118118 BTC-USDT | 0.1153 | Neutral | 0.016 | 0.1005098837209302 | 0.6376376376376376 ETH-USDT | 0.0996 | Bearish | 0.963 | 0.09945134328358202 | 0.47847847847847846 SOL-USDT | 0.0708 | Bullish | 0.973 | 0.10118099688473524 | 0.24124124124124124 BTC-USDC | 0.0747 | Neutral | 0.818 | 0.1005098837209302 | 0.27627627627627627 ADA-USDC | 0.0481 | Neutral | 0.192 | 0.1005098837209302 | 0.1021021021021021 ETH-USDC | 0.0376 | Bullish | 0.536 | 0.10118099688473524 | 0.07407407407407407 ETH-USD | 0.1579 | Bearish | 0.244 | 0.09945134328358202 | 0.9099099099099099 SOL-USDT | 0.1124 | Neutral | 0.261 | 0.1005098837209302 | 0.6096096096096096 BTC-USDT | 0.1702 | Bearish | 0.451 | 0.09945134328358202 | 0.958958958958959 SOL-USDT | 0.0263 | Neutral | 0.875 | 0.1005098837209302 | 0.03903903903903904 ADA-USD | 0.0675 | Bullish | 0.031 | 0.10118099688473524 | 0.2222222222222222 BTC-USDC | 0.061 | Neutral | 0.62 | 0.1005098837209302 | 0.17317317317317318 ETH-USDC | 0.1037 | Neutral | 0.86 | 0.1005098837209302 | 0.5205205205205206 ETH-USDC | 0.0916 | Bullish | 0.286 | 0.101180996884735...<truncated>",
+        "cost": 1.0,
+        "budget_before": 13.5,
+        "budget_after": 12.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: crypto\nTask ID: crypto_6\n\nUser Query:\nAnalyze the spread across different markets and correlate it with market mood indicators. For each market pair, display the market pair name, the calculated spread percentage, the overall market mood, the buy force, the average spread percentage for that mood, and the percentile ranking of the spread.\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-eabfd85b-deb0-4745-b782-b8fd7e81ab12",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_hkn0j0t5464f",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_tajdkwgycmj0",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_0x1m0yjcehn1",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-eabfd85b-deb0-4745-b782-b8fd7e81ab12",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_hkn0j0t5464f",
+              "response": "{\"result\": \"CREATE TABLE \\\"users\\\" (\\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\\nuserstamp character NOT NULL,\\nacctscope USER-DEFINED NULL,\\n    PRIMARY KEY (usersnode)\\n);\\n\\nFirst 3 rows:\\n  usersnode  userstamp    acctscope\\n-----------  -----------  -----------\\n          1  U583322      Margin\\n          2  U810391      Spot\\n          3  U485932      Options\\n...\\n\\n\\nCREATE TABLE \\\"riskandmargin\\\" (\\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\\nordervault character NULL,\\nrisk_margin_profile jsonb NULL,\\n    PRIMARY KEY (riskandmarginpivot),\\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\\n);\\n\\nFirst 3 rows:\\n  riskandmarginpivot  ordervault    risk_margin_profile\\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10308.06, 'traildiff': 0.02, 'trigquote': 10689.56}, 'risk_factors': {'cpfactor': '0.823', 'liqfactor': '0.171', 'netfactor': '0.896', 'regfactor': '0.975', 'setfactor': '0.755', 'custfactor': '0.544'}, 'margin_thresholds': {'inithold': 81019.9, 'mainthold': 40509.95}}\\n                   3  OB179652      {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': None}, 'position': {'possum': 990687.61, 'posedge': 'Short', 'posmagn': '2', 'poscount': 92.888, 'posriskrate': 0.553}, 'collateral': {'collsum': 19000.13, 'collcoin': 'USDT', 'collrate': 0.438, 'insfundshare': 4.53}, 'margin_rates': {'margrate': 0.826, 'bkptquote': 11913.55, 'margcallquote': 6818.72}, 'price_levels': {'liqquote': 11661.77, 'stopquote': 10558.32, 'traildiff': 0.03, 'trigquote': 11263.9}, 'risk_factors': {'cpfactor': '0.286', 'liqfactor': '0.639', 'netfactor': '0.803', 'regfactor': '0.416', 'setfactor': '0.538', 'custfactor': '0.728'}, 'margin_thresholds': {'inithold': 42532.07, 'mainthold': 21266.03}}\\n                   4  OB827275      {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': None}, 'position': {'possum': 1210450.2, 'posedge': 'Long', 'posmagn': '1', 'poscount': 32.377, 'posriskrate': 0.836}, 'collateral': {'collsum': 87696.52, 'collcoin': 'USDT', 'collrate': 0.381, 'insfundshare': 38.45}, 'margin_rates': {'margrate': 0.403, 'bkptquote': 27881.46, 'margcallquote': 40130.12}, 'price_levels': {'liqquote': 34894.2, 'stopquote': 34914.37, 'traildiff': 0.038, 'trigquote': 35326.06}, 'risk_factors': {'cpfactor': '0.712', 'liqfactor': '0.959', 'netfactor': '0.226', 'regfactor': '0.421', 'setfactor': '0.296', 'custfactor': '0.199'}, 'margin_thresholds': {'inithold': 93681.57, 'mainthold': 46840.79}}\\n...\\n\\n\\nCREATE TABLE \\\"orders\\\" (\\norderspivot bigint NOT NULL DEFAULT nextval('orders_orderspivot_seq'::regclass),\\nrecordvault character NOT NULL,\\ntimecod...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_tajdkwgycmj0",
+              "response": "{\"result\": \"{\\n  \\\"crypto|users|usersnode\\\": \\\"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\\\",\\n  \\\"crypto|users|userstamp\\\": \\\"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\\\",\\n  \\\"crypto|users|acctscope\\\": \\\"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\\\",\\n  \\\"crypto|orders|orderspivot\\\": \\\"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\\\",\\n  \\\"crypto|orders|recordvault\\\": \\\"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\\\",\\n  \\\"crypto|orders|timecode\\\": \\\"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|exchspot\\\": \\\"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\\\",\\n  \\\"crypto|orders|mktnote\\\": \\\"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\\\",\\n  \\\"crypto|orders|orderstamp\\\": \\\"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\\\",\\n  \\\"crypto|orders|userlink\\\": \\\"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\\\",\\n  \\\"crypto|orders|ordertune\\\": \\\"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\\\",\\n  \\\"crypto|orders|dealedge\\\": \\\"An enum (DealEdge_enum) indicating side (Sell, Buy).\\\",\\n  \\\"crypto|orders|dealquote\\\": \\\"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\\\",\\n  \\\"crypto|orders|dealcount\\\": \\\"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\\\",\\n  \\\"crypto|orders|notionsum\\\": \\\"A DECIMAL(12,3) notional value (price \\\\u00d7 quantity) (e.g., '3475.063').\\\",\\n  \\\"crypto|orders|orderflow\\\": \\\"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\\\",\\n  \\\"crypto|orders|timespan\\\": \\\"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\\\",\\n  \\\"crypto|orders|orderbase\\\": \\\"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\\\",\\n  \\\"crypto|orders|clientmark\\\": \\\"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXtrOrder001').\\\",\\n  \\\"crypto|orders|createspot\\\": \\\"A TIMESTAMP showing when the order was first persisted (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|updatespot\\\": \\\"A TIMESTAMP noting the last update to this order (e.g., '2025-05-10 14:02:15').\\\",\\n  \\\"crypto|orderexecutions|orderexecmark\\\": \\\"A BIGSERIAL primary key for each fill/execution (e.g., 210345).\\\",\\n  \\\"crypto|orderexecutions|fillcount\\\": \\\"A DECIMAL(8,4) showing how many units were filled (e.g., '0.0500').\\\",\\n  \\\"crypto|orderexecutions|remaincount\\\": \\\"A NUMERIC(8,4) showing how many units remain unfilled (e.g., '0.0750').\\\",\\n  \\\"crypto|orderexecutions|fillquote\\\": \\\"A DECIMAL(12,3) capturing the fill price (e.g., '27699.150').\\\",\\n  \\\"crypto|orderexecutions|fillsum\\\": \\\"A DECIMAL(12,3) notional of the fill (e.g., '1384.958').\\\",\\n  \\\"crypto|orderexecutions|expirespot\\\": \\\"A TIMESTAMP if the partial fill or order slice expires (e.g., '2025-05-10 15:00:00').\\\",\\n  \\\"crypto|orderexecutions|cancelnote\\\": \\\"An enum (CancelNote_enum) describing cancel reason (Expired, InsufficientFunds, UserRequested).\\\",\\n  \\\"crypto|orderexecutions|exectune\\\": \\\"An enum (ExecTune_enum) indicating execution style (Maker, Taker).\\\",\\n  \\\"crypto|orderexecutions|ordersmark\\\": \\\"A CHAR(36) referencing Orders(RecordVault) to link back to the original order.\\\",\\n  \\\"crypto|fees|feesnode\\\": \\\"A BIGSERIAL primary key for fee records (e.g., 30012).\\\",\\n  \\\"crypto|fees|feerange\\\": \\\"An enum (FeeRange_enum) describing the user's fee tier (Tier4, Tier1, Tier3, Tier2).\\\",\\n  \\\"crypto|fees|feerate\\\": \\\"A DECIMAL(8,5) capturing fee percentage (e.g., '0.00050').\\\",\\n  \\\"crypto|fees|feetotal\\\": \\\"A DECIMAL(12,6) total fee charged (e.g., '0.250000').\\\",\\n  \\\"crypto|fees|feecoin\\\": \\\"An enum (FeeCoin_enum) for the currency used to pay fees (USDC, USD, USDT).\\\",\\n  \\\"crypto|fees|rebrate\\\": \\\"A DECIMAL(8,5) capturing the maker re...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_0x1m0yjcehn1",
+              "response": "{\"result\": \"[\\\"Spread Percentage\\\", \\\"Slippage Impact\\\", \\\"Position Value at Risk (PVaR)\\\", \\\"Arbitrage Opportunity Score (AOS)\\\", \\\"Market Impact Cost (MIC)\\\", \\\"Liquidity Ratio\\\", \\\"Realized Risk Ratio (RRR)\\\", \\\"Margin Utilization\\\", \\\"Order Fill Rate\\\", \\\"Market Efficiency Ratio (MER)\\\", \\\"Whale Order\\\", \\\"Liquidation Risk Level\\\", \\\"Arbitrage Window\\\", \\\"Over-Leveraged Position\\\", \\\"Market Maker Activity\\\", \\\"Smart Money Flow\\\", \\\"Liquidity Crisis\\\", \\\"Momentum Divergence\\\", \\\"Margin Call Risk\\\", \\\"Technical Breakout\\\", \\\"dealedge\\\", \\\"orderflow\\\", \\\"timespan\\\", \\\"posedge\\\", \\\"posmagn\\\", \\\"mktfeel\\\", \\\"techmeter\\\", \\\"whalemotion\\\", \\\"makermotion\\\", \\\"exectune\\\", \\\"Risk-Adjusted Return\\\", \\\"True Cost of Execution\\\", \\\"Order Book Imbalance Ratio\\\", \\\"Effective Leverage\\\", \\\"Profit Factor\\\", \\\"Arbitrage ROI\\\", \\\"Market Depth Ratio\\\", \\\"Volatility-Adjusted Spread\\\", \\\"Risk-to-Reward Ratio\\\", \\\"Technical Signal Strength\\\", \\\"Critically Over-Leveraged Position\\\", \\\"High-Quality Arbitrage Opportunity\\\", \\\"Technical Reversal Signal\\\", \\\"Liquidity Constrained Position\\\", \\\"Optimal Trading Window\\\", \\\"Risk-Efficient Position\\\", \\\"Whale-Driven Market\\\", \\\"Liquidation Cascade Risk\\\", \\\"Perfect Technical Setup\\\", \\\"Flash Crash Vulnerability\\\", \\\"Flow Dominance\\\", \\\"Smart Money Accuracy\\\", \\\"Effective Leverage Risk Classification\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 13.5/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-eabfd85b-deb0-4745-b782-b8fd7e81ab12",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_wyr244w9tbjv",
+              "args": {
+                "sql": "WITH MarketMood AS (\r\n    SELECT \r\n        m.marketdatanode,\r\n        m.quote_depth_snapshot#>'{metadata, mktcombo}' AS market_pair,\r\n        (m.quote_depth_snapshot#>'{spread, spreadrate}')::float AS spread_percentage,\r\n        a.market_sentiment_indicators#>'{momentum, mktfeel}' AS overall_market_mood,\r\n        (a.market_sentiment_indicators#>'{momentum, buyforce}')::float AS buy_force\r\n    FROM \r\n        marketdata AS m\r\n    JOIN \r\n        analyticsindicators AS a ON m.marketdatanode = a.mdataref\r\n),\r\nMoodAvgSpread AS (\r\n    SELECT \r\n        overall_market_mood, \r\n        AVG(spread_percentage) AS avg_spread_percentage\r\n    FROM \r\n        MarketMood\r\n    GROUP BY \r\n        overall_market_mood\r\n),\r\nPercentileRank AS (\r\n    SELECT \r\n        marketdatanode,\r\n        PERCENT_RANK() OVER (ORDER BY spread_percentage) AS percentile_rank\r\n    FROM \r\n        MarketMood\r\n)\r\nSELECT \r\n    mm.market_pair,\r\n    mm.spread_percentage,\r\n    mm.overall_market_mood,\r\n    mm.buy_force,\r\n    mas.avg_spread_percentage,\r\n    pr.percentile_rank\r\nFROM \r\n    MarketMood AS mm\r\nLEFT JOIN \r\n    MoodAvgSpread AS mas ON mm.overall_market_mood = mas.overall_market_mood\r\nLEFT JOIN \r\n    PercentileRank AS pr ON mm.marketdatanode = pr.marketdatanode;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-eabfd85b-deb0-4745-b782-b8fd7e81ab12",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_wyr244w9tbjv",
+              "response": "{\"result\": \"market_pair | spread_percentage | overall_market_mood | buy_force | avg_spread_percentage | percentile_rank ----------------------------------------------------------------------------------------------------------- ETH-USDT | 0.1199 | Bearish | 0.926 | 0.09945134328358202 | 0.6736736736736737 ADA-USDC | 0.1403 | Bearish | 0.253 | 0.09945134328358202 | 0.8288288288288288 BTC-USDT | 0.0904 | Bearish | 0.328 | 0.09945134328358202 | 0.4064064064064064 SOL-USDC | 0.047 | Bullish | 0.317 | 0.10118099688473524 | 0.0970970970970971 ETH-USDC | 0.1497 | Bearish | 0.38 | 0.09945134328358202 | 0.8668668668668669 BTC-USD | 0.1118 | Bullish | 0.527 | 0.10118099688473524 | 0.6056056056056056 SOL-USDC | 0.0718 | Bearish | 0.462 | 0.09945134328358202 | 0.2502502502502503 ADA-USDC | 0.0204 | Bullish | 0.376 | 0.10118099688473524 | 0.02002002002002002 SOL-USDC | 0.0622 | Neutral | 0.726 | 0.1005098837209302 | 0.18118118118118118 BTC-USDT | 0.1153 | Neutral | 0.016 | 0.1005098837209302 | 0.6376376376376376 ETH-USDT | 0.0996 | Bearish | 0.963 | 0.09945134328358202 | 0.47847847847847846 SOL-USDT | 0.0708 | Bullish | 0.973 | 0.10118099688473524 | 0.24124124124124124 BTC-USDC | 0.0747 | Neutral | 0.818 | 0.1005098837209302 | 0.27627627627627627 ADA-USDC | 0.0481 | Neutral | 0.192 | 0.1005098837209302 | 0.1021021021021021 ETH-USDC | 0.0376 | Bullish | 0.536 | 0.10118099688473524 | 0.07407407407407407 ETH-USD | 0.1579 | Bearish | 0.244 | 0.09945134328358202 | 0.9099099099099099 SOL-USDT | 0.1124 | Neutral | 0.261 | 0.1005098837209302 | 0.6096096096096096 BTC-USDT | 0.1702 | Bearish | 0.451 | 0.09945134328358202 | 0.958958958958959 SOL-USDT | 0.0263 | Neutral | 0.875 | 0.1005098837209302 | 0.03903903903903904 ADA-USD | 0.0675 | Bullish | 0.031 | 0.10118099688473524 | 0.2222222222222222 BTC-USDC | 0.061 | Neutral | 0.62 | 0.1005098837209302 | 0.17317317317317318 ETH-USDC | 0.1037 | Neutral | 0.86 | 0.1005098837209302 | 0.5205205205205206 ETH-USDC | 0.0916 | Bullish | 0.286 | 0.10118099688473524 | 0.41541541541541543 ADA-USDC | 0.0155 | Bullish | 0.763 | 0.10118099688473524 | 0.012012012012012012 ADA-USDC | 0.1009 | Bullish | 0.928 | 0.10118099688473524 | 0.4934934934934935 ETH-USDC | 0.1565 | Neutral | 0.288 | 0.1005098837209302 | 0.9059059059059059 BTC-USD | 0.1485 | Bullish | 0.726 | 0.10118099688473524 | 0.8568568568568569 ADA-USD | 0.0763 | Neutral | 0.582 | 0.1005098837209302 | 0.2902902902902903 ADA-USDC | 0.1289 | Bearish | 0.394 | 0.09945134328358202 | 0.7507507507507507 SOL-USDC | 0.0817 | Neutral | 0.913 | 0.1005098837209302 | 0.33433433433433435 ADA-USD | 0.0718 | Neutral | 0.722 | 0.1005098837209302 | 0.2502502502502503 ADA-USD | 0.029 | Bearish | 0.771 | 0.09945134328358202 | 0.05005005005005005 ADA-USD | 0.1272 | Bearish | 0.812 | 0.09945134328358202 | 0.7427427427427428 ADA-USD | 0.1185 | Neutral | 0.46 | 0.1005098837209302 | 0.6656656656656657 SOL-USDC | 0.1704 | Bullish | 0.168 | 0.10118099688473524 | 0.9629629629629629 ADA-USDC | 0.0788 | Bullish | 0.96 | 0.10118099688473524 | 0.3073073073073073 SOL-USDC | 0.1567 | Bearish | 0.908 | 0.09945134328358202 | 0.9079079079079079 BTC-USDC | 0.1071 | Bullish | 0.596 | 0.10118099688473524 | 0.5555555555555556 SOL-USDT | 0.1549 | Bullish | 0.576 | 0.10118099688473524 | 0.8978978978978979 SOL-USDT | 0.0339 | Bearish | 0.823 | 0.09945134328358202 | 0.06306306306306306 SOL-USDT | 0.0857 | Bearish | 0.529 | 0.09945134328358202 | 0.3713713713713714 ADA-USD | 0.0168 | Bearish | 0.239 | 0.09945134328358202 | 0.014014014014014014 ETH-USDT | 0.1134 | Neutral | 0.963 | 0.1005098837209302 | 0.6186186186186187 ETH-USD | 0.0787 | Neutral | 0.83 | 0.1005098837209302 | 0.30430430430430433 ETH-USDT | 0.0438 |...\\n\\n[SYSTEM NOTE: Remaining budget: 12.5/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-eabfd85b-deb0-4745-b782-b8fd7e81ab12",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the analysis of the spread across different markets and its correlation with market mood indicators:\n\n| market_pair | spread_percentage | overall_market_mood | buy_force | avg_spread_percentage | percentile_rank |\n|---|---|---|---|---|---|\n| ETH-USDT | 0.1199 | Bearish | 0.926 | 0.0995 | 0.6737 |\n| ADA-USDC | 0.1403 | Bearish | 0.253 | 0.0995 | 0.8288 |\n| BTC-USDT | 0.0904 | Bearish | 0.328 | 0.0995 | 0.4064 |\n| SOL-USDC | 0.047 | Bullish | 0.317 | 0.1012 | 0.0971 |\n| ETH-USDC | 0.1497 | Bearish | 0.38 | 0.0995 | 0.8669 |\n| BTC-USD | 0.1118 | Bullish | 0.527 | 0.1012 | 0.6056 |\n| SOL-USDC | 0.0718 | Bearish | 0.462 | 0.0995 | 0.2503 |\n| SOL-USDC | 0.0622 | Neutral | 0.726 | 0.1005 | 0.1812 |\n| BTC-USDT | 0.1153 | Neutral | 0.016 | 0.1005 | 0.6376 |\n| ETH-USDT | 0.0996 | Bearish | 0.963 | 0.0995 | 0.4785 |\n| SOL-USDT | 0.0708 | Bullish | 0.973 | 0.1012 | 0.2412 |\n| BTC-USDC | 0.0747 | Neutral | 0.818 | 0.1005 | 0.2763 |\n| ADA-USDC | 0.0481 | Neutral | 0.192 | 0.1005 | 0.1021 |\n| ETH-USDC | 0.0376 | Bullish | 0.536 | 0.1012 | 0.0741 |\n| ETH-USD | 0.1579 | Bearish | 0.244 | 0.0995 | 0.9099 |\n| SOL-USDT | 0.1124 | Neutral | 0.261 | 0.1005 | 0.6096 |\n| BTC-USDT | 0.1702 | Bearish | 0.451 | 0.0995 | 0.9590 |\n| SOL-USDT | 0.0263 | Neutral | 0.875 | 0.1005 | 0.0390 |\n| ADA-USD | 0.0675 | Bullish | 0.031 | 0.1012 | 0.2222 |\n| BTC-USDC | 0.061 | Neutral | 0.62 | 0.1005 | 0.1732 |\n| ETH-USDC | 0.1037 | Neutral | 0.86 | 0.1005 | 0.5205 |\n| ETH-USDC | 0.0916 | Bullish | 0.286 | 0.1012 | 0.4154 |\n| ADA-USDC | 0.0155 | Bullish | 0.763 | 0.1012 | 0.0120 |\n| ADA-USDC | 0.1009 | Bullish | 0.928 | 0.1012 | 0.4935 |\n| ETH-USDC | 0.1565 | Neutral | 0.288 | 0.1005 | 0.9059 |\n| BTC-USD | 0.1485 | Bullish | 0.726 | 0.1012 | 0.8569 |\n| ADA-USD | 0.0763 | Neutral | 0.582 | 0.1005 | 0.2903 |\n| ADA-USDC | 0.1289 | Bearish | 0.394 | 0.0995 | 0.7508 |\n| SOL-USDC | 0.0817 | Neutral | 0.913 | 0.1005 | 0.3343 |\n| ADA-USD | 0.0718 | Neutral | 0.722 | 0.1005 | 0.2503 |\n| ADA-USD | 0.029 | Bearish | 0.771 | 0.0995 | 0.0501 |\n| ADA-USD | 0.1272 | Bearish | 0.812 | 0.0995 | 0.7427 |\n| ADA-USD | 0.1185 | Neutral | 0.46 | 0.1005 | 0.6657 |\n| SOL-USDC | 0.1704 | Bullish | 0.168 | 0.1012 | 0.9630 |\n| ADA-USDC | 0.0788 | Bullish | 0.96 | 0.1012 | 0.3073 |\n| SOL-USDC | 0.1567 | Bearish | 0.908 | 0.0995 | 0.9080 |\n| BTC-USDC | 0.1071 | Bullish | 0.596 | 0.1012 | 0.5556 |\n| SOL-USDT | 0.1549 | Bullish | 0.576 | 0.1012 | 0.8979 |\n| SOL-USDT | 0.0339 | Bearish | 0.823 | 0.0995 | 0.0"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the analysis of the spread across different markets and its correlation with market mood indicators:\n\n| market_pair | spread_percentage | overall_market_mood | buy_force | avg_spread_percentage | percentile_rank |\n|---|---|---|---|---|---|\n| ETH-USDT | 0.1199 | Bearish | 0.926 | 0.0995 | 0.6737 |\n| ADA-USDC | 0.1403 | Bearish | 0.253 | 0.0995 | 0.8288 |\n| BTC-USDT | 0.0904 | Bearish | 0.328 | 0.0995 | 0.4064 |\n| SOL-USDC | 0.047 | Bullish | 0.317 | 0.1012 | 0.0971 |\n| ETH-USDC | 0.1497 | Bearish | 0.38 | 0.0995 | 0.8669 |\n| BTC-USD | 0.1118 | Bullish | 0.527 | 0.1012 | 0.6056 |\n| SOL-USDC | 0.0718 | Bearish | 0.462 | 0.0995 | 0.2503 |\n| SOL-USDC | 0.0622 | Neutral | 0.726 | 0.1005 | 0.1812 |\n| BTC-USDT | 0.1153 | Neutral | 0.016 | 0.1005 | 0.6376 |\n| ETH-USDT | 0.0996 | Bearish | 0.963 | 0.0995 | 0.4785 |\n| SOL-USDT | 0.0708 | Bullish | 0.973 | 0.1012 | 0.2412 |\n| BTC-USDC | 0.0747 | Neutral | 0.818 | 0.1005 | 0.2763 |\n| ADA-USDC | 0.0481 | Neutral | 0.192 | 0.1005 | 0.1021 |\n| ETH-USDC | 0.0376 | Bullish | 0.536 | 0.1012 | 0.0741 |\n| ETH-USD | 0.1579 | Bearish | 0.244 | 0.0995 | 0.9099 |\n| SOL-USDT | 0.1124 | Neutral | 0.261 | 0.1005 | 0.6096 |\n| BTC-USDT | 0.1702 | Bearish | 0.451 | 0.0995 | 0.9590 |\n| SOL-USDT | 0.0263 | Neutral | 0.875 | 0.1005 | 0.0390 |\n| ADA-USD | 0.0675 | Bullish | 0.031 | 0.1012 | 0.2222 |\n| BTC-USDC | 0.061 | Neutral | 0.62 | 0.1005 | 0.1732 |\n| ETH-USDC | 0.1037 | Neutral | 0.86 | 0.1005 | 0.5205 |\n| ETH-USDC | 0.0916 | Bullish | 0.286 | 0.1012 | 0.4154 |\n| ADA-USDC | 0.0155 | Bullish | 0.763 | 0.1012 | 0.0120 |\n| ADA-USDC | 0.1009 | Bullish | 0.928 | 0.1012 | 0.4935 |\n| ETH-USDC | 0.1565 | Neutral | 0.288 | 0.1005 | 0.9059 |\n| BTC-USD | 0.1485 | Bullish | 0.726 | 0.1012 | 0.8569 |\n| ADA-USD | 0.0763 | Neutral | 0.582 | 0.1005 | 0.2903 |\n| ADA-USDC | 0.1289 | Bearish | 0.394 | 0.0995 | 0.7508 |\n| SOL-USDC | 0.0817 | Neutral | 0.913 | 0.1005 | 0.3343 |\n| ADA-USD | 0.0718 | Neutral | 0.722 | 0.1005 | 0.2503 |\n| ADA-USD | 0.029 | Bearish | 0.771 | 0.0995 | 0.0501 |\n| ADA-USD | 0.1272 | Bearish | 0.812 | 0.0995 | 0.7427 |\n| ADA-USD | 0.1185 | Neutral | 0.46 | 0.1005 | 0.6657 |\n| SOL-USDC | 0.1704 | Bullish | 0.168 | 0.1012 | 0.9630 |\n| ADA-USDC | 0.0788 | Bullish | 0.96 | 0.1012 | 0.3073 |\n| SOL-USDC | 0.1567 | Bearish | 0.908 | 0.0995 | 0.9080 |\n| BTC-USDC | 0.1071 | Bullish | 0.596 | 0.1012 | 0.5556 |\n| SOL-USDT | 0.1549 | Bullish | 0.576 | 0.1012 | 0.8979 |\n| SOL-USDT | 0.0339 | Bearish | 0.823 | 0.0995 | 0.0"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "c377bbe1d539453d96d57c27321ba154",
+      "client": "crypto_6",
+      "database": "crypto",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/f0d51b2907b741419fae3edb7b6c34f4/0",
+      "at": 1793848488.995585,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 3.2664000027580187,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "95d555fb61bb4f06a024e20f17ed6477",
+      "client": "crypto_6",
+      "database": "crypto",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/f0d51b2907b741419fae3edb7b6c34f4/0",
+      "at": 1793848570.4135866,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.985499999136664,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "cf8c5a36a99a474fbb4d818f69708589",
+      "client": "crypto_6",
+      "database": "crypto",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/f0d51b2907b741419fae3edb7b6c34f4/0",
+      "at": 1793848621.9380777,
+      "sql": "WITH MarketMood AS (\r\n    SELECT \r\n        m.marketdatanode,\r\n        m.quote_depth_snapshot#>'{metadata, mktcombo}' AS market_pair,\r\n        (m.quote_depth_snapshot#>'{spread, spreadrate}')::float AS spread_percentage,\r\n        a.market_sentiment_indicators#>'{momentum, mktfeel}' AS overall_market_mood,\r\n        (a.market_sentiment_indicators#>'{momentum, buyforce}')::float AS buy_force\r\n    FROM \r\n        marketdata AS m\r\n    JOIN \r\n        analyticsindicators AS a ON m.marketdatanode = a.mdataref\r\n),\r\nMoodAvgSpread AS (\r\n    SELECT \r\n        overall_market_mood, \r\n        AVG(spread_percentage) AS avg_spread_percentage\r\n    FROM \r\n        MarketMood\r\n    GROUP BY \r\n        overall_market_mood\r\n),\r\nPercentileRank AS (\r\n    SELECT \r\n        marketdatanode,\r\n        PERCENT_RANK() OVER (ORDER BY spread_percentage) AS percentile_rank\r\n    FROM \r\n        MarketMood\r\n)\r\nSELECT \r\n    mm.market_pair,\r\n    mm.spread_percentage,\r\n    mm.overall_market_mood,\r\n    mm.buy_force,\r\n    mas.avg_spread_percentage,\r\n    pr.percentile_rank\r\nFROM \r\n    MarketMood AS mm\r\nLEFT JOIN \r\n    MoodAvgSpread AS mas ON mm.overall_market_mood = mas.overall_market_mood\r\nLEFT JOIN \r\n    PercentileRank AS pr ON mm.marketdatanode = pr.marketdatanode;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 33.77850000106264,
+      "response_bytes": 3736,
+      "response_digest": "d2b17f9f88c70e74c6ec30f57717db4faee02424a0b571d294db02bcdb740f8a",
+      "successful": true
+    }
+  ]
+}

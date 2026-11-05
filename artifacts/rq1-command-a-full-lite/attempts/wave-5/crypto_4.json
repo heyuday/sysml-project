@@ -1,0 +1,364 @@
+{
+  "wave": 5,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "crypto_4",
+    "instance_id": "crypto_4",
+    "database": "crypto",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 593.67236328125,
+    "budget_used": 5.5,
+    "budget_remaining": 14.5,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"users\" (\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\nuserstamp character NOT NULL,\nacctscope USER-DEFINED NULL,\n    PRIMARY KEY (usersnode)\n);\n\nFirst 3 rows:\n  usersnode  userstamp    acctscope\n-----------  -----------  -----------\n          1  U583322      Margin\n          2  U810391      Spot\n          3  U485932      Options\n...\n\n\nCREATE TABLE \"riskandmargin\" (\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\nordervault character NULL,\nrisk_margin_profile jsonb NULL,\n    PRIMARY KEY (riskandmarginpivot),\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\n);\n\nFirst 3 rows:\n  riskandmarginpivot  ordervault    risk_margin_profile\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"crypto|users|usersnode\": \"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\",\n  \"crypto|users|userstamp\": \"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\",\n  \"crypto|users|acctscope\": \"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\",\n  \"crypto|orders|orderspivot\": \"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\",\n  \"crypto|orders|recordvault\": \"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\",\n  \"crypto|orders|timecode\": \"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\",\n  \"crypto|orders|exchspot\": \"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\",\n  \"crypto|orders|mktnote\": \"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\",\n  \"crypto|orders|orderstamp\": \"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\",\n  \"crypto|orders|userlink\": \"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\",\n  \"crypto|orders|ordertune\": \"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\",\n  \"crypto|orders|dealedge\": \"An enum (DealEdge_enum) indicating side (Sell, Buy).\",\n  \"crypto|orders|dealquote\": \"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\",\n  \"crypto|orders|dealcount\": \"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\",\n  \"crypto|orders|notionsum\": \"A DECIMAL(12,3) notional value (price \\u00d7 quantity) (e.g., '3475.063').\",\n  \"crypto|orders|orderflow\": \"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\",\n  \"crypto|orders|timespan\": \"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\",\n  \"crypto|orders|orderbase\": \"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\",\n  \"crypto|orders|clientmark\": \"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXt...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_column_meaning",
+        "args": {
+          "table_name": "riskandmargin",
+          "column_name": "risk_margin_profile"
+        },
+        "result": "{\"column_meaning\": \"JSONB column. Bundles leverage settings, margin thresholds, liquidation levels, iceberg layout, multifaceted risk labels, position sizing, margin\\u2011call figures, and collateral details into one field for rapid risk evaluation.\", \"fields_meaning\": {\"leverage\": {\"margform\": \"An enum (MargForm_enum) for margin mode (Isolated, Cross).\", \"levscale\": \"An enum (LevScale_enum) for leverage (1, 2, 3, 5, 10, 20, 50, 100).\"}, \"margin_thresholds\": {\"inithold\": \"A DECIMAL(12,3) initial margin required (e.g., '500.250').\", \"mainthold\": \"A DECIMAL(12,3) maintenance margin threshold (e.g., '300.125').\"}, \"price_levels\": {\"liqquote\": \"A NUMERIC(12,3) liquidation price estimate (e.g., '25000.750').\", \"stopquote\": \"A NUMERIC(12,3) stop price (e.g., '27000.000').\", \"trigquote\": \"A DECIMAL(12,3) advanced trigger price (e.g., '26950.250').\", \"traildiff\": \"A DECIMAL(12,3) trailing delta (e.g., '150.500').\"}, \"iceberg\": {\"icebcount\": \"A DOUBLE PRECISION iceberg hidden portion (e.g., 3.25).\", \"viscount\": \"A DOUBLE PRECISION visible portion (e.g., 1.75).\"}, \"risk_factors\": {\"liqfactor\": \"A VARCHAR(20) label for liquidation risk (e.g., 'HighRisk').\", \"cpfactor\": \"A VARCHAR(30) label for counterparty risk (e.g., 'Tier2Counterparty').\", \"setfactor\": \"A VARCHAR(30) settlement risk label (e.g., 'DailySettle').\", \"custfactor\": \"A VARCHAR(30) custody risk label (e.g., 'ColdStorage').\", \"netfactor\": \"A VARCHAR(30) network risk label (e.g., 'ChainCongestion').\", \"regfactor\": \"A VARCHAR(30) regulatory risk label (e.g., 'RestrictedRegion').\"}, \"position\": {\"poscount\": \"A DECIMAL(12,3) position size in base units (e.g., '0.300').\", \"possum\": \"A DECIMAL(12,3) notional value of position (e.g., '8100.000').\", \"posedge\": \"An enum (PosEdge_enum) for position direction (Short, Long).\", \"posmagn\": \"An enum (PosMagn_enum) representing position leverage (1, 2, 3, 5, 10, 20, 50, 100).\", \"posriskrate\": \"A DECIMAL(5,3) position risk ratio (e.g., '0.455').\"}, \"margin_rates\": {\"margrate\": \"A DE...<truncated>",
+        "cost": 0.5,
+        "budget_before": 18.0,
+        "budget_after": 17.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_column_meaning",
+        "args": {
+          "table_name": "riskandmargin",
+          "column_name": "ordervault"
+        },
+        "result": "A CHAR(36) FK referencing Orders(RecordVault).",
+        "cost": 0.5,
+        "budget_before": 17.5,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_column_meaning",
+        "args": {
+          "table_name": "orders",
+          "column_name": "recordvault"
+        },
+        "result": "A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').",
+        "cost": 0.5,
+        "budget_before": 17.0,
+        "budget_after": 16.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_column_meaning",
+        "args": {
+          "table_name": "accountbalances",
+          "column_name": "accountbalancesnode"
+        },
+        "result": "A BIGSERIAL PK for each balance record (e.g., 88888).",
+        "cost": 0.5,
+        "budget_before": 16.5,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_column_meaning",
+        "args": {
+          "table_name": "accountbalances",
+          "column_name": "margsum"
+        },
+        "result": "A DECIMAL(12,3) margin account balance (e.g., '2000.000').",
+        "cost": 0.5,
+        "budget_before": 16.0,
+        "budget_after": 15.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    rm.risk_margin_profile,\r\n    o.recordvault,\r\n    ab.accountbalancesnode,\r\n    rm.risk_margin_profile->'margin_rates'->>'margrate' AS margrate,\r\n    rm.risk_margin_profile->'margin_rates'->>'margcallquote' AS margcallquote,\r\n    ab.margsum\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    orders o ON rm.ordervault = o.recordvault\r\nJOIN \r\n    accountbalances ab ON o.userlink = ab.usertag;"
+        },
+        "result": "risk_margin_profile | recordvault | accountbalancesnode | margrate | margcallquote | margsum -------------------------------------------------------------------------------------------- {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': | OB798737 | 2 | 0.264 | 11219.320 | 572884.270 {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': | OB179652 | 3 | 0.826 | 6818.720 | 321804.170 {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': | OB827275 | 4 | 0.403 | 40130.120 | 204380.240 {'iceberg': {'viscount': 1.847677, 'icebcount': 1.199823}, 'leverage': {'levscale': '50', 'margform' | OB736523 | 5 | 0.012 | 30258.920 | 375823.340 {'iceberg': {'viscount': 3.304174, 'icebcount': 2.911505}, 'leverage': {'levscale': '3', 'margform': | OB575491 | 6 | 0.609 | 24050.230 | 811884.920 {'iceberg': {'viscount': 0.512129, 'icebcount': 0.305535}, 'leverage': {'levscale': '10', 'margform' | OB892943 | 7 | 0.233 | 32369.690 | 196856.440 {'iceberg': {'viscount': 3.977232, 'icebcount': 2.295108}, 'leverage': {'levscale': '3', 'margform': | OB824478 | 8 | 0.816 | 8853.830 | 525237.000 {'iceberg': {'viscount': 1.316857, 'icebcount': 0.291721}, 'leverage': {'levscale': '20', 'margform' | OB214938 | 9 | 0.249 | 49265.940 | 512257.270 {'iceberg': {'viscount': 4.811834, 'icebcount': 1.813523}, 'leverage': {'levscale': '5', 'margform': | OB825463 | 10 | 0.846 | 51931.200 | 615133.050 {'iceberg': {'viscount': 6.726944, 'icebcount': 1.706737}, 'leverage': {'levscale': '10', 'margform' | OB606787 | 11 | 0.605 | 60067.150 | 606295.110 {'iceberg': {'viscount': 5.489398, 'icebcount': 0.86764}, 'leverage': {'levscale': '10', 'margform': | OB343060 | 12 | 0.378 | 6049.750 | 291061.620 {'iceberg': {'viscount': 1.371216, 'icebcount': 0.70148}, 'leverage': {'levscale': '100', 'margform' | OB351236 | 13 | 0.989 | 29528.960 | 742510.110 {'iceberg': {'viscount': 4...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.5,
+        "budget_after": 14.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: crypto\nTask ID: crypto_4\n\nUser Query:\nPlease display the risk profile ID, the related order, the account balance ID, the margin requirement, the margin balance, and the margin usage.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_09n3a1fkmw7z",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_2bfccdth8t1r",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_09n3a1fkmw7z",
+              "response": "{\"result\": \"CREATE TABLE \\\"users\\\" (\\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\\nuserstamp character NOT NULL,\\nacctscope USER-DEFINED NULL,\\n    PRIMARY KEY (usersnode)\\n);\\n\\nFirst 3 rows:\\n  usersnode  userstamp    acctscope\\n-----------  -----------  -----------\\n          1  U583322      Margin\\n          2  U810391      Spot\\n          3  U485932      Options\\n...\\n\\n\\nCREATE TABLE \\\"riskandmargin\\\" (\\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\\nordervault character NULL,\\nrisk_margin_profile jsonb NULL,\\n    PRIMARY KEY (riskandmarginpivot),\\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\\n);\\n\\nFirst 3 rows:\\n  riskandmarginpivot  ordervault    risk_margin_profile\\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10308.06, 'traildiff': 0.02, 'trigquote': 10689.56}, 'risk_factors': {'cpfactor': '0.823', 'liqfactor': '0.171', 'netfactor': '0.896', 'regfactor': '0.975', 'setfactor': '0.755', 'custfactor': '0.544'}, 'margin_thresholds': {'inithold': 81019.9, 'mainthold': 40509.95}}\\n                   3  OB179652      {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': None}, 'position': {'possum': 990687.61, 'posedge': 'Short', 'posmagn': '2', 'poscount': 92.888, 'posriskrate': 0.553}, 'collateral': {'collsum': 19000.13, 'collcoin': 'USDT', 'collrate': 0.438, 'insfundshare': 4.53}, 'margin_rates': {'margrate': 0.826, 'bkptquote': 11913.55, 'margcallquote': 6818.72}, 'price_levels': {'liqquote': 11661.77, 'stopquote': 10558.32, 'traildiff': 0.03, 'trigquote': 11263.9}, 'risk_factors': {'cpfactor': '0.286', 'liqfactor': '0.639', 'netfactor': '0.803', 'regfactor': '0.416', 'setfactor': '0.538', 'custfactor': '0.728'}, 'margin_thresholds': {'inithold': 42532.07, 'mainthold': 21266.03}}\\n                   4  OB827275      {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': None}, 'position': {'possum': 1210450.2, 'posedge': 'Long', 'posmagn': '1', 'poscount': 32.377, 'posriskrate': 0.836}, 'collateral': {'collsum': 87696.52, 'collcoin': 'USDT', 'collrate': 0.381, 'insfundshare': 38.45}, 'margin_rates': {'margrate': 0.403, 'bkptquote': 27881.46, 'margcallquote': 40130.12}, 'price_levels': {'liqquote': 34894.2, 'stopquote': 34914.37, 'traildiff': 0.038, 'trigquote': 35326.06}, 'risk_factors': {'cpfactor': '0.712', 'liqfactor': '0.959', 'netfactor': '0.226', 'regfactor': '0.421', 'setfactor': '0.296', 'custfactor': '0.199'}, 'margin_thresholds': {'inithold': 93681.57, 'mainthold': 46840.79}}\\n...\\n\\n\\nCREATE TABLE \\\"orders\\\" (\\norderspivot bigint NOT NULL DEFAULT nextval('orders_orderspivot_seq'::regclass),\\nrecordvault character NOT NULL,\\ntimecod...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_2bfccdth8t1r",
+              "response": "{\"result\": \"{\\n  \\\"crypto|users|usersnode\\\": \\\"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\\\",\\n  \\\"crypto|users|userstamp\\\": \\\"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\\\",\\n  \\\"crypto|users|acctscope\\\": \\\"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\\\",\\n  \\\"crypto|orders|orderspivot\\\": \\\"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\\\",\\n  \\\"crypto|orders|recordvault\\\": \\\"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\\\",\\n  \\\"crypto|orders|timecode\\\": \\\"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|exchspot\\\": \\\"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\\\",\\n  \\\"crypto|orders|mktnote\\\": \\\"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\\\",\\n  \\\"crypto|orders|orderstamp\\\": \\\"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\\\",\\n  \\\"crypto|orders|userlink\\\": \\\"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\\\",\\n  \\\"crypto|orders|ordertune\\\": \\\"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\\\",\\n  \\\"crypto|orders|dealedge\\\": \\\"An enum (DealEdge_enum) indicating side (Sell, Buy).\\\",\\n  \\\"crypto|orders|dealquote\\\": \\\"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\\\",\\n  \\\"crypto|orders|dealcount\\\": \\\"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\\\",\\n  \\\"crypto|orders|notionsum\\\": \\\"A DECIMAL(12,3) notional value (price \\\\u00d7 quantity) (e.g., '3475.063').\\\",\\n  \\\"crypto|orders|orderflow\\\": \\\"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\\\",\\n  \\\"crypto|orders|timespan\\\": \\\"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\\\",\\n  \\\"crypto|orders|orderbase\\\": \\\"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\\\",\\n  \\\"crypto|orders|clientmark\\\": \\\"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXtrOrder001').\\\",\\n  \\\"crypto|orders|createspot\\\": \\\"A TIMESTAMP showing when the order was first persisted (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|updatespot\\\": \\\"A TIMESTAMP noting the last update to this order (e.g., '2025-05-10 14:02:15').\\\",\\n  \\\"crypto|orderexecutions|orderexecmark\\\": \\\"A BIGSERIAL primary key for each fill/execution (e.g., 210345).\\\",\\n  \\\"crypto|orderexecutions|fillcount\\\": \\\"A DECIMAL(8,4) showing how many units were filled (e.g., '0.0500').\\\",\\n  \\\"crypto|orderexecutions|remaincount\\\": \\\"A NUMERIC(8,4) showing how many units remain unfilled (e.g., '0.0750').\\\",\\n  \\\"crypto|orderexecutions|fillquote\\\": \\\"A DECIMAL(12,3) capturing the fill price (e.g., '27699.150').\\\",\\n  \\\"crypto|orderexecutions|fillsum\\\": \\\"A DECIMAL(12,3) notional of the fill (e.g., '1384.958').\\\",\\n  \\\"crypto|orderexecutions|expirespot\\\": \\\"A TIMESTAMP if the partial fill or order slice expires (e.g., '2025-05-10 15:00:00').\\\",\\n  \\\"crypto|orderexecutions|cancelnote\\\": \\\"An enum (CancelNote_enum) describing cancel reason (Expired, InsufficientFunds, UserRequested).\\\",\\n  \\\"crypto|orderexecutions|exectune\\\": \\\"An enum (ExecTune_enum) indicating execution style (Maker, Taker).\\\",\\n  \\\"crypto|orderexecutions|ordersmark\\\": \\\"A CHAR(36) referencing Orders(RecordVault) to link back to the original order.\\\",\\n  \\\"crypto|fees|feesnode\\\": \\\"A BIGSERIAL primary key for fee records (e.g., 30012).\\\",\\n  \\\"crypto|fees|feerange\\\": \\\"An enum (FeeRange_enum) describing the user's fee tier (Tier4, Tier1, Tier3, Tier2).\\\",\\n  \\\"crypto|fees|feerate\\\": \\\"A DECIMAL(8,5) capturing fee percentage (e.g., '0.00050').\\\",\\n  \\\"crypto|fees|feetotal\\\": \\\"A DECIMAL(12,6) total fee charged (e.g., '0.250000').\\\",\\n  \\\"crypto|fees|feecoin\\\": \\\"An enum (FeeCoin_enum) for the currency used to pay fees (USDC, USD, USDT).\\\",\\n  \\\"crypto|fees|rebrate\\\": \\\"A DECIMAL(8,5) capturing the maker re...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_22zk98yf7h0j",
+              "args": {
+                "table_name": "riskandmargin",
+                "column_name": "risk_margin_profile"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_b1vwkd2vac7w",
+              "args": {
+                "table_name": "riskandmargin",
+                "column_name": "ordervault"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_cspdmb067sqt",
+              "args": {
+                "table_name": "orders",
+                "column_name": "recordvault"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_aqqt3m1f481d",
+              "args": {
+                "table_name": "accountbalances",
+                "column_name": "accountbalancesnode"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_hg0ysy0eeern",
+              "args": {
+                "table_name": "accountbalances",
+                "column_name": "margsum"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_22zk98yf7h0j",
+              "response": "{\"result\": \"{\\\"column_meaning\\\": \\\"JSONB column. Bundles leverage settings, margin thresholds, liquidation levels, iceberg layout, multifaceted risk labels, position sizing, margin\\\\u2011call figures, and collateral details into one field for rapid risk evaluation.\\\", \\\"fields_meaning\\\": {\\\"leverage\\\": {\\\"margform\\\": \\\"An enum (MargForm_enum) for margin mode (Isolated, Cross).\\\", \\\"levscale\\\": \\\"An enum (LevScale_enum) for leverage (1, 2, 3, 5, 10, 20, 50, 100).\\\"}, \\\"margin_thresholds\\\": {\\\"inithold\\\": \\\"A DECIMAL(12,3) initial margin required (e.g., '500.250').\\\", \\\"mainthold\\\": \\\"A DECIMAL(12,3) maintenance margin threshold (e.g., '300.125').\\\"}, \\\"price_levels\\\": {\\\"liqquote\\\": \\\"A NUMERIC(12,3) liquidation price estimate (e.g., '25000.750').\\\", \\\"stopquote\\\": \\\"A NUMERIC(12,3) stop price (e.g., '27000.000').\\\", \\\"trigquote\\\": \\\"A DECIMAL(12,3) advanced trigger price (e.g., '26950.250').\\\", \\\"traildiff\\\": \\\"A DECIMAL(12,3) trailing delta (e.g., '150.500').\\\"}, \\\"iceberg\\\": {\\\"icebcount\\\": \\\"A DOUBLE PRECISION iceberg hidden portion (e.g., 3.25).\\\", \\\"viscount\\\": \\\"A DOUBLE PRECISION visible portion (e.g., 1.75).\\\"}, \\\"risk_factors\\\": {\\\"liqfactor\\\": \\\"A VARCHAR(20) label for liquidation risk (e.g., 'HighRisk').\\\", \\\"cpfactor\\\": \\\"A VARCHAR(30) label for counterparty risk (e.g., 'Tier2Counterparty').\\\", \\\"setfactor\\\": \\\"A VARCHAR(30) settlement risk label (e.g., 'DailySettle').\\\", \\\"custfactor\\\": \\\"A VARCHAR(30) custody risk label (e.g., 'ColdStorage').\\\", \\\"netfactor\\\": \\\"A VARCHAR(30) network risk label (e.g., 'ChainCongestion').\\\", \\\"regfactor\\\": \\\"A VARCHAR(30) regulatory risk label (e.g., 'RestrictedRegion').\\\"}, \\\"position\\\": {\\\"poscount\\\": \\\"A DECIMAL(12,3) position size in base units (e.g., '0.300').\\\", \\\"possum\\\": \\\"A DECIMAL(12,3) notional value of position (e.g., '8100.000').\\\", \\\"posedge\\\": \\\"An enum (PosEdge_enum) for position direction (Short, Long).\\\", \\\"posmagn\\\": \\\"An enum (PosMagn_enum) representing position leverage (1, 2, 3, 5, 10, 20, 50, 100).\\\", \\\"posriskrate\\\": \\\"A DECIMAL(5,3) position risk ratio (e.g., '0.455').\\\"}, \\\"margin_rates\\\": {\\\"margrate\\\": \\\"A DECIMAL(5,3) margin ratio (e.g., '0.300').\\\", \\\"margcallquote\\\": \\\"A DECIMAL(12,3) margin-call trigger price (e.g., '25500.250').\\\", \\\"bkptquote\\\": \\\"A DECIMAL(12,3) bankruptcy or forced liquidation price (e.g., '25000.000').\\\"}, \\\"collateral\\\": {\\\"collrate\\\": \\\"A DECIMAL(5,3) collateral ratio (e.g., '0.600').\\\", \\\"collsum\\\": \\\"A DECIMAL(12,3) collateral amount posted (e.g., '5000.000').\\\", \\\"collcoin\\\": \\\"An enum (CollCoin_enum) referencing collateral currency (USDT, USDC, BTC, ETH).\\\", \\\"insfundshare\\\": \\\"A DECIMAL(12,3) portion allocated from the insurance fund (e.g., '50.000').\\\"}}}\\n\\n[SYSTEM NOTE: Remaining budget: 17.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_b1vwkd2vac7w",
+              "response": "{\"result\": \"A CHAR(36) FK referencing Orders(RecordVault).\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_cspdmb067sqt",
+              "response": "{\"result\": \"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\\n\\n[SYSTEM NOTE: Remaining budget: 16.5/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_aqqt3m1f481d",
+              "response": "{\"result\": \"A BIGSERIAL PK for each balance record (e.g., 88888).\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/20.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_column_meaning",
+              "id": "get_column_meaning_hg0ysy0eeern",
+              "response": "{\"result\": \"A DECIMAL(12,3) margin account balance (e.g., '2000.000').\\n\\n[SYSTEM NOTE: Remaining budget: 15.5/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_h862cj1wdkk0",
+              "args": {
+                "sql": "SELECT \r\n    rm.risk_margin_profile,\r\n    o.recordvault,\r\n    ab.accountbalancesnode,\r\n    rm.risk_margin_profile->'margin_rates'->>'margrate' AS margrate,\r\n    rm.risk_margin_profile->'margin_rates'->>'margcallquote' AS margcallquote,\r\n    ab.margsum\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    orders o ON rm.ordervault = o.recordvault\r\nJOIN \r\n    accountbalances ab ON o.userlink = ab.usertag;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_h862cj1wdkk0",
+              "response": "{\"result\": \"risk_margin_profile | recordvault | accountbalancesnode | margrate | margcallquote | margsum -------------------------------------------------------------------------------------------- {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': | OB798737 | 2 | 0.264 | 11219.320 | 572884.270 {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': | OB179652 | 3 | 0.826 | 6818.720 | 321804.170 {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': | OB827275 | 4 | 0.403 | 40130.120 | 204380.240 {'iceberg': {'viscount': 1.847677, 'icebcount': 1.199823}, 'leverage': {'levscale': '50', 'margform' | OB736523 | 5 | 0.012 | 30258.920 | 375823.340 {'iceberg': {'viscount': 3.304174, 'icebcount': 2.911505}, 'leverage': {'levscale': '3', 'margform': | OB575491 | 6 | 0.609 | 24050.230 | 811884.920 {'iceberg': {'viscount': 0.512129, 'icebcount': 0.305535}, 'leverage': {'levscale': '10', 'margform' | OB892943 | 7 | 0.233 | 32369.690 | 196856.440 {'iceberg': {'viscount': 3.977232, 'icebcount': 2.295108}, 'leverage': {'levscale': '3', 'margform': | OB824478 | 8 | 0.816 | 8853.830 | 525237.000 {'iceberg': {'viscount': 1.316857, 'icebcount': 0.291721}, 'leverage': {'levscale': '20', 'margform' | OB214938 | 9 | 0.249 | 49265.940 | 512257.270 {'iceberg': {'viscount': 4.811834, 'icebcount': 1.813523}, 'leverage': {'levscale': '5', 'margform': | OB825463 | 10 | 0.846 | 51931.200 | 615133.050 {'iceberg': {'viscount': 6.726944, 'icebcount': 1.706737}, 'leverage': {'levscale': '10', 'margform' | OB606787 | 11 | 0.605 | 60067.150 | 606295.110 {'iceberg': {'viscount': 5.489398, 'icebcount': 0.86764}, 'leverage': {'levscale': '10', 'margform': | OB343060 | 12 | 0.378 | 6049.750 | 291061.620 {'iceberg': {'viscount': 1.371216, 'icebcount': 0.70148}, 'leverage': {'levscale': '100', 'margform' | OB351236 | 13 | 0.989 | 29528.960 | 742510.110 {'iceberg': {'viscount': 4.73647, 'icebcount': 4.119615}, 'leverage': {'levscale': '1', 'margform': | OB808052 | 14 | 0.561 | 60472.150 | 825439.810 {'iceberg': {'viscount': 0.595256, 'icebcount': 0.241065}, 'leverage': {'levscale': '5', 'margform': | OB947435 | 15 | 0.151 | 18901.750 | 64846.540 {'iceberg': {'viscount': 3.020202, 'icebcount': 2.481995}, 'leverage': {'levscale': '20', 'margform' | OB521601 | 16 | 0.329 | 692.600 | 780437.460 {'iceberg': {'viscount': 4.925251, 'icebcount': 2.470474}, 'leverage': {'levscale': '100', 'margform | OB779587 | 17 | 0.872 | 24657.890 | 558404.040 {'iceberg': {'viscount': 3.07168, 'icebcount': 1.553232}, 'leverage': {'levscale': '5', 'margform': | OB504770 | 18 | 0.873 | 33754.690 | 187048.730 {'iceberg': {'viscount': 3.114321, 'icebcount': 0.636652}, 'leverage': {'levscale': '2', 'margform': | OB267869 | 19 | 0.905 | 2641.810 | 424989.590 {'iceberg': {'viscount': 3.081185, 'icebcount': 1.626477}, 'leverage': {'levscale': '5', 'margform': | OB193060 | 20 | 0.663 | 9081.160 | 945926.030 {'iceberg': {'viscount': 4.649646, 'icebcount': 3.457738}, 'leverage': {'levscale': '100', 'margform | OB745580 | 21 | 0.195 | 27528.620 | 231176.340 {'iceberg': {'viscount': 5.475437, 'icebcount': 3.453016}, 'leverage': {'levscale': '50', 'margform' | OB696539 | 22 | 0.586 | 24236.950 | 731653.560 {'iceberg': {'viscount': 0.075347, 'icebcount': 0.066348}, 'leverage': {'levscale': '3', 'margform': | OB196905 | 23 | 0.448 | 59583.190 | 770866.640 {'iceberg': {'viscount': 1.449988, 'icebcount': 1.416046}, 'leverage': {'levscale': '1', 'margform': | OB588281 | 24 | 0.062 | 11101.000 | 489136.390 {'iceberg': {'viscount': 0.762932, 'icebcount': 0.648707}, 'leverage': {'levscale': '1', 'margform': | OB231520 | 25 | 0.585 | 5940.250 | 671980.720 {'iceberg': {'viscount': 3.541865, 'icebcount': 2.391993}, 'leverage': {'levscale': '3', 'margform': | OB479561 | 26 | 0.222 | 310.370 | 714413.730 {'iceberg': {'viscount': 8.763209, 'icebcount': 1.081444}, 'leverage': {'l...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-9a2c3f02-3362-481d-bb7d-dd20aeb2e7d4",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the information you requested:\n\n| risk_margin_profile | ordervault | accountbalancesnode | margrate | margcallquote | margsum |\n|---|---|---|---|---|---|\n| {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': | OB798737 | 2 | 0.264 | 11219.320 | 572884.270 |\n| {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': | OB179652 | 3 | 0.826 | 6818.720 | 321804.170 |\n| {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': | OB827275 | 4 | 0.403 | 40130.120 | 204380.240 |\n| {'iceberg': {'viscount': 1.847677, 'icebcount': 1.199823}, 'leverage': {'levscale': '50', 'margform' | OB736523 | 5 | 0.012 | 30258.920 | 375823.340 |\n| {'iceberg': {'viscount': 3.304174, 'icebcount': 2.911505}, 'leverage': {'levscale': '3', 'margform': | OB575491 | 6 | 0.609 | 24050.230 | 811884.920 |\n| {'iceberg': {'viscount': 0.512129, 'icebcount': 0.305535}, 'leverage': {'levscale': '10', 'margform' | OB892943 | 7 | 0.233 | 32369.690 | 196856.440 |\n| {'iceberg': {'viscount': 3.977232, 'icebcount': 2.295108}, 'leverage': {'levscale': '3', 'margform': | OB824478 | 8 | 0.816 | 8853.830 | 525237.000 |\n| {'iceberg': {'viscount': 1.316857, 'icebcount': 0.291721}, 'leverage': {'levscale': '20', 'margform' | OB214938 | 9 | 0.249 | 49265.940 | 512257.270 |\n| {'iceberg': {'viscount': 4.811834, 'icebcount': 1.813523}, 'leverage': {'levscale': '5', 'margform': | OB825463 | 10 | 0.846 | 51931.200 | 615133.050 |\n| {'iceberg': {'viscount': 6.726944, 'icebcount': 1.706737}, 'leverage': {'levscale': '10', 'margform' | OB606787 | 11 | 0.605 | 60067.150 | 606295.110 |\n| {'iceberg': {'viscount': 5.489398, 'icebcount': 0.86764}, 'leverage': {'levscale': '10', 'margform': | OB343060 | 12 | 0.378 | 6049.750 | 291061.620 |\n| {'iceberg': {'viscount': 1.371216, 'icebcount': 0.70148}, 'leverage': {'levscale': '100', 'margform' | OB351236 | 13 | 0.989 | 29528.960 | 742510.110 |\n| {'iceberg': {'viscount': 4.73647, 'icebcount': 4.119615}, 'leverage': {'levscale': '1', 'margform': | OB808052 | 14 | 0.561 | 60472.150 | 825439.810 |\n| {'iceberg': {'viscount': 0.595256, 'icebcount': 0.241065}, 'leverage': {'levscale': '5', 'margform': | OB947435 | 15 | 0.151 | 18901.750 | 64846.540 |\n| {'iceberg': {'viscount': 3.020202, 'icebcount': 2.481995}, 'leverage': {'levscale': '20', 'margform' | OB521601 | 16 | 0.329 | 692.600 | 780437.460 |\n| {'iceberg': {'viscount': 4.925251, 'icebcount': 2.470474}, 'leverage': {'levscale': '100', 'margform | OB779587 | 17 | 0.872 | 24657.890 | 558404.040 |\n| {'iceberg': {'viscount': 3.07168, 'icebcount': 1.553232}, 'leverage': {'levscale': '5', 'margform': | OB504770 | 18 | 0.873 | 33754.690 | 187048.730 |\n| {'iceberg': {'viscount': 3.114321, 'icebcount': 0.636652}, 'leverage': {'levscale': '2', 'margform': | OB267869 | 19 | 0.905 | 2641.810 | 424989.590 |\n| {'iceberg': {'viscount': 3.081185, 'icebcount': 1.626477}, 'leverage': {'levscale': '5', 'margform': | OB193060 | 20 | 0.663 | 9081.160 | 945926.030 |\n| {'iceberg': {'viscount': 4.649646, 'icebcount': 3.457738}, 'leverage': {'levscale': '100', 'margform | OB745580 | 21 | 0.195 | 27528.620 | 231176.340 |\n| {'iceberg': {'viscount': 5.475437, 'icebcount': 3.453016}, 'leverage': {'levscale': '50', 'margform' | OB696539 | 22 | 0.586 | 24236.950 | 731653.560 |\n| {'iceberg': {'viscount': 0.075347, 'icebcount': 0.066348}, 'leverage': {'levscale': '3', 'margform': | OB196905 | 23 | 0.448 | 59583.190 | 770866.640 |\n| {'iceberg': {'viscount': 1.449988, 'icebcount': 1.416046}, 'leverage': {'levscale': '1', 'margform': | OB588281 | 24 | 0.062 | 11101.000 | 489136.390 |\n| {'iceberg': {'viscount': 0.762932, 'icebcount': 0.648707}, 'leverage': {'levscale': '1', 'margform': | OB231520 | 25 | 0.585 | 5940.250 | 671980.720 |\n| {'iceberg': {'viscount': 3.541865, 'icebcount': 2.391993}, 'leverage': {'levscale': '3', 'margform': | OB479561 | 26 | 0.222 | 310.370 | 714413.730 |\n| {'iceber...<truncated>"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the information you requested:\n\n| risk_margin_profile | ordervault | accountbalancesnode | margrate | margcallquote | margsum |\n|---|---|---|---|---|---|\n| {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': | OB798737 | 2 | 0.264 | 11219.320 | 572884.270 |\n| {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': | OB179652 | 3 | 0.826 | 6818.720 | 321804.170 |\n| {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': | OB827275 | 4 | 0.403 | 40130.120 | 204380.240 |\n| {'iceberg': {'viscount': 1.847677, 'icebcount': 1.199823}, 'leverage': {'levscale': '50', 'margform' | OB736523 | 5 | 0.012 | 30258.920 | 375823.340 |\n| {'iceberg': {'viscount': 3.304174, 'icebcount': 2.911505}, 'leverage': {'levscale': '3', 'margform': | OB575491 | 6 | 0.609 | 24050.230 | 811884.920 |\n| {'iceberg': {'viscount': 0.512129, 'icebcount': 0.305535}, 'leverage': {'levscale': '10', 'margform' | OB892943 | 7 | 0.233 | 32369.690 | 196856.440 |\n| {'iceberg': {'viscount': 3.977232, 'icebcount': 2.295108}, 'leverage': {'levscale': '3', 'margform': | OB824478 | 8 | 0.816 | 8853.830 | 525237.000 |\n| {'iceberg': {'viscount': 1.316857, 'icebcount': 0.291721}, 'leverage': {'levscale': '20', 'margform' | OB214938 | 9 | 0.249 | 49265.940 | 512257.270 |\n| {'iceberg': {'viscount': 4.811834, 'icebcount': 1.813523}, 'leverage': {'levscale': '5', 'margform': | OB825463 | 10 | 0.846 | 51931.200 | 615133.050 |\n| {'iceberg': {'viscount': 6.726944, 'icebcount': 1.706737}, 'leverage': {'levscale': '10', 'margform' | OB606787 | 11 | 0.605 | 60067.150 | 606295.110 |\n| {'iceberg': {'viscount': 5.489398, 'icebcount': 0.86764}, 'leverage': {'levscale': '10', 'margform': | OB343060 | 12 | 0.378 | 6049.750 | 291061.620 |\n| {'iceberg': {'viscount': 1.371216, 'icebcount': 0.70148}, 'leverage': {'levscale': '100', 'margform' | OB351236 | 13 | 0.989 | 29528.960 | 742510.110 |\n| {'iceberg': {'viscount': 4.73647, 'icebcount': 4.119615}, 'leverage': {'levscale': '1', 'margform': | OB808052 | 14 | 0.561 | 60472.150 | 825439.810 |\n| {'iceberg': {'viscount': 0.595256, 'icebcount': 0.241065}, 'leverage': {'levscale': '5', 'margform': | OB947435 | 15 | 0.151 | 18901.750 | 64846.540 |\n| {'iceberg': {'viscount': 3.020202, 'icebcount': 2.481995}, 'leverage': {'levscale': '20', 'margform' | OB521601 | 16 | 0.329 | 692.600 | 780437.460 |\n| {'iceberg': {'viscount': 4.925251, 'icebcount': 2.470474}, 'leverage': {'levscale': '100', 'margform | OB779587 | 17 | 0.872 | 24657.890 | 558404.040 |\n| {'iceberg': {'viscount': 3.07168, 'icebcount': 1.553232}, 'leverage': {'levscale': '5', 'margform': | OB504770 | 18 | 0.873 | 33754.690 | 187048.730 |\n| {'iceberg': {'viscount': 3.114321, 'icebcount': 0.636652}, 'leverage': {'levscale': '2', 'margform': | OB267869 | 19 | 0.905 | 2641.810 | 424989.590 |\n| {'iceberg': {'viscount': 3.081185, 'icebcount': 1.626477}, 'leverage': {'levscale': '5', 'margform': | OB193060 | 20 | 0.663 | 9081.160 | 945926.030 |\n| {'iceberg': {'viscount': 4.649646, 'icebcount': 3.457738}, 'leverage': {'levscale': '100', 'margform | OB745580 | 21 | 0.195 | 27528.620 | 231176.340 |\n| {'iceberg': {'viscount': 5.475437, 'icebcount': 3.453016}, 'leverage': {'levscale': '50', 'margform' | OB696539 | 22 | 0.586 | 24236.950 | 731653.560 |\n| {'iceberg': {'viscount': 0.075347, 'icebcount': 0.066348}, 'leverage': {'levscale': '3', 'margform': | OB196905 | 23 | 0.448 | 59583.190 | 770866.640 |\n| {'iceberg': {'viscount': 1.449988, 'icebcount': 1.416046}, 'leverage': {'levscale': '1', 'margform': | OB588281 | 24 | 0.062 | 11101.000 | 489136.390 |\n| {'iceberg': {'viscount': 0.762932, 'icebcount': 0.648707}, 'leverage': {'levscale': '1', 'margform': | OB231520 | 25 | 0.585 | 5940.250 | 671980.720 |\n| {'iceberg': {'viscount': 3.541865, 'icebcount': 2.391993}, 'leverage': {'levscale': '3', 'margform': | OB479561 | 26 | 0.222 | 310.370 | 714413.730 |\n| {'iceberg': {'viscount': 8.763209, 'icebcount': 1.081444}, 'leverage': {'levscale': '1', 'margform': | OB180974 | 27 |\n\nThe table above contains the risk_margin_profile, ordervault,"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "99a653f728764c3eb130c122059c6e5b",
+      "client": "crypto_4",
+      "database": "crypto",
+      "scope": "bbcefac208b54e959c4153106e599f9c/c23b3a0c7d5f4e93970e897c643e1c4d/0",
+      "at": 1793858887.1548736,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 3.558500000508502,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "161e7439727e4f7880bb96f3b9715740",
+      "client": "crypto_4",
+      "database": "crypto",
+      "scope": "bbcefac208b54e959c4153106e599f9c/c23b3a0c7d5f4e93970e897c643e1c4d/0",
+      "at": 1793858918.7000995,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 3.0393999986699782,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "16d35a577bcd4a27838d3fdac7f9ee3a",
+      "client": "crypto_4",
+      "database": "crypto",
+      "scope": "bbcefac208b54e959c4153106e599f9c/c23b3a0c7d5f4e93970e897c643e1c4d/0",
+      "at": 1793859051.8539674,
+      "sql": "SELECT \r\n    rm.risk_margin_profile,\r\n    o.recordvault,\r\n    ab.accountbalancesnode,\r\n    rm.risk_margin_profile->'margin_rates'->>'margrate' AS margrate,\r\n    rm.risk_margin_profile->'margin_rates'->>'margcallquote' AS margcallquote,\r\n    ab.margsum\r\nFROM \r\n    riskandmargin rm\r\nJOIN \r\n    orders o ON rm.ordervault = o.recordvault\r\nJOIN \r\n    accountbalances ab ON o.userlink = ab.usertag;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 58.91189999965718,
+      "response_bytes": 4074,
+      "response_digest": "796455b4f09efe96aa6f8e5f065d134c316765229fe6d0845ed98d3ce594e66c",
+      "successful": true
+    }
+  ]
+}

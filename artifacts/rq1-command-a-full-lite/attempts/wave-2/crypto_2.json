@@ -1,0 +1,225 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "crypto_2",
+    "instance_id": "crypto_2",
+    "database": "crypto",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 466.79613876342773,
+    "budget_used": 3.5,
+    "budget_remaining": 12.5,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"users\" (\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\nuserstamp character NOT NULL,\nacctscope USER-DEFINED NULL,\n    PRIMARY KEY (usersnode)\n);\n\nFirst 3 rows:\n  usersnode  userstamp    acctscope\n-----------  -----------  -----------\n          1  U583322      Margin\n          2  U810391      Spot\n          3  U485932      Options\n...\n\n\nCREATE TABLE \"riskandmargin\" (\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\nordervault character NULL,\nrisk_margin_profile jsonb NULL,\n    PRIMARY KEY (riskandmarginpivot),\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\n);\n\nFirst 3 rows:\n  riskandmarginpivot  ordervault    risk_margin_profile\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10...<truncated>",
+        "cost": 1.0,
+        "budget_before": 16.0,
+        "budget_after": 15.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"crypto|users|usersnode\": \"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\",\n  \"crypto|users|userstamp\": \"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\",\n  \"crypto|users|acctscope\": \"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\",\n  \"crypto|orders|orderspivot\": \"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\",\n  \"crypto|orders|recordvault\": \"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\",\n  \"crypto|orders|timecode\": \"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\",\n  \"crypto|orders|exchspot\": \"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\",\n  \"crypto|orders|mktnote\": \"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\",\n  \"crypto|orders|orderstamp\": \"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\",\n  \"crypto|orders|userlink\": \"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\",\n  \"crypto|orders|ordertune\": \"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\",\n  \"crypto|orders|dealedge\": \"An enum (DealEdge_enum) indicating side (Sell, Buy).\",\n  \"crypto|orders|dealquote\": \"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\",\n  \"crypto|orders|dealcount\": \"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\",\n  \"crypto|orders|notionsum\": \"A DECIMAL(12,3) notional value (price \\u00d7 quantity) (e.g., '3475.063').\",\n  \"crypto|orders|orderflow\": \"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\",\n  \"crypto|orders|timespan\": \"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\",\n  \"crypto|orders|orderbase\": \"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\",\n  \"crypto|orders|clientmark\": \"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXt...<truncated>",
+        "cost": 1.0,
+        "budget_before": 15.0,
+        "budget_after": 14.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Spread Percentage\", \"Slippage Impact\", \"Position Value at Risk (PVaR)\", \"Arbitrage Opportunity Score (AOS)\", \"Market Impact Cost (MIC)\", \"Liquidity Ratio\", \"Realized Risk Ratio (RRR)\", \"Margin Utilization\", \"Order Fill Rate\", \"Market Efficiency Ratio (MER)\", \"Whale Order\", \"Liquidation Risk Level\", \"Arbitrage Window\", \"Over-Leveraged Position\", \"Market Maker Activity\", \"Smart Money Flow\", \"Liquidity Crisis\", \"Momentum Divergence\", \"Margin Call Risk\", \"Technical Breakout\", \"dealedge\", \"orderflow\", \"timespan\", \"posedge\", \"posmagn\", \"mktfeel\", \"techmeter\", \"whalemotion\", \"makermotion\", \"exectune\", \"Risk-Adjusted Return\", \"True Cost of Execution\", \"Order Book Imbalance Ratio\", \"Effective Leverage\", \"Profit Factor\", \"Arbitrage ROI\", \"Market Depth Ratio\", \"Volatility-Adjusted Spread\", \"Risk-to-Reward Ratio\", \"Technical Signal Strength\", \"Critically Over-Leveraged Position\", \"High-Quality Arbitrage Opportunity\", \"Technical Reversal Signal\", \"Liquidity Constrained Position\", \"Optimal Trading Window\", \"Risk-Efficient Position\", \"Whale-Driven Market\", \"Liquidation Cascade Risk\", \"Perfect Technical Setup\", \"Flash Crash Vulnerability\", \"Flow Dominance\", \"Smart Money Accuracy\", \"Effective Leverage Risk Classification\"]",
+        "cost": 0.5,
+        "budget_before": 14.0,
+        "budget_after": 13.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    o.recordvault AS order_id,\r\n    SUM(o.dealcount) AS total_order_quantity,\r\n    SUM(oe.remaincount) AS remaining_quantity,\r\n    (SUM(o.dealcount) - SUM(oe.remaincount)) / SUM(o.dealcount) AS order_fill_rate\r\nFROM \r\n    orders o\r\nJOIN \r\n    orderexecutions oe ON o.recordvault = oe.ordersmark\r\nGROUP BY \r\n    o.recordvault\r\nORDER BY \r\n    o.recordvault;"
+        },
+        "result": "order_id | total_order_quantity | remaining_quantity | order_fill_rate ---------------------------------------------------------------------- OB100239 | 3.3645 | 0.7769 | 0.76908901768464853619 OB101796 | 7.8888 | 7.5713 | 0.04024693235980123720 OB102450 | 7.1548 | 4.1815 | 0.41556717168893609884 OB102755 | 5.1944 | 2.8434 | 0.45260280301863545357 OB102886 | 6.0474 | 3.2503 | 0.46252935145682442041 OB103837 | 5.5109 | 1.6680 | 0.69732711535320909470 OB104042 | 3.9395 | 0.6795 | 0.82751618225663155223 OB104465 | 8.1542 | 7.9945 | 0.01958499914154668760 OB108316 | 3.9594 | 3.6144 | 0.08713441430519775724 OB108470 | 9.0174 | 4.5932 | 0.49062922793709938563 OB109871 | 9.6978 | 5.4620 | 0.43677947575738827363 OB110088 | 0.4952 | 0.2100 | 0.57592891760904684976 OB110274 | 5.7144 | 2.8884 | 0.49454010919781604368 OB110391 | 4.8033 | 3.5968 | 0.25118147939957945579 OB113513 | 5.3370 | 4.9665 | 0.06942102304665542440 OB113583 | 9.9021 | 0.3146 | 0.96822896153341210450 OB114253 | 2.9817 | 0.8564 | 0.71278129925881208706 OB114774 | 4.1229 | 3.5088 | 0.14894855562831987193 OB115399 | 8.1817 | 4.5512 | 0.44373418727159392302 OB116233 | 5.5182 | 3.1572 | 0.42785690986191149288 OB118160 | 2.7821 | 1.7795 | 0.36037525610150605658 OB118977 | 7.8986 | 6.3625 | 0.19447750234218722305 OB119176 | 3.2310 | 1.5193 | 0.52977406375735066543 OB120521 | 1.2924 | 0.0451 | 0.96510368307025688641 OB120591 | 6.3280 | 5.3142 | 0.16020859671302149178 OB121372 | 5.0645 | 0.5078 | 0.89973343864152433606 OB122315 | 5.2568 | 4.6324 | 0.11877948561862730178 OB122898 | 1.3821 | 0.7847 | 0.43224079299616525577 OB123320 | 0.9562 | 0.9217 | 0.03608031792512026773 OB125423 | 2.8424 | 1.3348 | 0.53039684773430903462 OB125958 | 2.2015 | 1.9477 | 0.11528503293209175562 OB126558 | 8.9476 | 4.5132 | 0.49559658455898788502 OB126635 | 9.6124 | 0.9616 | 0.89996254837501560484 OB128747 | 7.9603 | 3.7913 | 0.52372398025200055274 OB131400 | 8.9071 | 5.4231 | 0.39114863423560979443 OB132209 | 7.4517 | 0.9279 | 0.8754780...<truncated>",
+        "cost": 1.0,
+        "budget_before": 13.5,
+        "budget_after": 12.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: crypto\nTask ID: crypto_2\n\nUser Query:\nFor each order, calculate the completion rate for orders based on their some recent executions. Display the order ID, total order quantity, remaining quantity, and the calculated order fill rate.\n\nYou have a budget of 16.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-b81b7cdf-d98f-4805-a273-c6ee36e7a693",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_5fck2fsdmgbt",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_b6b5e0nqbpd1",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_pr3xdqsk5w0t",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-b81b7cdf-d98f-4805-a273-c6ee36e7a693",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_5fck2fsdmgbt",
+              "response": "{\"result\": \"CREATE TABLE \\\"users\\\" (\\nusersnode bigint NOT NULL DEFAULT nextval('users_usersnode_seq'::regclass),\\nuserstamp character NOT NULL,\\nacctscope USER-DEFINED NULL,\\n    PRIMARY KEY (usersnode)\\n);\\n\\nFirst 3 rows:\\n  usersnode  userstamp    acctscope\\n-----------  -----------  -----------\\n          1  U583322      Margin\\n          2  U810391      Spot\\n          3  U485932      Options\\n...\\n\\n\\nCREATE TABLE \\\"riskandmargin\\\" (\\nriskandmarginpivot bigint NOT NULL DEFAULT nextval('riskandmargin_riskandmarginpivot_seq'::regclass),\\nordervault character NULL,\\nrisk_margin_profile jsonb NULL,\\n    PRIMARY KEY (riskandmarginpivot),\\n    FOREIGN KEY (ordervault) REFERENCES orders(recordvault)\\n);\\n\\nFirst 3 rows:\\n  riskandmarginpivot  ordervault    risk_margin_profile\\n--------------------  ------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\\n                   2  OB798737      {'iceberg': {'viscount': 7.152985, 'icebcount': 0.88799}, 'leverage': {'levscale': '1', 'margform': None}, 'position': {'possum': 12995.76, 'posedge': None, 'posmagn': '1', 'poscount': 1.29, 'posriskrate': 0.024}, 'collateral': {'collsum': 719677.95, 'collcoin': 'USDC', 'collrate': 0.48, 'insfundshare': 10.09}, 'margin_rates': {'margrate': 0.264, 'bkptquote': 4564.25, 'margcallquote': 11219.32}, 'price_levels': {'liqquote': 14140.01, 'stopquote': 10308.06, 'traildiff': 0.02, 'trigquote': 10689.56}, 'risk_factors': {'cpfactor': '0.823', 'liqfactor': '0.171', 'netfactor': '0.896', 'regfactor': '0.975', 'setfactor': '0.755', 'custfactor': '0.544'}, 'margin_thresholds': {'inithold': 81019.9, 'mainthold': 40509.95}}\\n                   3  OB179652      {'iceberg': {'viscount': 5.334452, 'icebcount': 2.641267}, 'leverage': {'levscale': '2', 'margform': None}, 'position': {'possum': 990687.61, 'posedge': 'Short', 'posmagn': '2', 'poscount': 92.888, 'posriskrate': 0.553}, 'collateral': {'collsum': 19000.13, 'collcoin': 'USDT', 'collrate': 0.438, 'insfundshare': 4.53}, 'margin_rates': {'margrate': 0.826, 'bkptquote': 11913.55, 'margcallquote': 6818.72}, 'price_levels': {'liqquote': 11661.77, 'stopquote': 10558.32, 'traildiff': 0.03, 'trigquote': 11263.9}, 'risk_factors': {'cpfactor': '0.286', 'liqfactor': '0.639', 'netfactor': '0.803', 'regfactor': '0.416', 'setfactor': '0.538', 'custfactor': '0.728'}, 'margin_thresholds': {'inithold': 42532.07, 'mainthold': 21266.03}}\\n                   4  OB827275      {'iceberg': {'viscount': 4.113913, 'icebcount': 3.403397}, 'leverage': {'levscale': '3', 'margform': None}, 'position': {'possum': 1210450.2, 'posedge': 'Long', 'posmagn': '1', 'poscount': 32.377, 'posriskrate': 0.836}, 'collateral': {'collsum': 87696.52, 'collcoin': 'USDT', 'collrate': 0.381, 'insfundshare': 38.45}, 'margin_rates': {'margrate': 0.403, 'bkptquote': 27881.46, 'margcallquote': 40130.12}, 'price_levels': {'liqquote': 34894.2, 'stopquote': 34914.37, 'traildiff': 0.038, 'trigquote': 35326.06}, 'risk_factors': {'cpfactor': '0.712', 'liqfactor': '0.959', 'netfactor': '0.226', 'regfactor': '0.421', 'setfactor': '0.296', 'custfactor': '0.199'}, 'margin_thresholds': {'inithold': 93681.57, 'mainthold': 46840.79}}\\n...\\n\\n\\nCREATE TABLE \\\"orders\\\" (\\norderspivot bigint NOT NULL DEFAULT nextval('orders_orderspivot_seq'::regclass),\\nrecordvault character NOT NULL,\\ntimecod...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_b6b5e0nqbpd1",
+              "response": "{\"result\": \"{\\n  \\\"crypto|users|usersnode\\\": \\\"A BIGSERIAL primary key uniquely identifying each user (e.g., 1001).\\\",\\n  \\\"crypto|users|userstamp\\\": \\\"A CHAR(36) UUID linking to external/client user references (e.g., 'e3bd1f12-3e93-4b3c-a9f3-84be2593a6d7').\\\",\\n  \\\"crypto|users|acctscope\\\": \\\"An enum (AcctScope_enum) indicating the account scope (Margin, Spot, Options, Futures).\\\",\\n  \\\"crypto|orders|orderspivot\\\": \\\"A BIGSERIAL primary key uniquely identifying each order (e.g., 15002).\\\",\\n  \\\"crypto|orders|recordvault\\\": \\\"A CHAR(36) unique order reference (e.g., '58d9c141-7f13-4cd3-ba93-f520bf922f7c').\\\",\\n  \\\"crypto|orders|timecode\\\": \\\"A TIMESTAMP recording order creation (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|exchspot\\\": \\\"A CHAR(10) referencing the exchange ID (e.g., 'BINANCE').\\\",\\n  \\\"crypto|orders|mktnote\\\": \\\"A VARCHAR(30) naming the market pair or trading symbol (e.g., 'BTC/USDT').\\\",\\n  \\\"crypto|orders|orderstamp\\\": \\\"A CHAR(36) external or client order ID (e.g., 'CL-3c4a8f89-9aed').\\\",\\n  \\\"crypto|orders|userlink\\\": \\\"A CHAR(36) FK to Users(UserStamp), linking this order to its owner.\\\",\\n  \\\"crypto|orders|ordertune\\\": \\\"An enum (OrderTune_enum) describing order type (Stop, Market, Limit, StopLimit).\\\",\\n  \\\"crypto|orders|dealedge\\\": \\\"An enum (DealEdge_enum) indicating side (Sell, Buy).\\\",\\n  \\\"crypto|orders|dealquote\\\": \\\"A DECIMAL(12,3) capturing the limit or stop price (e.g., '27800.500').\\\",\\n  \\\"crypto|orders|dealcount\\\": \\\"A NUMERIC(12,4) for the order quantity (e.g., '0.1250').\\\",\\n  \\\"crypto|orders|notionsum\\\": \\\"A DECIMAL(12,3) notional value (price \\\\u00d7 quantity) (e.g., '3475.063').\\\",\\n  \\\"crypto|orders|orderflow\\\": \\\"An enum (OrderFlow_enum) describing the status (New, PartiallyFilled, Cancelled, Filled).\\\",\\n  \\\"crypto|orders|timespan\\\": \\\"An enum (TimeSpan_enum) for time-in-force (IOC, GTC, GTD, FOK).\\\",\\n  \\\"crypto|orders|orderbase\\\": \\\"An enum (OrderBase_enum) indicating how the order was placed (API, Web, Mobile, Bot).\\\",\\n  \\\"crypto|orders|clientmark\\\": \\\"A VARCHAR(80) holding an optional client-supplied tag (e.g., 'myXtrOrder001').\\\",\\n  \\\"crypto|orders|createspot\\\": \\\"A TIMESTAMP showing when the order was first persisted (e.g., '2025-05-10 13:45:00').\\\",\\n  \\\"crypto|orders|updatespot\\\": \\\"A TIMESTAMP noting the last update to this order (e.g., '2025-05-10 14:02:15').\\\",\\n  \\\"crypto|orderexecutions|orderexecmark\\\": \\\"A BIGSERIAL primary key for each fill/execution (e.g., 210345).\\\",\\n  \\\"crypto|orderexecutions|fillcount\\\": \\\"A DECIMAL(8,4) showing how many units were filled (e.g., '0.0500').\\\",\\n  \\\"crypto|orderexecutions|remaincount\\\": \\\"A NUMERIC(8,4) showing how many units remain unfilled (e.g., '0.0750').\\\",\\n  \\\"crypto|orderexecutions|fillquote\\\": \\\"A DECIMAL(12,3) capturing the fill price (e.g., '27699.150').\\\",\\n  \\\"crypto|orderexecutions|fillsum\\\": \\\"A DECIMAL(12,3) notional of the fill (e.g., '1384.958').\\\",\\n  \\\"crypto|orderexecutions|expirespot\\\": \\\"A TIMESTAMP if the partial fill or order slice expires (e.g., '2025-05-10 15:00:00').\\\",\\n  \\\"crypto|orderexecutions|cancelnote\\\": \\\"An enum (CancelNote_enum) describing cancel reason (Expired, InsufficientFunds, UserRequested).\\\",\\n  \\\"crypto|orderexecutions|exectune\\\": \\\"An enum (ExecTune_enum) indicating execution style (Maker, Taker).\\\",\\n  \\\"crypto|orderexecutions|ordersmark\\\": \\\"A CHAR(36) referencing Orders(RecordVault) to link back to the original order.\\\",\\n  \\\"crypto|fees|feesnode\\\": \\\"A BIGSERIAL primary key for fee records (e.g., 30012).\\\",\\n  \\\"crypto|fees|feerange\\\": \\\"An enum (FeeRange_enum) describing the user's fee tier (Tier4, Tier1, Tier3, Tier2).\\\",\\n  \\\"crypto|fees|feerate\\\": \\\"A DECIMAL(8,5) capturing fee percentage (e.g., '0.00050').\\\",\\n  \\\"crypto|fees|feetotal\\\": \\\"A DECIMAL(12,6) total fee charged (e.g., '0.250000').\\\",\\n  \\\"crypto|fees|feecoin\\\": \\\"An enum (FeeCoin_enum) for the currency used to pay fees (USDC, USD, USDT).\\\",\\n  \\\"crypto|fees|rebrate\\\": \\\"A DECIMAL(8,5) capturing the maker re...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_pr3xdqsk5w0t",
+              "response": "{\"result\": \"[\\\"Spread Percentage\\\", \\\"Slippage Impact\\\", \\\"Position Value at Risk (PVaR)\\\", \\\"Arbitrage Opportunity Score (AOS)\\\", \\\"Market Impact Cost (MIC)\\\", \\\"Liquidity Ratio\\\", \\\"Realized Risk Ratio (RRR)\\\", \\\"Margin Utilization\\\", \\\"Order Fill Rate\\\", \\\"Market Efficiency Ratio (MER)\\\", \\\"Whale Order\\\", \\\"Liquidation Risk Level\\\", \\\"Arbitrage Window\\\", \\\"Over-Leveraged Position\\\", \\\"Market Maker Activity\\\", \\\"Smart Money Flow\\\", \\\"Liquidity Crisis\\\", \\\"Momentum Divergence\\\", \\\"Margin Call Risk\\\", \\\"Technical Breakout\\\", \\\"dealedge\\\", \\\"orderflow\\\", \\\"timespan\\\", \\\"posedge\\\", \\\"posmagn\\\", \\\"mktfeel\\\", \\\"techmeter\\\", \\\"whalemotion\\\", \\\"makermotion\\\", \\\"exectune\\\", \\\"Risk-Adjusted Return\\\", \\\"True Cost of Execution\\\", \\\"Order Book Imbalance Ratio\\\", \\\"Effective Leverage\\\", \\\"Profit Factor\\\", \\\"Arbitrage ROI\\\", \\\"Market Depth Ratio\\\", \\\"Volatility-Adjusted Spread\\\", \\\"Risk-to-Reward Ratio\\\", \\\"Technical Signal Strength\\\", \\\"Critically Over-Leveraged Position\\\", \\\"High-Quality Arbitrage Opportunity\\\", \\\"Technical Reversal Signal\\\", \\\"Liquidity Constrained Position\\\", \\\"Optimal Trading Window\\\", \\\"Risk-Efficient Position\\\", \\\"Whale-Driven Market\\\", \\\"Liquidation Cascade Risk\\\", \\\"Perfect Technical Setup\\\", \\\"Flash Crash Vulnerability\\\", \\\"Flow Dominance\\\", \\\"Smart Money Accuracy\\\", \\\"Effective Leverage Risk Classification\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 13.5/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-b81b7cdf-d98f-4805-a273-c6ee36e7a693",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_w98a0s1ajxbb",
+              "args": {
+                "sql": "SELECT \r\n    o.recordvault AS order_id,\r\n    SUM(o.dealcount) AS total_order_quantity,\r\n    SUM(oe.remaincount) AS remaining_quantity,\r\n    (SUM(o.dealcount) - SUM(oe.remaincount)) / SUM(o.dealcount) AS order_fill_rate\r\nFROM \r\n    orders o\r\nJOIN \r\n    orderexecutions oe ON o.recordvault = oe.ordersmark\r\nGROUP BY \r\n    o.recordvault\r\nORDER BY \r\n    o.recordvault;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-b81b7cdf-d98f-4805-a273-c6ee36e7a693",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_w98a0s1ajxbb",
+              "response": "{\"result\": \"order_id | total_order_quantity | remaining_quantity | order_fill_rate ---------------------------------------------------------------------- OB100239 | 3.3645 | 0.7769 | 0.76908901768464853619 OB101796 | 7.8888 | 7.5713 | 0.04024693235980123720 OB102450 | 7.1548 | 4.1815 | 0.41556717168893609884 OB102755 | 5.1944 | 2.8434 | 0.45260280301863545357 OB102886 | 6.0474 | 3.2503 | 0.46252935145682442041 OB103837 | 5.5109 | 1.6680 | 0.69732711535320909470 OB104042 | 3.9395 | 0.6795 | 0.82751618225663155223 OB104465 | 8.1542 | 7.9945 | 0.01958499914154668760 OB108316 | 3.9594 | 3.6144 | 0.08713441430519775724 OB108470 | 9.0174 | 4.5932 | 0.49062922793709938563 OB109871 | 9.6978 | 5.4620 | 0.43677947575738827363 OB110088 | 0.4952 | 0.2100 | 0.57592891760904684976 OB110274 | 5.7144 | 2.8884 | 0.49454010919781604368 OB110391 | 4.8033 | 3.5968 | 0.25118147939957945579 OB113513 | 5.3370 | 4.9665 | 0.06942102304665542440 OB113583 | 9.9021 | 0.3146 | 0.96822896153341210450 OB114253 | 2.9817 | 0.8564 | 0.71278129925881208706 OB114774 | 4.1229 | 3.5088 | 0.14894855562831987193 OB115399 | 8.1817 | 4.5512 | 0.44373418727159392302 OB116233 | 5.5182 | 3.1572 | 0.42785690986191149288 OB118160 | 2.7821 | 1.7795 | 0.36037525610150605658 OB118977 | 7.8986 | 6.3625 | 0.19447750234218722305 OB119176 | 3.2310 | 1.5193 | 0.52977406375735066543 OB120521 | 1.2924 | 0.0451 | 0.96510368307025688641 OB120591 | 6.3280 | 5.3142 | 0.16020859671302149178 OB121372 | 5.0645 | 0.5078 | 0.89973343864152433606 OB122315 | 5.2568 | 4.6324 | 0.11877948561862730178 OB122898 | 1.3821 | 0.7847 | 0.43224079299616525577 OB123320 | 0.9562 | 0.9217 | 0.03608031792512026773 OB125423 | 2.8424 | 1.3348 | 0.53039684773430903462 OB125958 | 2.2015 | 1.9477 | 0.11528503293209175562 OB126558 | 8.9476 | 4.5132 | 0.49559658455898788502 OB126635 | 9.6124 | 0.9616 | 0.89996254837501560484 OB128747 | 7.9603 | 3.7913 | 0.52372398025200055274 OB131400 | 8.9071 | 5.4231 | 0.39114863423560979443 OB132209 | 7.4517 | 0.9279 | 0.87547807882765006643 OB132575 | 1.8684 | 1.3223 | 0.29228216655962320702 OB133188 | 1.7889 | 0.0515 | 0.97121135893565878473 OB135062 | 4.3997 | 3.3269 | 0.24383480691865354456 OB135230 | 9.8415 | 7.7095 | 0.21663364324544022761 OB135699 | 6.7288 | 0.6600 | 0.90191416002853406254 OB137112 | 1.2444 | 0.9130 | 0.26631308261009321761 OB137288 | 8.1215 | 8.0808 | 0.00501138952164009112 OB138435 | 2.0543 | 1.4715 | 0.28369760989144720829 OB138664 | 2.2059 | 1.4791 | 0.32948003082642005531 OB138938 | 5.1867 | 1.9266 | 0.62854994505176701949 OB139324 | 0.5129 | 0.2423 | 0.52758822382530707740 OB139718 | 6.5246 | 0.6524 | 0.90000919596603623211 OB141197 | 9.6620 | 2.2797 | 0.76405506106396191265 OB141938 | 9.4653 | 4.8419 | 0.48845784074461453942 OB142964 | 8.9996 | 2.2389 | 0.75122227654562424997 OB143588 | 0.4266 | 0.2371 | 0.44421003281762775434 OB143843 | 1.0738 | 0.2276 | 0.78804246600856770348 OB144339 | 5.7650 | 2.3452 | 0.59320034692107545533 OB144991 | 4.8962 | 2.2727 | 0.53582370001225440137 OB145265 | 3.8395 | 2.1947 | 0.42838911316577679385 OB147724 | 3.5719 | 2.3801 | 0.33365995688569108878 OB148309 | 1.1393 | 0.3916 | 0.65628017203546037040 OB151317 | 7.5346 | 4.3310 | 0.42518514586043054708 OB151681 | 5.9791 | 2.1151 | 0.64625110802629158235 OB153752 | 9.5979 | 6.0597 | 0.36864314068702528678 OB154178 | 0.3149 | 0.0982 | 0.68815496983169260083 OB155960 | 8.9502 | 1.1422 | 0.87238274005050166477 OB156907 | 2.3427 | 0.1203 | 0.94864899474964784223 OB157101 | 2.0036 | 1.1600 | 0.42104212417648233180 OB158220 | 3.5415 | 0.9477 | 0.73240152477763659466 OB159421 | 8.0632 | 3.2819 | 0.59297797400535767437 OB159588 | 3.7533 | 2.6515 | 0.29355500492899581701 OB160642 | 5.1580 | 0.2198 | 0.95738658394726638232 OB162296 | 4.6101 | 2.7616 | 0.40096744105333940695 OB162582 |...\\n\\n[SYSTEM NOTE: Remaining budget: 12.5/16.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-b81b7cdf-d98f-4805-a273-c6ee36e7a693",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the result of the order completion rate calculation:\n\n| order_id | total_order_quantity | remaining_quantity | order_fill_rate |\n|---|---|---|---|\n| OB100239 | 3.3645 | 0.7769 | 0.76908901768464853619 |\n| OB101796 | 7.8888 | 7.5713 | 0.04024693235980123720 |\n| OB102450 | 7.1548 | 4.1815 | 0.41556717168893609884 |\n| OB102755 | 5.1944 | 2.8434 | 0.45260280301863545357 |\n| OB102886 | 6.0474 | 3.2503 | 0.46252935145682442041 |\n| OB103837 | 5.5109 | 1.6680 | 0.69732711535320909470 |\n| OB104042 | 3.9395 | 0.6795 | 0.82751618225663155223 |\n| OB104465 | 8.1542 | 7.9945 | 0.01958499914154668760 |\n| OB108316 | 3.9594 | 3.6144 | 0.08713441430519775724 |\n| OB108470 | 9.0174 | 4.5932 | 0.49062922793709938563 |\n| OB109871 | 9.6978 | 5.4620 | 0.43677947575738827363 |\n| OB110088 | 0.4952 | 0.2100 | 0.57592891760904684976 |\n| OB110274 | 5.7144 | 2.8884 | 0.49454010919781604368 |\n| OB110391 | 4.8033 | 3.5968 | 0.25118147939957945579 |\n| OB113513 | 5.3370 | 4.9665 | 0.06942102304665542440 |\n| OB113583 | 9.9021 | 0.3146 | 0.96822896153341210450 |\n| OB114253 | 2.9817 | 0.8564 | 0.71278129925881208706 |\n| OB114774 | 4.1229 | 3.5088 | 0.14894855562831987193 |\n| OB115399 | 8.1817 | 4.5512 | 0.44373418727159392302 |\n| OB116233 | 5.5182 | 3.1572 | 0.42785690986191149288 |\n| OB118160 | 2.7821 | 1.7795 | 0.36037525610150605658 |\n| OB118977 | 7.8986 | 6.3625 | 0.19447750234218722305 |\n| OB119176 | 3.2310 | 1.5193 | 0.52977406375735066543 |\n| OB120521 | 1.2924 | 0.0451 | 0.96510368307025688641 |\n| OB120591 | 6.3280 | 5.3142 | 0.16020859671302149178 |\n| OB121372 | 5.0645 | 0.5078 | 0.89973343864152433606 |\n| OB122315 | 5.2568 | 4.6324 | 0.11877948561862730178 |\n| OB122898 | 1.3821 | 0.7847 | 0.43224079299616525577 |\n| OB123320 | 0.9562 | 0.9217 | 0.03608031792512026773 |\n| OB125423 | 2.8424 | 1.3348 | 0.53039684773430903462 |\n| OB125958 | 2.2015 | 1.9477 | 0.11528503293209175562 |\n| OB126558 | 8.9476 | 4.5132 | 0.49559658455898788502 |\n| OB126635 | 9.6124 | 0.9616 | 0.89996254837501560484 |\n| OB128747 | 7.9603 | 3.7913 | 0.52372398025200055274 |\n| OB131400 | 8.9071 | 5.4231 | 0.39114863423560979443 |\n| OB132209 | 7.4517 | 0.9279 | 0.87547807882765006643 |\n| OB132575 | 1.8684 | 1.3223 | 0.29228216655962320702 |\n| OB133188 | 1.7889 | 0.0515 | 0.97121135893565878473 |\n| OB135062 | 4.3997 | 3.3269 | 0.24383480691865354456 |\n| OB135230 | 9.8415 | 7.7095 | 0.21663364324544022761 |\n| OB135699 | 6.7288 | 0.6600 | 0.90191416002853406254 |\n| OB137112 | 1.2444 | 0.9130 | 0.26631308261009321761 |\n| OB137288 | 8.1215 | 8.0808 | 0.00501138952164009112 |\n| OB138435 | 2.0543 | 1.4715 | 0.28369760989144720829 |\n| OB1386"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the result of the order completion rate calculation:\n\n| order_id | total_order_quantity | remaining_quantity | order_fill_rate |\n|---|---|---|---|\n| OB100239 | 3.3645 | 0.7769 | 0.76908901768464853619 |\n| OB101796 | 7.8888 | 7.5713 | 0.04024693235980123720 |\n| OB102450 | 7.1548 | 4.1815 | 0.41556717168893609884 |\n| OB102755 | 5.1944 | 2.8434 | 0.45260280301863545357 |\n| OB102886 | 6.0474 | 3.2503 | 0.46252935145682442041 |\n| OB103837 | 5.5109 | 1.6680 | 0.69732711535320909470 |\n| OB104042 | 3.9395 | 0.6795 | 0.82751618225663155223 |\n| OB104465 | 8.1542 | 7.9945 | 0.01958499914154668760 |\n| OB108316 | 3.9594 | 3.6144 | 0.08713441430519775724 |\n| OB108470 | 9.0174 | 4.5932 | 0.49062922793709938563 |\n| OB109871 | 9.6978 | 5.4620 | 0.43677947575738827363 |\n| OB110088 | 0.4952 | 0.2100 | 0.57592891760904684976 |\n| OB110274 | 5.7144 | 2.8884 | 0.49454010919781604368 |\n| OB110391 | 4.8033 | 3.5968 | 0.25118147939957945579 |\n| OB113513 | 5.3370 | 4.9665 | 0.06942102304665542440 |\n| OB113583 | 9.9021 | 0.3146 | 0.96822896153341210450 |\n| OB114253 | 2.9817 | 0.8564 | 0.71278129925881208706 |\n| OB114774 | 4.1229 | 3.5088 | 0.14894855562831987193 |\n| OB115399 | 8.1817 | 4.5512 | 0.44373418727159392302 |\n| OB116233 | 5.5182 | 3.1572 | 0.42785690986191149288 |\n| OB118160 | 2.7821 | 1.7795 | 0.36037525610150605658 |\n| OB118977 | 7.8986 | 6.3625 | 0.19447750234218722305 |\n| OB119176 | 3.2310 | 1.5193 | 0.52977406375735066543 |\n| OB120521 | 1.2924 | 0.0451 | 0.96510368307025688641 |\n| OB120591 | 6.3280 | 5.3142 | 0.16020859671302149178 |\n| OB121372 | 5.0645 | 0.5078 | 0.89973343864152433606 |\n| OB122315 | 5.2568 | 4.6324 | 0.11877948561862730178 |\n| OB122898 | 1.3821 | 0.7847 | 0.43224079299616525577 |\n| OB123320 | 0.9562 | 0.9217 | 0.03608031792512026773 |\n| OB125423 | 2.8424 | 1.3348 | 0.53039684773430903462 |\n| OB125958 | 2.2015 | 1.9477 | 0.11528503293209175562 |\n| OB126558 | 8.9476 | 4.5132 | 0.49559658455898788502 |\n| OB126635 | 9.6124 | 0.9616 | 0.89996254837501560484 |\n| OB128747 | 7.9603 | 3.7913 | 0.52372398025200055274 |\n| OB131400 | 8.9071 | 5.4231 | 0.39114863423560979443 |\n| OB132209 | 7.4517 | 0.9279 | 0.87547807882765006643 |\n| OB132575 | 1.8684 | 1.3223 | 0.29228216655962320702 |\n| OB133188 | 1.7889 | 0.0515 | 0.97121135893565878473 |\n| OB135062 | 4.3997 | 3.3269 | 0.24383480691865354456 |\n| OB135230 | 9.8415 | 7.7095 | 0.21663364324544022761 |\n| OB135699 | 6.7288 | 0.6600 | 0.90191416002853406254 |\n| OB137112 | 1.2444 | 0.9130 | 0.26631308261009321761 |\n| OB137288 | 8.1215 | 8.0808 | 0.00501138952164009112 |\n| OB138435 | 2.0543 | 1.4715 | 0.28369760989144720829 |\n| OB1386"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "40c3afdba7964741b1171159265d773f",
+      "client": "crypto_2",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/8475f07c06ba4093bb474c62037a5d33/0",
+      "at": 1793844847.2117763,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.5401000016718172,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "cfc34d6ccfae4621ac2842602c4b10b7",
+      "client": "crypto_2",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/8475f07c06ba4093bb474c62037a5d33/0",
+      "at": 1793844852.196453,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.3032000060775317,
+      "response_bytes": 17548,
+      "response_digest": "80f1c03513c55f456052ba858f191ae4e6ed4cb87fbb697170215b6d690cde87"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "a83f982697d64a4cb3bebc05e7d3f0ad",
+      "client": "crypto_2",
+      "database": "crypto",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/8475f07c06ba4093bb474c62037a5d33/0",
+      "at": 1793844887.6838717,
+      "sql": "SELECT \r\n    o.recordvault AS order_id,\r\n    SUM(o.dealcount) AS total_order_quantity,\r\n    SUM(oe.remaincount) AS remaining_quantity,\r\n    (SUM(o.dealcount) - SUM(oe.remaincount)) / SUM(o.dealcount) AS order_fill_rate\r\nFROM \r\n    orders o\r\nJOIN \r\n    orderexecutions oe ON o.recordvault = oe.ordersmark\r\nGROUP BY \r\n    o.recordvault\r\nORDER BY \r\n    o.recordvault;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 39.705299997876864,
+      "response_bytes": 3836,
+      "response_digest": "7fade3b9561a2b453100dc456f7385877e4a31f73ffd6dbf7232c2ae8af13d33",
+      "successful": true
+    }
+  ]
+}

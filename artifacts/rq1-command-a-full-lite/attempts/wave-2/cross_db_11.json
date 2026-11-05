@@ -1,0 +1,204 @@
+{
+  "wave": 2,
+  "result": {
+    "task_id": "cross_db_11",
+    "instance_id": "cross_db_11",
+    "database": "cross_db",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 252.38256335258484,
+    "budget_used": 3.0,
+    "budget_remaining": 17.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"dataflow\" (\nrecordregistry character NOT NULL,\nflowstamp timestamp without time zone NULL,\nflowtag character varying NULL,\norignation character varying NULL,\ndestnation character varying NULL,\norigactor character varying NULL,\ndestactor character varying NULL,\nchanproto character varying NULL,\nchanfreq character varying NULL,\ndatasizemb numeric NULL,\ndurmin smallint NULL,\nbwidthpct numeric NULL,\nsuccesspct numeric NULL,\nerrtally smallint NULL,\nrtrytally smallint NULL,\n    PRIMARY KEY (recordregistry)\n);\n\nFirst 3 rows:\nrecordregistry    flowstamp                   flowtag    orignation                    destnation    origactor       destactor                chanproto        chanfreq      datasizemb    durmin    bwidthpct    successpct    errtally    rtrytally\n----------------  --------------------------  ---------  ----------------------------  ------------  --------------  -----------------------  ---------------  ----------  ------------  --------  -----------  ------------  ----------  -----------\nCB932064          2024-03-11 11:43:31.039769  DF7811     Niue                          Djibouti      Hill Ltd        Davis, Harper and Weber  Blockchain       Weekly           42668.4      1068        68.81         99.93          39            1\nCB339111          2024-05-01 07:58:45.040384  DF9309     Israel                        Monaco        Boyer-Mcdonald  Rogers Inc               SFTP             Hourly           32804         996         7.52         91.77          68           48\nCB899685          2024-05-07 04:39:04.040801  DF8105     United States Virgin Islands  Germany       Curtis Inc      Horton LLC               Private Network  Real-time        93843.2      1325        62.66         93.76          80           45\n...\n\n\nCREATE TABLE \"auditandcompliance\" (\naudittrace integer NOT NULL DEFAULT nextval('auditandcompliance_audittrace_seq1'::regclass),\nprofjoin integer NOT NULL,\ncompjoin integer NOT NULL,\nvendjoin integer NOT NULL,\nrecordregistry c...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"cross|dataflow|recordregistry\": \"CHAR(10) primary key uniquely identifying each data flow record in the DataFlow table.\",\n  \"cross|dataflow|flowstamp\": \"TIMESTAMP(6) for the moment this data flow record was created or logged. Microsecond precision.\",\n  \"cross|dataflow|flowtag\": \"A short identifier or tag (VARCHAR(20)) for the data flow, previously 'DataFlowID'.\",\n  \"cross|dataflow|orignation\": \"VARCHAR(80) storing the source/origin country's name for this data flow.\",\n  \"cross|dataflow|destnation\": \"VARCHAR(80) storing the destination country's name for this data flow.\",\n  \"cross|dataflow|origactor\": \"VARCHAR(150) referencing the source entity/system initiating the flow (person, organization, or app).\",\n  \"cross|dataflow|destactor\": \"VARCHAR(150) referencing the destination entity/system receiving the flow.\",\n  \"cross|dataflow|chanproto\": \"VARCHAR(30) for the protocol used (HTTP, FTP, SFTP, etc.). Currently possible values: (Blockchain, SFTP, Private Network, HTTPS).\",\n  \"cross|dataflow|chanfreq\": \"VARCHAR(25) specifying how frequently data is transferred (daily, weekly, on-demand, etc.). Currently possible values: (Weekly, Hourly, Real-time, Daily).\",\n  \"cross|dataflow|datasizemb\": \"NUMERIC(12,2) representing the size in MB of each data transfer.\",\n  \"cross|dataflow|durmin\": \"SMALLINT capturing the average or actual duration (in minutes) of the data flow.\",\n  \"cross|dataflow|bwidthpct\": \"NUMERIC(5,2) for bandwidth utilization percentage (0 to 100%).\",\n  \"cross|dataflow|successpct\": \"NUMERIC(5,2) measuring the success rate (0\\u2013100%) of the flow attempts.\",\n  \"cross|dataflow|errtally\": \"SMALLINT counting the total errors or failures observed for this data flow.\",\n  \"cross|dataflow|rtrytally\": \"SMALLINT storing how many retry attempts were made after failures.\",\n  \"cross|riskmanagement|risktrace\": \"SERIAL primary key uniquely identifying each risk management record.\",\n  \"cross|riskmanagement|flowlink\": \"CHAR(10) referencing DataFlow(RecordRegistry), linking t...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \r\n    df.flowtag AS flow_id,\r\n    rm.riskassess AS risk_score,\r\n    dp.datasense AS data_sensitivity\r\nFROM \r\n    DataFlow AS df\r\nJOIN \r\n    RiskManagement AS rm ON df.recordregistry = rm.flowlink\r\nJOIN \r\n    DataProfile AS dp ON df.recordregistry = dp.flowsign\r\nORDER BY \r\n    dp.datasense;"
+        },
+        "result": "flow_id | risk_score | data_sensitivity --------------------------------------- DF8224 | 39.33 | Critical DF4643 | 62.57 | Critical DF7214 | 19.99 | Critical DF9025 | 96.94 | Critical DF2414 | 18.33 | Critical DF8354 | 28.85 | Critical DF1776 | 43.97 | Critical DF4474 | 67.14 | Critical DF4695 | 94.27 | Critical DF5144 | 30.50 | Critical DF5439 | 64.71 | Critical DF5298 | 87.10 | Critical DF5081 | 7.38 | Critical DF6982 | 89.36 | Critical DF2435 | 81.92 | Critical DF2473 | 35.86 | Critical DF5782 | 28.31 | Critical DF8353 | 97.84 | Critical DF5901 | 67.44 | Critical DF3669 | 32.95 | Critical DF9184 | 45.46 | Critical DF1601 | 45.59 | Critical DF2345 | 82.74 | Critical DF4536 | 90.76 | Critical DF1093 | 45.48 | Critical DF9112 | 50.87 | Critical DF9829 | 53.92 | Critical DF4696 | 1.55 | Critical DF8346 | 15.78 | Critical DF7070 | 5.38 | Critical DF9025 | 0.67 | Critical DF2341 | 31.12 | Critical DF5654 | 89.41 | Critical DF7900 | 52.36 | Critical DF2216 | 82.68 | Critical DF2879 | 18.97 | Critical DF4285 | 80.04 | Critical DF4293 | 3.04 | Critical DF9765 | 41.09 | Critical DF8631 | 46.30 | Critical DF7480 | 67.06 | Critical DF8861 | 89.05 | Critical DF3313 | 67.59 | Critical DF1435 | 49.63 | Critical DF6185 | 29.91 | Critical DF1956 | 30.35 | Critical DF3676 | 50.10 | Critical DF7902 | 58.05 | Critical DF7803 | 91.10 | Critical DF2950 | 10.81 | Critical DF7137 | 40.44 | Critical DF4694 | 78.26 | Critical DF2022 | 35.49 | Critical DF8178 | 94.04 | Critical DF1726 | 56.73 | Critical DF3493 | 90.00 | Critical DF8698 | 35.29 | Critical DF8711 | 9.34 | Critical DF7377 | 17.22 | Critical DF3414 | 10.95 | Critical DF6411 | 16.25 | Critical DF1437 | 32.82 | Critical DF8338 | 64.23 | Critical DF2255 | 2.73 | Critical DF7970 | 58.91 | Critical DF5790 | 5.75 | Critical DF9423 | 20.10 | Critical DF1606 | 21.79 | Critical DF8213 | 65.06 | Critical DF7704 | 59.36 | Critical DF8046 | 74.38 | Critical DF8159 | 35.61 | Critical DF3673 | 97.30 | Critical DF5852 | 73.35 | Critical DF65...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: cross_db\nTask ID: cross_db_11\n\nUser Query:\nList the some top high-risk data flows, showing each flows ID, risk score, and data sensitivity. Sort by data sensitivity.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e510cac2-c324-4b5a-97e0-34a12c638eb6",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_s71zkc69pckh",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_deqjdgqg2vn0",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e510cac2-c324-4b5a-97e0-34a12c638eb6",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_s71zkc69pckh",
+              "response": "{\"result\": \"CREATE TABLE \\\"dataflow\\\" (\\nrecordregistry character NOT NULL,\\nflowstamp timestamp without time zone NULL,\\nflowtag character varying NULL,\\norignation character varying NULL,\\ndestnation character varying NULL,\\norigactor character varying NULL,\\ndestactor character varying NULL,\\nchanproto character varying NULL,\\nchanfreq character varying NULL,\\ndatasizemb numeric NULL,\\ndurmin smallint NULL,\\nbwidthpct numeric NULL,\\nsuccesspct numeric NULL,\\nerrtally smallint NULL,\\nrtrytally smallint NULL,\\n    PRIMARY KEY (recordregistry)\\n);\\n\\nFirst 3 rows:\\nrecordregistry    flowstamp                   flowtag    orignation                    destnation    origactor       destactor                chanproto        chanfreq      datasizemb    durmin    bwidthpct    successpct    errtally    rtrytally\\n----------------  --------------------------  ---------  ----------------------------  ------------  --------------  -----------------------  ---------------  ----------  ------------  --------  -----------  ------------  ----------  -----------\\nCB932064          2024-03-11 11:43:31.039769  DF7811     Niue                          Djibouti      Hill Ltd        Davis, Harper and Weber  Blockchain       Weekly           42668.4      1068        68.81         99.93          39            1\\nCB339111          2024-05-01 07:58:45.040384  DF9309     Israel                        Monaco        Boyer-Mcdonald  Rogers Inc               SFTP             Hourly           32804         996         7.52         91.77          68           48\\nCB899685          2024-05-07 04:39:04.040801  DF8105     United States Virgin Islands  Germany       Curtis Inc      Horton LLC               Private Network  Real-time        93843.2      1325        62.66         93.76          80           45\\n...\\n\\n\\nCREATE TABLE \\\"auditandcompliance\\\" (\\naudittrace integer NOT NULL DEFAULT nextval('auditandcompliance_audittrace_seq1'::regclass),\\nprofjoin integer NOT NULL,\\ncompjoin integer NOT NULL,\\nvendjoin integer NOT NULL,\\nrecordregistry character NULL,\\naudtrailstate USER-DEFINED NULL,\\nfindtally smallint NULL,\\ncritfindnum smallint NULL,\\nremedstate character varying NULL,\\nremeddue date NULL,\\nauthnotify character varying NULL,\\nbordermech character varying NULL,\\ntransimpassess text NULL,\\nlocalreqs text NULL,\\ndatamapstate character varying NULL,\\nsysintstate character varying NULL,\\naccreqnum smallint NULL,\\ndelreqnum smallint NULL,\\nrectreqnum smallint NULL,\\nportreqnum smallint NULL,\\nresptimeday numeric NULL,\\n    PRIMARY KEY (audittrace),\\n    FOREIGN KEY (compjoin) REFERENCES compliance(compliancetrace),\\n    FOREIGN KEY (profjoin) REFERENCES dataprofile(profiletrace),\\n    FOREIGN KEY (vendjoin) REFERENCES vendormanagement(vendortrace)\\n);\\n\\nFirst 3 rows:\\n  audittrace    profjoin    compjoin    vendjoin  recordregistry    audtrailstate      findtally    critfindnum  remedstate    remeddue    authnotify    bordermech         transimpassess    localreqs    datamapstate    sysintstate         accreqnum    delreqnum    rectreqnum    portreqnum    resptimeday\\n------------  ----------  ----------  ----------  ----------------  ---------------  -----------  -------------  ------------  ----------  ------------  -----------------  ----------------  -----------  --------------  ----------------  -----------  -----------  ------------  ------------  -------------\\n           1           1           1           1  CB932064          Complete                   3              6  In Progress   2025-03-16  Not Required  SCCs               Required          Not Met      Partial         Fully Integrated          959          409            76            53            4.5\\n           2           2           2           2  CB339111          Complete                  49              8  In Progress   2025-04-14  Required      Adequacy Decision  Completed         Met          Partial         Manual                     36          326           196            2...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_deqjdgqg2vn0",
+              "response": "{\"result\": \"{\\n  \\\"cross|dataflow|recordregistry\\\": \\\"CHAR(10) primary key uniquely identifying each data flow record in the DataFlow table.\\\",\\n  \\\"cross|dataflow|flowstamp\\\": \\\"TIMESTAMP(6) for the moment this data flow record was created or logged. Microsecond precision.\\\",\\n  \\\"cross|dataflow|flowtag\\\": \\\"A short identifier or tag (VARCHAR(20)) for the data flow, previously 'DataFlowID'.\\\",\\n  \\\"cross|dataflow|orignation\\\": \\\"VARCHAR(80) storing the source/origin country's name for this data flow.\\\",\\n  \\\"cross|dataflow|destnation\\\": \\\"VARCHAR(80) storing the destination country's name for this data flow.\\\",\\n  \\\"cross|dataflow|origactor\\\": \\\"VARCHAR(150) referencing the source entity/system initiating the flow (person, organization, or app).\\\",\\n  \\\"cross|dataflow|destactor\\\": \\\"VARCHAR(150) referencing the destination entity/system receiving the flow.\\\",\\n  \\\"cross|dataflow|chanproto\\\": \\\"VARCHAR(30) for the protocol used (HTTP, FTP, SFTP, etc.). Currently possible values: (Blockchain, SFTP, Private Network, HTTPS).\\\",\\n  \\\"cross|dataflow|chanfreq\\\": \\\"VARCHAR(25) specifying how frequently data is transferred (daily, weekly, on-demand, etc.). Currently possible values: (Weekly, Hourly, Real-time, Daily).\\\",\\n  \\\"cross|dataflow|datasizemb\\\": \\\"NUMERIC(12,2) representing the size in MB of each data transfer.\\\",\\n  \\\"cross|dataflow|durmin\\\": \\\"SMALLINT capturing the average or actual duration (in minutes) of the data flow.\\\",\\n  \\\"cross|dataflow|bwidthpct\\\": \\\"NUMERIC(5,2) for bandwidth utilization percentage (0 to 100%).\\\",\\n  \\\"cross|dataflow|successpct\\\": \\\"NUMERIC(5,2) measuring the success rate (0\\\\u2013100%) of the flow attempts.\\\",\\n  \\\"cross|dataflow|errtally\\\": \\\"SMALLINT counting the total errors or failures observed for this data flow.\\\",\\n  \\\"cross|dataflow|rtrytally\\\": \\\"SMALLINT storing how many retry attempts were made after failures.\\\",\\n  \\\"cross|riskmanagement|risktrace\\\": \\\"SERIAL primary key uniquely identifying each risk management record.\\\",\\n  \\\"cross|riskmanagement|flowlink\\\": \\\"CHAR(10) referencing DataFlow(RecordRegistry), linking this risk record to a specific data flow.\\\",\\n  \\\"cross|riskmanagement|recordregistry\\\": \\\"CHAR(10) formerly 'RecordID'; can be used for cross-references or historical reasons.\\\",\\n  \\\"cross|riskmanagement|riskassess\\\": \\\"NUMERIC(4,2) storing the assessed risk score (0\\\\u2013100 or custom).\\\",\\n  \\\"cross|riskmanagement|riskmitstate\\\": \\\"VARCHAR(40) describing how the risk is being mitigated. Currently possible values: (Pending, Partial, Implemented).\\\",\\n  \\\"cross|riskmanagement|secureaction\\\": \\\"TEXT describing security measures or controls used to reduce identified risks. Currently possible values: (Adequate, Strong, Insufficient).\\\",\\n  \\\"cross|riskmanagement|breachnotify\\\": \\\"TEXT outlining the procedure for breach notification if a security event occurs. Currently possible values: (Partial, Established, Missing).\\\",\\n  \\\"cross|riskmanagement|incidentplan\\\": \\\"TEXT capturing the incident response plan or steps for handling security/operational events. Currently possible values: (Missing, Active, Outdated).\\\",\\n  \\\"cross|riskmanagement|incidentcount\\\": \\\"SMALLINT counting incidents recorded for this data flow or scenario.\\\",\\n  \\\"cross|riskmanagement|breachcount\\\": \\\"SMALLINT counting data breaches recorded.\\\",\\n  \\\"cross|riskmanagement|nearmissnum\\\": \\\"SMALLINT enumerating near misses (close calls that didn't escalate).\\\",\\n  \\\"cross|riskmanagement|avgresolhrs\\\": \\\"NUMERIC(5,2) average incident resolution time in hours.\\\",\\n  \\\"cross|riskmanagement|slapct\\\": \\\"NUMERIC(4,2) indicating SLA (Service Level Agreement) compliance percentage (0\\\\u2013100%).\\\",\\n  \\\"cross|riskmanagement|costusd\\\": \\\"NUMERIC(11,2) capturing the cost of compliance in USD (security, risk measures, etc.).\\\",\\n  \\\"cross|riskmanagement|penusd\\\": \\\"NUMERIC(11,2) storing potential or actual penalty/fine risk in USD.\\\",\\n  \\\"cross|riskmanagement|coveragestate\\\": \\\"VARCHAR(40) describing insurance cove...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e510cac2-c324-4b5a-97e0-34a12c638eb6",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_mzwx9zzv3sja",
+              "args": {
+                "sql": "SELECT \r\n    df.flowtag AS flow_id,\r\n    rm.riskassess AS risk_score,\r\n    dp.datasense AS data_sensitivity\r\nFROM \r\n    DataFlow AS df\r\nJOIN \r\n    RiskManagement AS rm ON df.recordregistry = rm.flowlink\r\nJOIN \r\n    DataProfile AS dp ON df.recordregistry = dp.flowsign\r\nORDER BY \r\n    dp.datasense;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e510cac2-c324-4b5a-97e0-34a12c638eb6",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_mzwx9zzv3sja",
+              "response": "{\"result\": \"flow_id | risk_score | data_sensitivity --------------------------------------- DF8224 | 39.33 | Critical DF4643 | 62.57 | Critical DF7214 | 19.99 | Critical DF9025 | 96.94 | Critical DF2414 | 18.33 | Critical DF8354 | 28.85 | Critical DF1776 | 43.97 | Critical DF4474 | 67.14 | Critical DF4695 | 94.27 | Critical DF5144 | 30.50 | Critical DF5439 | 64.71 | Critical DF5298 | 87.10 | Critical DF5081 | 7.38 | Critical DF6982 | 89.36 | Critical DF2435 | 81.92 | Critical DF2473 | 35.86 | Critical DF5782 | 28.31 | Critical DF8353 | 97.84 | Critical DF5901 | 67.44 | Critical DF3669 | 32.95 | Critical DF9184 | 45.46 | Critical DF1601 | 45.59 | Critical DF2345 | 82.74 | Critical DF4536 | 90.76 | Critical DF1093 | 45.48 | Critical DF9112 | 50.87 | Critical DF9829 | 53.92 | Critical DF4696 | 1.55 | Critical DF8346 | 15.78 | Critical DF7070 | 5.38 | Critical DF9025 | 0.67 | Critical DF2341 | 31.12 | Critical DF5654 | 89.41 | Critical DF7900 | 52.36 | Critical DF2216 | 82.68 | Critical DF2879 | 18.97 | Critical DF4285 | 80.04 | Critical DF4293 | 3.04 | Critical DF9765 | 41.09 | Critical DF8631 | 46.30 | Critical DF7480 | 67.06 | Critical DF8861 | 89.05 | Critical DF3313 | 67.59 | Critical DF1435 | 49.63 | Critical DF6185 | 29.91 | Critical DF1956 | 30.35 | Critical DF3676 | 50.10 | Critical DF7902 | 58.05 | Critical DF7803 | 91.10 | Critical DF2950 | 10.81 | Critical DF7137 | 40.44 | Critical DF4694 | 78.26 | Critical DF2022 | 35.49 | Critical DF8178 | 94.04 | Critical DF1726 | 56.73 | Critical DF3493 | 90.00 | Critical DF8698 | 35.29 | Critical DF8711 | 9.34 | Critical DF7377 | 17.22 | Critical DF3414 | 10.95 | Critical DF6411 | 16.25 | Critical DF1437 | 32.82 | Critical DF8338 | 64.23 | Critical DF2255 | 2.73 | Critical DF7970 | 58.91 | Critical DF5790 | 5.75 | Critical DF9423 | 20.10 | Critical DF1606 | 21.79 | Critical DF8213 | 65.06 | Critical DF7704 | 59.36 | Critical DF8046 | 74.38 | Critical DF8159 | 35.61 | Critical DF3673 | 97.30 | Critical DF5852 | 73.35 | Critical DF6503 | 0.23 | Critical DF9959 | 18.90 | Critical DF1468 | 45.12 | Critical DF3459 | 50.71 | Critical DF1356 | 9.60 | Critical DF4128 | 17.81 | Critical DF5251 | 33.76 | Critical DF2374 | 56.40 | Critical DF1706 | 58.28 | Critical DF2970 | 63.48 | Critical DF8288 | 75.04 | Critical DF1931 | 2.50 | Critical DF9296 | 76.87 | Critical DF7271 | 43.12 | Critical DF7451 | 13.77 | Critical DF4749 | 37.37 | Critical DF9127 | 76.05 | Critical DF5711 | 77.01 | Critical DF6674 | 24.67 | Critical DF8718 | 17.34 | Critical DF9722 | 82.62 | Critical DF4854 | 16.95 | Critical DF3806 | 19.93 | Critical DF4214 | 3.43 | Critical DF1646 | 59.95 |...\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-e510cac2-c324-4b5a-97e0-34a12c638eb6",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here are some of the top high-risk data flows, sorted by data sensitivity:\n\n| Flow ID | Risk Score | Data Sensitivity |\n|---|---|---|\n| DF8224 | 39.33 | Critical |\n| DF4643 | 62.57 | Critical |\n| DF7214 | 19.99 | Critical |\n| DF9025 | 96.94 | Critical |\n| DF2414 | 18.33 | Critical |\n| DF8354 | 28.85 | Critical |\n| DF1776 | 43.97 | Critical |\n| DF4474 | 67.14 | Critical |\n| DF4695 | 94.27 | Critical |\n| DF5144 | 30.50 | Critical |\n| DF5439 | 64.71 | Critical |\n| DF5298 | 87.10 | Critical |\n| DF5081 | 7.38 | Critical |\n| DF6982 | 89.36 | Critical |\n| DF2435 | 81.92 | Critical |\n| DF2473 | 35.86 | Critical |\n| DF5782 | 28.31 | Critical |\n| DF8353 | 97.84 | Critical |\n| DF5901 | 67.44 | Critical |\n| DF3669 | 32.95 | Critical |\n| DF9184 | 45.46 | Critical |\n| DF1601 | 45.59 | Critical |\n| DF2345 | 82.74 | Critical |\n| DF4536 | 90.76 | Critical |\n| DF1093 | 45.48 | Critical |\n| DF9112 | 50.87 | Critical |\n| DF9829 | 53.92 | Critical |\n| DF4696 | 1.55 | Critical |\n| DF8346 | 15.78 | Critical |\n| DF7070 | 5.38 | Critical |\n| DF9025 | 0.67 | Critical |\n| DF2341 | 31.12 | Critical |\n| DF5654 | 89.41 | Critical |\n| DF7900 | 52.36 | Critical |\n| DF2216 | 82.68 | Critical |\n| DF2879 | 18.97 | Critical |\n| DF4285 | 80.04 | Critical |\n| DF4293 | 3.04 | Critical |\n| DF9765 | 41.09 | Critical |\n| DF8631 | 46.30 | Critical |\n| DF7480 | 67.06 | Critical |\n| DF8861 | 89.05 | Critical |\n| DF3313 | 67.59 | Critical |\n| DF1435 | 49.63 | Critical |\n| DF6185 | 29.91 | Critical |\n| DF1956 | 30.35 | Critical |\n| DF3676 | 50.10 | Critical |\n| DF7902 | 58.05 | Critical |\n| DF7803 | 91.10 | Critical |\n| DF2950 | 10.81 | Critical |\n| DF7137 | 40.44 | Critical |\n| DF4694 | 78.26 | Critical |\n| DF2022 | 35.49 | Critical |\n| DF8178 | 94.04 | Critical |\n| DF1726 | 56.73 | Critical |\n| DF3493 | 90.00 | Critical |\n| DF8698 | 35.29 | Critical |\n| DF8711 | 9.34 | Critical |\n| DF7377 | 17.22 | Critical |\n| DF3414 | 10.95 | Critical |\n| DF6411 | 16.25 | Critical |\n| DF1437 | 32.82 | Critical |\n| DF8338 | 64.23 | Critical |\n| DF2255 | 2.73 | Critical |\n| DF7970 | 58.91 | Critical |\n| DF5790 | 5.75 | Critical |\n| DF9423 | 20.10 | Critical |\n| DF1606 | 21.79 | Critical |\n| DF8213 | 65.06 | Critical |\n| DF7704 | 59.36 | Critical |\n| DF8046 | 74.38 | Critical |\n| DF8159 | 35.61 | Critical |\n| DF3673 | 97.30 | Critical |\n| DF5852 | 73.35 | Critical |\n| DF6503 | 0.23 | Critical |\n| DF9959 | 18.90 | Critical |\n| DF1468 | 45.12 | Critical |\n| DF3459 | 50.71 | Critical |\n| DF1356 | 9.60 | Critical |\n| DF4128 | 17.81 | Critical |\n| DF5251 | 33.76 | Critical |\n| DF2374 | 56.40 | Critical |\n| DF1706 | <co"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here are some of the top high-risk data flows, sorted by data sensitivity:\n\n| Flow ID | Risk Score | Data Sensitivity |\n|---|---|---|\n| DF8224 | 39.33 | Critical |\n| DF4643 | 62.57 | Critical |\n| DF7214 | 19.99 | Critical |\n| DF9025 | 96.94 | Critical |\n| DF2414 | 18.33 | Critical |\n| DF8354 | 28.85 | Critical |\n| DF1776 | 43.97 | Critical |\n| DF4474 | 67.14 | Critical |\n| DF4695 | 94.27 | Critical |\n| DF5144 | 30.50 | Critical |\n| DF5439 | 64.71 | Critical |\n| DF5298 | 87.10 | Critical |\n| DF5081 | 7.38 | Critical |\n| DF6982 | 89.36 | Critical |\n| DF2435 | 81.92 | Critical |\n| DF2473 | 35.86 | Critical |\n| DF5782 | 28.31 | Critical |\n| DF8353 | 97.84 | Critical |\n| DF5901 | 67.44 | Critical |\n| DF3669 | 32.95 | Critical |\n| DF9184 | 45.46 | Critical |\n| DF1601 | 45.59 | Critical |\n| DF2345 | 82.74 | Critical |\n| DF4536 | 90.76 | Critical |\n| DF1093 | 45.48 | Critical |\n| DF9112 | 50.87 | Critical |\n| DF9829 | 53.92 | Critical |\n| DF4696 | 1.55 | Critical |\n| DF8346 | 15.78 | Critical |\n| DF7070 | 5.38 | Critical |\n| DF9025 | 0.67 | Critical |\n| DF2341 | 31.12 | Critical |\n| DF5654 | 89.41 | Critical |\n| DF7900 | 52.36 | Critical |\n| DF2216 | 82.68 | Critical |\n| DF2879 | 18.97 | Critical |\n| DF4285 | 80.04 | Critical |\n| DF4293 | 3.04 | Critical |\n| DF9765 | 41.09 | Critical |\n| DF8631 | 46.30 | Critical |\n| DF7480 | 67.06 | Critical |\n| DF8861 | 89.05 | Critical |\n| DF3313 | 67.59 | Critical |\n| DF1435 | 49.63 | Critical |\n| DF6185 | 29.91 | Critical |\n| DF1956 | 30.35 | Critical |\n| DF3676 | 50.10 | Critical |\n| DF7902 | 58.05 | Critical |\n| DF7803 | 91.10 | Critical |\n| DF2950 | 10.81 | Critical |\n| DF7137 | 40.44 | Critical |\n| DF4694 | 78.26 | Critical |\n| DF2022 | 35.49 | Critical |\n| DF8178 | 94.04 | Critical |\n| DF1726 | 56.73 | Critical |\n| DF3493 | 90.00 | Critical |\n| DF8698 | 35.29 | Critical |\n| DF8711 | 9.34 | Critical |\n| DF7377 | 17.22 | Critical |\n| DF3414 | 10.95 | Critical |\n| DF6411 | 16.25 | Critical |\n| DF1437 | 32.82 | Critical |\n| DF8338 | 64.23 | Critical |\n| DF2255 | 2.73 | Critical |\n| DF7970 | 58.91 | Critical |\n| DF5790 | 5.75 | Critical |\n| DF9423 | 20.10 | Critical |\n| DF1606 | 21.79 | Critical |\n| DF8213 | 65.06 | Critical |\n| DF7704 | 59.36 | Critical |\n| DF8046 | 74.38 | Critical |\n| DF8159 | 35.61 | Critical |\n| DF3673 | 97.30 | Critical |\n| DF5852 | 73.35 | Critical |\n| DF6503 | 0.23 | Critical |\n| DF9959 | 18.90 | Critical |\n| DF1468 | 45.12 | Critical |\n| DF3459 | 50.71 | Critical |\n| DF1356 | 9.60 | Critical |\n| DF4128 | 17.81 | Critical |\n| DF5251 | 33.76 | Critical |\n| DF2374 | 56.40 | Critical |\n| DF1706 | <co"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "ef2edd49241441619ba333a82b391f5e",
+      "client": "cross_db_11",
+      "database": "cross_db",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b3ff451642c142278665b496e23eefbf/0",
+      "at": 1793843502.8337924,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.3953000016044825,
+      "response_bytes": 15319,
+      "response_digest": "43359dd655c890b5849bd3f44b1a608b5f910bc4766b21ad282b1a6bf6444d42"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "2449d9acc9154e6da57f74a75c58c51b",
+      "client": "cross_db_11",
+      "database": "cross_db",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b3ff451642c142278665b496e23eefbf/0",
+      "at": 1793843511.6259928,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 0.552999998035375,
+      "response_bytes": 15319,
+      "response_digest": "43359dd655c890b5849bd3f44b1a608b5f910bc4766b21ad282b1a6bf6444d42"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "aabd0107afca47a2a7e002811aa45e58",
+      "client": "cross_db_11",
+      "database": "cross_db",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/b3ff451642c142278665b496e23eefbf/0",
+      "at": 1793843638.3559964,
+      "sql": "SELECT \r\n    df.flowtag AS flow_id,\r\n    rm.riskassess AS risk_score,\r\n    dp.datasense AS data_sensitivity\r\nFROM \r\n    DataFlow AS df\r\nJOIN \r\n    RiskManagement AS rm ON df.recordregistry = rm.flowlink\r\nJOIN \r\n    DataProfile AS dp ON df.recordregistry = dp.flowsign\r\nORDER BY \r\n    dp.datasense;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 37.72380000009434,
+      "response_bytes": 2676,
+      "response_digest": "2bd438689596e707464b414186fc5305600fe4890c01f1d30b7ddb8f7ac4ea43",
+      "successful": true
+    }
+  ]
+}

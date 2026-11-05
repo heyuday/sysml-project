@@ -1,0 +1,2451 @@
+{
+  "version": 2,
+  "database": "disaster",
+  "queries": {
+    "89dfb6e50b9027a968009833187d723b2d48ec3c4ee9bcfb5dc76c3c3d596361": {
+      "sql": "SELECT\n    ba.beneregistry AS \"Beneficiary Registry ID\",\n    ba.distequityidx AS \"Calculated Equity Value\",\n    CASE\n        WHEN ba.distequityidx < 1 THEN 'Resource Distribution Inequity'\n        ELSE 'Normal Distribution'\n    END AS \"Distribution Status\",\n    (de.impactmetrics -> 'population' ->> 'affected')::int AS \"Disaster-Affected Population\"\nFROM\n    beneficiariesandassessments AS ba\nJOIN\n    disasterevents AS de ON ba.benedistref = de.distregistry\nORDER BY\n    \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d702addb2afff3adffe07f9d944a022e0b5ff36a88a421ad72a7b05d3210598a",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "b5e6bf23849e06109e258b1ed51a1f172e5af878cdec1770f56c89cb7c32834f",
+      "values_digest": "24223e77ca6c1f6541377d394c6d2ebfb9c0e192e4feaa82fa39125e2f09cbaf",
+      "ordered_digest": "a923bdf689bf5131a108100d849866f4a46f25e336454a1276d32a8bc07d2165"
+    },
+    "77de1b5af3a3ecef9d20246838fb33d80b19f10fdbd5fe66ee1bd08ac0eb1e57": {
+      "sql": "SELECT\n    ba.beneregistry AS \"Beneficiary Registry ID\",\n    ba.distequityidx AS \"Equity Value\",\n    CASE\n        WHEN ba.distequityidx > 0.5 THEN 'Resource Distribution Inequity'\n        ELSE 'Normal Distribution'\n    END AS \"Distribution Status\",\n    (de.impactmetrics->'population'->>'affected')::int AS \"Disaster-Affected Population\"\nFROM\n    beneficiariesandassessments AS ba\nJOIN\n    disasterevents AS de ON ba.benedistref = de.distregistry\nORDER BY\n    \"Disaster-Affected Population\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c0ddb599d1c0555c693cdf1f0d4d53c59c2fba3068664b42891070840f42e9d9",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "25dc7fe5d69719ecb53b6452c135cbdc3606e1c04bfd64d81be7aca7f8bab002",
+      "values_digest": "674864414855f2f0b11104691f26bfe105a883c0c1a8a7f7f1ba45d424b49d40",
+      "ordered_digest": "145309356af4b37b3ab986f03144f51ad9eaa5cb117338e8f1aaa2c39b6d2d1b"
+    },
+    "093e4934fa1fb526afde57c3aa83bd754cc0e4e48cff5d940dd44a084a9db3f1": {
+      "sql": "SELECT\n    t.transportregistry,\n    (\n        (t.totaldeliverytons / dh.hubcaptons) *\n        t.deliverysuccessrate *\n        (1 - t.vehiclebreakrate / 100)\n    ) * 100 AS lpm,\n    CASE\n        WHEN (\n            (t.totaldeliverytons / dh.hubcaptons) *\n            t.deliverysuccessrate *\n            (1 - t.vehiclebreakrate / 100)\n        ) * 100 < 100 THEN 'Logistics Breakdown'\n        ELSE 'Normal Operation'\n    END AS status\nFROM\n    transportation AS t\nJOIN\n    distributionhubs AS dh ON t.transporthubref = dh.hubregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2ceaeb6d13a232b9c0e73194f4cafe4371e0385480d458e9fc3a3990cb3a8fd7",
+      "ordered": false,
+      "columns": [
+        [
+          "transportregistry",
+          1043,
+          24
+        ],
+        [
+          "lpm",
+          1700,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "180f4e72a92bb8b0ae07e7c9bd91599d46f0c3322808e346a9532a59fe46a489",
+      "values_digest": "98d31b0d41dedc54a79fffb185659ce3d9f83b99bbd8bb0416e304238c10216f",
+      "ordered_digest": "a21a4795d7afaec8898c220576680fa7bbd208ff1f46cd115a52eb856ffe4901"
+    },
+    "c2c94314c04982b1fdcccf20c88953aa034be50d5c57892a74c5ae2bbdd8bf63": {
+      "sql": "SELECT\n    t1.beneregistry AS \"Beneficiary Registry ID\",\n    t1.benedistref AS \"Disaster Reference\",\n    t1.commengagelvl AS \"CEE Score\",\n    t2.hazlevel AS \"Classification\",\n    RANK() OVER (PARTITION BY t1.commengagelvl ORDER BY t1.commengagelvl) AS rank\nFROM\n    beneficiariesandassessments AS t1\nJOIN\n    disasterevents AS t2 ON t1.benedistref = t2.distregistry\nORDER BY\n    t1.commengagelvl, rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "92ba32cb1c8611c1abd525a5dcde45b6457bdeacb4f9ca3cef879c541c8613fb",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Disaster Reference",
+          1043,
+          24
+        ],
+        [
+          "CEE Score",
+          22134,
+          -1
+        ],
+        [
+          "Classification",
+          22242,
+          -1
+        ],
+        [
+          "rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "451d8582cdc3fda989643827e60a43b8e8bc47d3d1557e883d25f4402632348e",
+      "values_digest": "597489e0988c414c03ee6fbade1f7fb085c54a7a1d36d8e7c9970a68390cc558",
+      "ordered_digest": "41b7b298385040a124196c742e26e18df7e63e3a96b8024c41098635c37e2a93"
+    },
+    "246cc1042fb0700b9e3dcc580ed41815350695e2bdb7ee8314db4e69cc407636": {
+      "sql": "SELECT\n    t1.beneregistry,\n    t1.benedistref,\n    t1.commengagelvl,\n    t1.localcapacitygrowth,\n    t2.impactmetrics\nFROM\n    beneficiariesandassessments AS t1\nJOIN\n    disasterevents AS t2 ON t1.benedistref = t2.distregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "436a6781dd1f481135c01cd4b6cc002e353b8093ba2b3909c9fdea7f38610fa1",
+      "ordered": false,
+      "columns": [
+        [
+          "beneregistry",
+          1043,
+          24
+        ],
+        [
+          "benedistref",
+          1043,
+          24
+        ],
+        [
+          "commengagelvl",
+          22134,
+          -1
+        ],
+        [
+          "localcapacitygrowth",
+          22296,
+          -1
+        ],
+        [
+          "impactmetrics",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "573a5b38f8449a5af267ab972386f9dc6f50531bf0839e1bf0f3173d503b9937",
+      "values_digest": "d4d28e76e00e777227e5ac971ca2c7a0f1f65cbe076eac629bdb6719bf38a982",
+      "ordered_digest": "88aadf9dd229190e83a83a649f1efeceefa35c16b30ed745cb782784c7f5c707"
+    },
+    "615935f46a40f1078da8ec5440330c55f526f7ce0a066c46aee47f2c52060a3a": {
+      "sql": "SELECT\n    t1.envhealthregistry AS \"Environmental Registry\",\n    t2.affectedarea AS \"Affected Area\",\n    t2.haztype AS \"Hazard Type\",\n    (t1.carbontons * (100 - t1.renewenergypct) * (100 - t1.recyclepct)) AS \"Environmental Footprint Factor\",\n    CASE\n        WHEN (t1.carbontons * (100 - t1.renewenergypct) * (100 - t1.recyclepct)) < 100 THEN 'Low'\n        WHEN (t1.carbontons * (100 - t1.renewenergypct) * (100 - t1.recyclepct)) BETWEEN 100 AND 500 THEN 'Medium'\n        ELSE 'High'\n    END AS \"Environmental Impact Classification\"\nFROM\n    environmentandhealth AS t1\nJOIN\n    disasterevents AS t2 ON t1.envdistref = t2.distregistry\nORDER BY\n    \"Environmental Footprint Factor\";",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "81006d6e6ba21eeaf6f327e4da57483b29c4a9e7128a68c04b94cc8c987ea0d2",
+      "ordered": true,
+      "columns": [
+        [
+          "Environmental Registry",
+          1043,
+          24
+        ],
+        [
+          "Affected Area",
+          1043,
+          104
+        ],
+        [
+          "Hazard Type",
+          22254,
+          -1
+        ],
+        [
+          "Environmental Footprint Factor",
+          1700,
+          -1
+        ],
+        [
+          "Environmental Impact Classification",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "d0ceb3f855943f45c111c099de2f9ae5e55bc2c1972b758b42de8ee685385e33",
+      "values_digest": "4870cd8a639c15427361c7f48fdf31d910fd809a6906d99e757ad87eda7557bc",
+      "ordered_digest": "5d630c6c61e6afabcfcf26be91d599c11f4945ea3f37f484d693f5049c19f0c9"
+    },
+    "81cb78b5a13e622b0a27a26267ba01da97867e418b647c23eba89da71d83d949": {
+      "sql": "SELECT\n    t1.opsregistry AS operation_registry_id,\n    t2.storeavailm3 AS available_storage_m3,\n    t1.supplyflowstate AS current_supply_flow_state\nFROM\n    operations AS t1\nJOIN\n    distributionhubs AS t2 ON t1.opshubref = t2.hubregistry\nWHERE\n    t1.resourceallocstate = 'Critical'\nORDER BY\n    operation_registry_id;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c1620e707d78eae7af5a97bfd15749eae4d0bd5209ec554545facbee91c07689",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_registry_id",
+          1043,
+          24
+        ],
+        [
+          "available_storage_m3",
+          1700,
+          524295
+        ],
+        [
+          "current_supply_flow_state",
+          22426,
+          -1
+        ]
+      ],
+      "rows": 329,
+      "bag_digest": "01a7a36859ce97e468b7d311fd411de8ecb5963375fd29d3d6ccac0395b9aed6",
+      "values_digest": "bcd06d1d4d5d5bb4476a32ac5fdb667cc591d81442645b5b86ae3716f9113a1d",
+      "ordered_digest": "7e4f91446e6f85847d8e7e5d83db07ac5d669feb6b32a5bf4115e194ef5091ff"
+    },
+    "52fffe48c6f0adadc38fe16a62535e4ea0b8257824cc507c64efafce95dfd629": {
+      "sql": "SELECT\n    t1.opsregistry AS registry_id,\n    t2.storecapm3 AS storage_details,\n    t2.storeavailm3 AS storage_details,\n    t1.supplyflowstate AS current_supply_flow_state\nFROM\n    operations AS t1\nJOIN\n    distributionhubs AS t2 ON t1.opshubref = t2.hubregistry\nWHERE\n    t1.resourceallocstate = 'Critical'\nORDER BY\n    t1.opsregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6b036f78a065f11384e30c64325e7d3a31ca99f8a466941041e33c3bf4353090",
+      "ordered": true,
+      "columns": [
+        [
+          "registry_id",
+          1043,
+          24
+        ],
+        [
+          "storage_details",
+          1700,
+          589830
+        ],
+        [
+          "storage_details",
+          1700,
+          524295
+        ],
+        [
+          "current_supply_flow_state",
+          22426,
+          -1
+        ]
+      ],
+      "rows": 329,
+      "bag_digest": "1ee8884ceebcfef7b2995314e16dd573ddca80f99150d63ad927583e5ec92bc6",
+      "values_digest": "ecfcf8444f84cbddc31a6ad88939cb72b7d70764a758dbe83019a15190c429fe",
+      "ordered_digest": "293bc70ea21e9257796bb358ea4f310413948a186ffe88c7e09bf36cab3a23ad"
+    },
+    "902060e728e337b6b9b0123bb27f7774bcb1c515698ccf593ff62492eb01c898": {
+      "sql": "SELECT\r\n    HubRegistry AS \"Hub Registry ID\",\r\n    HubUtilPct AS \"Calculated Utilization Value\",\r\n    CASE\r\n        WHEN HubUtilPct > 5 THEN 'High Utilization'\r\n        WHEN HubUtilPct BETWEEN 2 AND 5 THEN 'Moderate Utilization'\r\n        WHEN HubUtilPct < 2 THEN 'Low Utilization'\r\n    END AS \"Resource Utilization Classification\"\r\nFROM\r\n    DistributionHubs\r\nORDER BY\r\n    HubUtilPct DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "95f37db220d7643b1856af30fa7fa87c6371448513c2763b73be678f4fc99558",
+      "ordered": true,
+      "columns": [
+        [
+          "Hub Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Utilization Value",
+          1700,
+          458759
+        ],
+        [
+          "Resource Utilization Classification",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "3e5f6e69a1f42a6759aadd228b5bb47f771f20b6cc51baeec6251c97ec4f92fd",
+      "values_digest": "d3c8dda605f49a6f23ec52866a15312e7464390fbea2851db58dd86083c26b27",
+      "ordered_digest": "dd4127639dac67b491b38609725ccf94052064ab3a1697f4ab55c9ede6b88226"
+    },
+    "4b0f5fa53af1ad77627bb2542ed613904a1cd199abf31d7511d0fd8f487289db": {
+      "sql": "SELECT\r\n    eh.envhealthregistry AS environmental_registry,\r\n    de.affectedarea AS affected_area,\r\n    de.haztype AS hazard_type,\r\n    eh.envimpactrate AS environmental_impact_rate,\r\n    CASE \r\n        WHEN eh.envimpactrate = 'Low' THEN 'Category 1'\r\n        WHEN eh.envimpactrate = 'Medium' THEN 'Category 2'\r\n        WHEN eh.envimpactrate = 'High' THEN 'Category 3'\r\n    END AS category\r\nFROM \r\n    environmentandhealth eh\r\nJOIN \r\n    disasterevents de ON eh.envdistref = de.distregistry\r\nORDER BY \r\n    environmental_registry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f55226ecf8be36575e79b3a4b4a9c1905ab72e669f428c502d5c9b8794f389ac",
+      "ordered": true,
+      "columns": [
+        [
+          "environmental_registry",
+          1043,
+          24
+        ],
+        [
+          "affected_area",
+          1043,
+          104
+        ],
+        [
+          "hazard_type",
+          22254,
+          -1
+        ],
+        [
+          "environmental_impact_rate",
+          22218,
+          -1
+        ],
+        [
+          "category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "0c2ee00a03c0647a615438dc9207a8b387cf4764f5f7bc881d31974617895ba9",
+      "values_digest": "0394a41804c46e5a01522bb6362c833efc2c582bc3135f416bbd137e3a05d3e4",
+      "ordered_digest": "2f6d787f949add947261aaf2efd92d9890103fdad07ae94c3130fd24c80cb2e8"
+    },
+    "344f24af3a3bab8f0d2629f94b6b3560edd42f31b0f01355db464d4e5a1b915c": {
+      "sql": "SELECT\r\n    t1.envimpactrate AS environmental_score,\r\n    t2.impactmetrics ->> 'damage_level' AS impact_category\r\nFROM\r\n    \"environmentandhealth\" AS t1\r\nJOIN\r\n    disasterevents AS t2 ON t1.envdistref = t2.distregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "229e76d936384e3a2f0d9cb53b99262be8863ce6d67f800926d1ffe0c598c9df",
+      "ordered": false,
+      "columns": [
+        [
+          "environmental_score",
+          22218,
+          -1
+        ],
+        [
+          "impact_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "8d406dba6dec71d3550d89189e5691780b19dc61939139257b4be767a120e38a",
+      "values_digest": "393b41565188081548d7f45949547d7046048c16773a823ab274192f5fd9d38d",
+      "ordered_digest": "6d96e07df7ede19b18e0c3f5420a804989da1c3f71f3a32272da4cfaeef6d652"
+    },
+    "3d2e81f8c9772c70836c46d6aaf3fbffe6b443aff6a2890c9c21d1508416a16d": {
+      "sql": "SELECT \n    ba.beneregistry AS \"Beneficiary Registry ID\", \n    ba.benedistref AS \"Disaster Reference\", \n    ba.commengagelvl AS \"CEE Score\", \n    de.impactmetrics->>'classification' AS \"Classification\", \n    RANK() OVER (PARTITION BY ba.commengagelvl ORDER BY (CASE ba.commengagelvl WHEN 'Low' THEN 1 WHEN 'Medium' THEN 2 WHEN 'High' THEN 3 END) DESC) AS \"Rank\" \nFROM \n    beneficiariesandassessments AS ba \nJOIN \n    disasterevents AS de ON ba.benedistref = de.distregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "118be6decaa3b9eeb8e50ae795640392663461e25698eaa32bd6d16ad95074b5",
+      "ordered": false,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Disaster Reference",
+          1043,
+          24
+        ],
+        [
+          "CEE Score",
+          22134,
+          -1
+        ],
+        [
+          "Classification",
+          25,
+          -1
+        ],
+        [
+          "Rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "d5f0277ee762f6fa0f90633203438600f21c446418c7b0be068d67b282d3db8b",
+      "values_digest": "3f86fb9a255b103265bb80aaa1a404e9e40d0ba1a596daf72f947fd80f8ad237",
+      "ordered_digest": "b5eba0f4a24409f90f8a100fe5bb7c8c2ace3064d7495e0d1a59860cf54f8e2f"
+    },
+    "5a54fb518a8145c0881e4cbeb090dcaaff0b0fb6c2d7e811d6392f6f4f6e2e3e": {
+      "sql": "SELECT \n    ba.beneregistry AS beneficiary_registry_id,\n    ba.distequityidx AS calculated_equity_value,\n    CASE \n        WHEN ba.distequityidx < 1 THEN 'Resource Distribution Inequity' \n        ELSE 'Normal Distribution' \n    END AS distribution_status,\n    de.impactmetrics->'population'->>'affected' AS disaster_affected_population\nFROM \n    beneficiariesandassessments AS ba\nJOIN \n    disasterevents AS de ON ba.benedistref = de.distregistry\nORDER BY \n    beneficiary_registry_id ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "2dac2adc35f92fb74251b81fb67100fac8ae242c3d80a2e3097ba7a0def956be",
+      "ordered": true,
+      "columns": [
+        [
+          "beneficiary_registry_id",
+          1043,
+          24
+        ],
+        [
+          "calculated_equity_value",
+          1700,
+          327686
+        ],
+        [
+          "distribution_status",
+          25,
+          -1
+        ],
+        [
+          "disaster_affected_population",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "27ae2b4fc7eef7a241a6cb2fd335408c23eb3618f7d4e412d7df0a882e4363bf",
+      "values_digest": "24223e77ca6c1f6541377d394c6d2ebfb9c0e192e4feaa82fa39125e2f09cbaf",
+      "ordered_digest": "1ad722e9f2c2375dc9ecfd09e0debf0c9b1a4041b1fa3fbaa3325c34bc4705bc"
+    },
+    "7a2427a3936a5aedeb75ddcff39cdf20c387142e5b453e7d122a08dba0260ef9": {
+      "sql": "SELECT \n    ba.beneregistry AS beneficiary_registry_id,\n    ba.distequityidx AS equity_value,\n    CASE \n        WHEN ba.distequityidx < 1 THEN 'Resource Distribution Inequity' \n        ELSE 'Normal Distribution' \n    END AS distribution_status,\n    de.impactmetrics->'population'->>'affected' AS disaster_affected_population\nFROM \n    beneficiariesandassessments AS ba\nJOIN \n    disasterevents AS de ON ba.benedistref = de.distregistry\nORDER BY \n    beneficiary_registry_id ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6f540ac74e1fa588c790c6bc1da384336cee183bafbbe606fd7b4d36bbadb83b",
+      "ordered": true,
+      "columns": [
+        [
+          "beneficiary_registry_id",
+          1043,
+          24
+        ],
+        [
+          "equity_value",
+          1700,
+          327686
+        ],
+        [
+          "distribution_status",
+          25,
+          -1
+        ],
+        [
+          "disaster_affected_population",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "b09bab88d6790dd19be5ec169136966f8c3afcfb43bc1184dc8df672135ffd09",
+      "values_digest": "24223e77ca6c1f6541377d394c6d2ebfb9c0e192e4feaa82fa39125e2f09cbaf",
+      "ordered_digest": "2393c33413668391447c17a32e96a116da9e042a3babc2a92abb6a31d9e43e0f"
+    },
+    "91e21e36c776bee2cd69da60023cc6a68daf3160c678bb8c96cdd0e6bf67a08b": {
+      "sql": "SELECT \n    t.transportregistry AS transport_registry_id,\n    (\n        (t.vehiclecount * 0.2) +\n        (t.trucksavailable * 0.2) +\n        (t.helosavailable * 0.15) +\n        (t.boatsavailable * 0.15) +\n        (t.totaldeliverytons * 0.1) +\n        (t.dailydeliverytons * 0.1) +\n        CASE \n            WHEN t.lastmilestatus = 'On Track' THEN 10\n            WHEN t.lastmilestatus = 'Delayed' THEN 5\n            ELSE 0\n        END +\n        (t.distributionpoints * 0.05) +\n        (100 / (1 + t.avgdeliveryhours)) * 0.05 +\n        (t.deliverysuccessrate * 0.05) +\n        CASE \n            WHEN t.routeoptstatus = 'Optimized' THEN 5\n            WHEN t.routeoptstatus = 'In Progress' THEN 3\n            ELSE 0\n        END +\n        (t.fuelefficiencylpk * 0.03) +\n        CASE \n            WHEN t.maintenancestate = 'Up to Date' THEN 5\n            WHEN t.maintenancestate = 'Due' THEN 2\n            ELSE 0\n        END -\n        (t.vehiclebreakrate * 0.02)\n    ) AS lpm_score,\n    CASE \n        WHEN (\n            (t.vehiclecount * 0.2) +\n            (t.trucksavailable * 0.2) +\n            (t.helosavailable * 0.15) +\n            (t.boatsavailable * 0.15) +\n            (t.totaldeliverytons * 0.1) +\n            (t.dailydeliverytons * 0.1) +\n            CASE \n                WHEN t.lastmilestatus = 'On Track' THEN 10\n                WHEN t.lastmilestatus = 'Delayed' THEN 5\n                ELSE 0\n            END +\n            (t.distributionpoints * 0.05) +\n            (100 / (1 + t.avgdeliveryhours)) * 0.05 +\n            (t.deliverysuccessrate * 0.05) +\n            CASE \n                WHEN t.routeoptstatus = 'Optimized' THEN 5\n                WHEN t.routeoptstatus = 'In Progress' THEN 3\n                ELSE 0\n            END +\n            (t.fuelefficiencylpk * 0.03) +\n            CASE \n                WHEN t.maintenancestate = 'Up to Date' THEN 5\n                WHEN t.maintenancestate = 'Due' THEN 2\n                ELSE 0\n            END -\n            (t.vehiclebreakrate * 0.02)\n        ) < 50 THEN 'Logistics Breakdown'\n        ELSE 'Normal Operation'\n    END AS status\nFROM \n    transportation AS t;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7de4d908b63cb68f031d44eddcdd41eb5db2b17a232503445b13a489fd7574f3",
+      "ordered": false,
+      "columns": [
+        [
+          "transport_registry_id",
+          1043,
+          24
+        ],
+        [
+          "lpm_score",
+          1700,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "7532a1944ad126b582e05ed9e185ef86129c15a03066932baf603f355b327364",
+      "values_digest": "87483e8ca5c4e58d10d564dfb275361dabee31c28ddc3708bbe8a1a11b4b34a4",
+      "ordered_digest": "e354aafa050036a0fa912a3ede4fb967f0bc64bf9ecf9e373f1433911badb7dd"
+    },
+    "f8f9bda9965068ad44c30459d8ccc0c39ee7858e7978c60c81d58d9eeb528d04": {
+      "sql": "SELECT \n    t1.beneregistry AS \"Beneficiary Registry ID\", \n    t1.distequityidx AS \"Calculated Equity Value\", \n    CASE \n        WHEN t1.distequityidx > 0.5 THEN 'Resource Distribution Inequity' \n        ELSE 'Normal Distribution' \n    END AS \"Distribution Status\",\n    (t2.impactmetrics->'population'->>'affected')::int AS \"Disaster-Affected Population\"\nFROM \n    beneficiariesandassessments AS t1\nJOIN \n    disasterevents AS t2 ON t1.benedistref = t2.distregistry\nORDER BY \n    \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6c9499167ffc60a1d94acb214637dd26f69054ae96a6473b2a2e2e223bccba05",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "c547827be5872f77e4ff08a2ed002be167e2853b807a335a733ab3614edd2308",
+      "values_digest": "674864414855f2f0b11104691f26bfe105a883c0c1a8a7f7f1ba45d424b49d40",
+      "ordered_digest": "8c0f4bd28fabb764cafc13bf3c39ddff6a089ff8b783622a34548897306d7b4e"
+    },
+    "2cc1b0111cdbc9296bd28939ba8a4e1ea602f875c6d97bd5749c14cf9f2bc637": {
+      "sql": "SELECT \n    t1.beneregistry AS \"Beneficiary Registry ID\", \n    t1.distequityidx AS \"Calculated Equity Value\", \n    CASE \n        WHEN t1.distequityidx > 0.5 THEN 'Resource Distribution Inequity' \n        ELSE 'Normal Distribution' \n    END AS \"Distribution Status\", \n    (t2.impactmetrics->>'affected')::int AS \"Disaster-Affected Population\" \nFROM \n    beneficiariesandassessments AS t1 \nJOIN \n    disasterevents AS t2 ON t1.benedistref = t2.distregistry \nORDER BY \n    \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ba4fc346565d947cc4cf04103693a6426bf20eb910a7cba79e4edafe7e78d935",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "72891184ad53f0630a38806391ad4fe309e1c4b59c108cb6cc51e6b3b2837671",
+      "values_digest": "fcc0d47925d853a051f61df0449b189358aa05ebb51523adf577016ad682aeb1",
+      "ordered_digest": "f563f8d255568c219580b1db1bce10470370b91a9fcae2591053291b5451db98"
+    },
+    "a5e8a738266da4c4b0162e7271ef8dcf9619dac28df7b38f88f2000a011c6a8e": {
+      "sql": "SELECT \n  financeregistry AS registry_id,\n  CASE \n    WHEN fundingstate = 'Critical' THEN 'Financial Crisis Risk'\n    ELSE 'Financially Stable'\n  END AS status\nFROM \n  financials\nORDER BY \n  financeregistry ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c3117f97fb3e5c311f93772d9e63d1b5fcc1deb2af5ca860a02969d3ee68a095",
+      "ordered": true,
+      "columns": [
+        [
+          "registry_id",
+          1043,
+          24
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "cdb2169c02b4de7e4ea59026b1175b41ae958f77450df031716e0fbade536ba7",
+      "values_digest": "180ffb9b01cbd7bd66aeb6b583d5713f74f8c9c4f3b1d05020ea37ea6fc778b0",
+      "ordered_digest": "28a488d296e1785c4a97f356a157c70fa5e89d4f9f36d6d427b3996b51d1b86b"
+    },
+    "f796a24004d2b7cfb7f74d89bf07ad32b813a0f712a9e830b8a692a16a30c672": {
+      "sql": "SELECT \n  t1.beneregistry AS \"Beneficiary Registry ID\", \n  t1.distequityidx AS \"Equity Value\", \n  CASE \n    WHEN t1.distequityidx < 0.5 THEN 'Resource Distribution Inequity' \n    ELSE 'Normal Distribution' \n  END AS \"Distribution Status\",\n  t2.impactmetrics->'population'->>'affected' AS \"Disaster-affected Population\"\nFROM \n  beneficiariesandassessments AS t1 \n  JOIN disasterevents AS t2 ON t1.benedistref = t2.distregistry \nORDER BY \n  \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4fc5738695e3eb8cc3b53d091c92b26b4d864c1251688a7abc571290e8885f1c",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-affected Population",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "ba7045feaab5ea1dda652046c8d1b2672745f5cfe9a6b70edab9dec33013ee8f",
+      "values_digest": "5ef2bdd1028d91f482f3b749ad8a80e1ef47fe73cb375f8576e5640080bbf53d",
+      "ordered_digest": "c43487189ccb0ecb6b46b8ce54ff2a12042c034fdef024fd9dc1fd179952b3ee"
+    },
+    "524ec8279c0adea2d8055fa83bd17125293943efc3f8dde0e5c359c4e523aaf3": {
+      "sql": "SELECT \r\n    AVG(deliverysuccessrate) as avg_delivery_success_rate,\r\n    lastmilestatus\r\nFROM \r\n    transportation\r\nGROUP BY \r\n    lastmilestatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8179672a82b5479bd28b96da9c0db6bca1d1017aa3d9ece28872caf6979a21f9",
+      "ordered": false,
+      "columns": [
+        [
+          "avg_delivery_success_rate",
+          1700,
+          -1
+        ],
+        [
+          "lastmilestatus",
+          22280,
+          -1
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "259660c1d165f7c2666fbc2cd1e6ee4c634c895769aa09d0c8394adaaba0f71f",
+      "values_digest": "bed40516beebde6febe3413abc270e680fe22174e07f1cc25f4d5663356db0e3",
+      "ordered_digest": "e5467c29ac4fe0f988c009a2f28669bb29e01b47b1904aa57408ac14ea5b9b6b"
+    },
+    "0bb50cb6968b29ad02fb84166c6a81f2cc515b28658ae7eeead02484692cfa51": {
+      "sql": "SELECT \r\n    T1.opsregistry AS operation_registry_id,\r\n    T2.storecapm3 AS storage_capacity_m3,\r\n    T2.storeavailm3 AS storage_availability_m3,\r\n    T1.supplyflowstate AS current_supply_flow_state\r\nFROM \r\n    operations AS T1\r\nJOIN \r\n    distributionhubs AS T2 ON T1.opshubref = T2.hubregistry\r\nWHERE \r\n    T1.resourceallocstate = 'Critical'\r\nORDER BY \r\n    T1.opsregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3f43663f5f530a8c991133203c6b44aa2cf863f38eb034261aaae459bda55032",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_registry_id",
+          1043,
+          24
+        ],
+        [
+          "storage_capacity_m3",
+          1700,
+          589830
+        ],
+        [
+          "storage_availability_m3",
+          1700,
+          524295
+        ],
+        [
+          "current_supply_flow_state",
+          22426,
+          -1
+        ]
+      ],
+      "rows": 329,
+      "bag_digest": "391546e8efec7f86b71599e6b5faa09b90c77bcb55ccf8e3fe7b445cd2de81a5",
+      "values_digest": "ecfcf8444f84cbddc31a6ad88939cb72b7d70764a758dbe83019a15190c429fe",
+      "ordered_digest": "d661406fcab2cf6b4c4476af68afa0e7c28e5d6223c44de50ef04142cdc21d96"
+    },
+    "5a4e7c2538e0b938b604c47f504d75541ceb0114cbe1492d7dce086678fc2bdd": {
+      "sql": "SELECT \r\n    de.distregistry AS registry_id,\r\n    (\r\n        (\r\n            CASE \r\n                WHEN eh.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                WHEN eh.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                WHEN eh.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                ELSE 0.0\r\n            END\r\n        ) * (\r\n            CASE \r\n                WHEN de.hazlevel = 'Level 1' THEN 1\r\n                WHEN de.hazlevel = 'Level 2' THEN 2\r\n                WHEN de.hazlevel = 'Level 3' THEN 3\r\n                WHEN de.hazlevel = 'Level 4' THEN 4\r\n                WHEN de.hazlevel = 'Level 5' THEN 5\r\n                ELSE 0\r\n            END\r\n        ) * (\r\n            1 - (\r\n                (\r\n                    CASE \r\n                        WHEN de.hazlevel = 'Level 1' THEN 1\r\n                        WHEN de.hazlevel = 'Level 2' THEN 2\r\n                        WHEN de.hazlevel = 'Level 3' THEN 3\r\n                        WHEN de.hazlevel = 'Level 4' THEN 4\r\n                        WHEN de.hazlevel = 'Level 5' THEN 5\r\n                        ELSE 0\r\n                    END\r\n                ) / 6.0\r\n            )\r\n        )\r\n    ) AS health_resilience_score,\r\n    (\r\n        CASE \r\n            WHEN \r\n                (\r\n                    (\r\n                        CASE \r\n                            WHEN eh.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                            WHEN eh.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                            WHEN eh.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                            ELSE 0.0\r\n                        END\r\n                    ) * (\r\n                        CASE \r\n                            WHEN de.hazlevel = 'Level 1' THEN 1\r\n                            WHEN de.hazlevel = 'Level 2' THEN 2\r\n                            WHEN de.hazlevel = 'Level 3' THEN 3\r\n                            WHEN de.hazlevel = 'Level 4' THEN 4\r\n                            WHEN de.hazlevel = 'Level 5' THEN 5\r\n                            ELSE 0\r\n                        END\r\n                    ) * (\r\n                        1 - (\r\n                            (\r\n                                CASE \r\n                                    WHEN de.hazlevel = 'Level 1' THEN 1\r\n                                    WHEN de.hazlevel = 'Level 2' THEN 2\r\n                                    WHEN de.hazlevel = 'Level 3' THEN 3\r\n                                    WHEN de.hazlevel = 'Level 4' THEN 4\r\n                                    WHEN de.hazlevel = 'Level 5' THEN 5\r\n                                    ELSE 0\r\n                                END\r\n                            ) / 6.0\r\n                        )\r\n                    )\r\n                ) < 0.5 THEN 'Health Crisis' \r\n            ELSE 'Normal Health Status'\r\n        END \r\n    ) AS health_status\r\nFROM \r\n    disasterevents de\r\nJOIN \r\n    environmentandhealth eh ON de.distregistry = eh.envdistref\r\nORDER BY \r\n    de.distregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fe764d21f1f1d1ba88f342b0c928581fbaa704ac5de52385c5eaa8b8d0771ff4",
+      "ordered": true,
+      "columns": [
+        [
+          "registry_id",
+          1043,
+          24
+        ],
+        [
+          "health_resilience_score",
+          1700,
+          -1
+        ],
+        [
+          "health_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "ce00ea87930e00c4ed9c217b913bd34f0a1f3fb2785b0de4a5eb50d3a8e4a2fe",
+      "values_digest": "4b33d258296ad008ff438d3ca626c7c0a85d26e30a13f6e64da92475bb80e104",
+      "ordered_digest": "78dbdfe335f4594d7fbe6e33f542e814fcd4b005826ec0bc3fe091cd90c41ebd"
+    },
+    "34bb3e1e58fe1fe4bd32f285c0b26194b875569fe25e1d46723084178afa44b4": {
+      "sql": "SELECT \r\n    de.distregistry,\r\n    de.impactmetrics ->> 'transportation' AS transportation_status\r\nFROM \r\n    disasterevents de;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ccf604f5d6653546ae2aa49c78224cbe153ce0321a9cbc7b3730c01a3ff62a80",
+      "ordered": false,
+      "columns": [
+        [
+          "distregistry",
+          1043,
+          24
+        ],
+        [
+          "transportation_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "52d4915c54e981efe685291e4e9a0199928f062eee38a90aea88e0c15ace489d",
+      "values_digest": "2791a4e2e4b818f9b90b79fd42bc14eca29bef9e4e0d12cbc6e2181c5e4b895f",
+      "ordered_digest": "02299d6dfb5fb285866130d3d671e0da7407510cf6beed4d177876426c93caec"
+    },
+    "81676e3cffbd46bbb4ee9940732357662b8d0b5727f945495f861a15bd93a9fe": {
+      "sql": "SELECT \r\n    dh.hubregistry AS hub_registry_id,\r\n    (dh.hubutilpct * 100) AS calculated_utilisation_value,\r\n    CASE \r\n        WHEN (dh.hubutilpct * 100) < 30 THEN 'Underutilized'\r\n        WHEN (dh.hubutilpct * 100) BETWEEN 30 AND 70 THEN 'Moderately Utilized'\r\n        ELSE 'Highly Utilized'\r\n    END AS utilisation_classification\r\nFROM \r\n    distributionhubs AS dh\r\nJOIN \r\n    operations AS o ON dh.hubregistry = o.opshubref\r\nORDER BY \r\n    calculated_utilisation_value DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d8a7a7973d973e0beafdf9be5fa6bd4bd7f24b59492ecbfbaf89d6a91a2f9489",
+      "ordered": true,
+      "columns": [
+        [
+          "hub_registry_id",
+          1043,
+          24
+        ],
+        [
+          "calculated_utilisation_value",
+          1700,
+          -1
+        ],
+        [
+          "utilisation_classification",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "0f8d09ab12935682de7da3c7a597a7d070dbea24b5d1b367fc2be90ef0322213",
+      "values_digest": "ffb8b4e210364e21b6f538669728cb893611cc44f913f85c21c1c79847696b2b",
+      "ordered_digest": "b886c2889a682909f9babc2bc9182d596cfa78ba6fbdb02aa557cea8b71ae6fd"
+    },
+    "ba64cc633a24c48bb5f4d0dff3faff7499602b36a96a78ff8a82bab12123bc40": {
+      "sql": "SELECT \r\n    dh.hubregistry AS hub_registry_id,\r\n    (dh.hubutilpct * 100) AS calculated_utilization_value,\r\n    CASE \r\n        WHEN dh.hubutilpct < 0.3 THEN 'Underutilized'\r\n        WHEN dh.hubutilpct >= 0.3 AND dh.hubutilpct < 0.7 THEN 'Moderate'\r\n        ELSE 'High'\r\n    END AS utilization_classification\r\nFROM \r\n    distributionhubs AS dh\r\nJOIN \r\n    operations AS o ON dh.hubregistry = o.opshubref\r\nORDER BY \r\n    calculated_utilization_value DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "1071fb96695dc70b622726609dbb7690c88986e9b83c1c389cd162dffee6504a",
+      "ordered": true,
+      "columns": [
+        [
+          "hub_registry_id",
+          1043,
+          24
+        ],
+        [
+          "calculated_utilization_value",
+          1700,
+          -1
+        ],
+        [
+          "utilization_classification",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "ebb1fc0acadd6187eedbe980c0f6507be3bf6834c6f9833d37e57ab0878e5ce3",
+      "values_digest": "ecacad5499e4de9308e768a0af9e354f4b80f4956c78ce60852a646ebbc3d375",
+      "ordered_digest": "27bb4643c2054e4d85b2b309e51be0c34838fe93f9bab337cac370c3d1c89d0c"
+    },
+    "d435dcfc15efe0676c2b1fceceae8befa086483af3ab1a4d809e22b287a9b034": {
+      "sql": "SELECT \r\n    hubregistry AS \"Hub Registry ID\", \r\n    hubutilpct AS \"Calculated Utilization Value\", \r\n    warehousestate AS Classification\r\nFROM \r\n    distributionhubs\r\nORDER BY \r\n    hubutilpct DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bdf3b3b821efe7f7af50cd203cdf0af1a9bca54114b89f7594cf943a80696a22",
+      "ordered": true,
+      "columns": [
+        [
+          "Hub Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Utilization Value",
+          1700,
+          458759
+        ],
+        [
+          "classification",
+          22458,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "5fc1424f9f985342fc7eb173e5a3894ff54feecaac7a6bb2e68d91bc4828424e",
+      "values_digest": "b31055d877de04a0f5c7392ac78007bc81e9e50dea301c8cd9e33f79539b4abe",
+      "ordered_digest": "bc42c70250cc3792deeea8ad3fb23ea5ede55b481f1f9791bf57f16e19c7ec86"
+    },
+    "e8bdb47835348d351b2a92470d96eeada716c98c0ea572a7fad45a05dfbeaabd": {
+      "sql": "SELECT \r\n    o.opsregistry AS operation_id,\r\n    ce.coordeffectlvl AS performance_efficiency_score,\r\n    CASE \r\n        WHEN t.deliverysuccessrate > 90 AND dh.invaccpct > 95 AND (t.deliverysuccessrate + dh.invaccpct) > 3 THEN 'Yes' \r\n        ELSE 'No' \r\n    END AS excellence_criteria\r\nFROM \r\n    operations AS o\r\nJOIN \r\n    coordinationandevaluation AS ce ON o.opsregistry = ce.coordopsref\r\nJOIN \r\n    transportation AS t ON o.opsregistry = t.transportregistry\r\nJOIN \r\n    distributionhubs AS dh ON o.opshubref = dh.hubregistry\r\nORDER BY \r\n    ce.coordeffectlvl DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ff63a9aaa913f488fed25a905c8d7f115628c451ceee6eafa4196bd74a5b18da",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_id",
+          1043,
+          24
+        ],
+        [
+          "performance_efficiency_score",
+          22174,
+          -1
+        ],
+        [
+          "excellence_criteria",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "8d44b0ddceb29e90ac967d82e72b052003a17970cbb4cabfddb8a4a1e51c47d4",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "8d44b0ddceb29e90ac967d82e72b052003a17970cbb4cabfddb8a4a1e51c47d4"
+    },
+    "dd363080c3a359f7e0e882c9045f8242486907173cbf67ab46644d350b56f9d8": {
+      "sql": "SELECT \r\n    o.opsregistry AS operation_id,\r\n    ce.coordeffectlvl AS performance_efficiency_score,\r\n    CASE \r\n        WHEN t.deliverysuccessrate > 90 AND dh.invaccpct > 95 AND (t.deliverysuccessrate + dh.invaccpct) > 3 THEN 'Yes' \r\n        ELSE 'No' \r\n    END AS excellence_criteria\r\nFROM \r\n    operations AS o\r\nJOIN \r\n    transportation AS t ON o.opsregistry = t.transportregistry\r\nJOIN \r\n    distributionhubs AS dh ON o.opshubref = dh.hubregistry\r\nJOIN \r\n    coordinationandevaluation AS ce ON o.opsregistry = ce.coordopsref\r\nORDER BY \r\n    ce.coordeffectlvl DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9fa58ba3eb9a095a5ca31d825a3beda13bf140421bd05a07c5a78e85bfabbecf",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_id",
+          1043,
+          24
+        ],
+        [
+          "performance_efficiency_score",
+          22174,
+          -1
+        ],
+        [
+          "excellence_criteria",
+          25,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "8d44b0ddceb29e90ac967d82e72b052003a17970cbb4cabfddb8a4a1e51c47d4",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "8d44b0ddceb29e90ac967d82e72b052003a17970cbb4cabfddb8a4a1e51c47d4"
+    },
+    "baba7de61ad73f16ad91a4cb30f4feaa9cf685f26c67e69dbc334477c55fd0c6": {
+      "sql": "SELECT \r\n    t1.beneregistry AS \"Beneficiary Registry ID\", \r\n    t1.distequityidx AS \"Calculated Equity Value\", \r\n    CASE \r\n        WHEN t1.distequityidx > 0.5 THEN 'Resource Distribution Inequity' \r\n        ELSE 'Normal Distribution' \r\n    END AS \"Distribution Status\",\r\n    (t2.impactmetrics->'population'->>'affected')::int AS \"Disaster-Affected Population\"\r\nFROM \r\n    beneficiariesandassessments AS t1\r\nJOIN \r\n    disasterevents AS t2 ON t1.benedistref = t2.distregistry\r\nORDER BY \r\n    \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6c9499167ffc60a1d94acb214637dd26f69054ae96a6473b2a2e2e223bccba05",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Calculated Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "c547827be5872f77e4ff08a2ed002be167e2853b807a335a733ab3614edd2308",
+      "values_digest": "674864414855f2f0b11104691f26bfe105a883c0c1a8a7f7f1ba45d424b49d40",
+      "ordered_digest": "8c0f4bd28fabb764cafc13bf3c39ddff6a089ff8b783622a34548897306d7b4e"
+    },
+    "e405602406f5057f13cc6c28062c2f8caddda58f7252751c435d2bfdb0ad27d8": {
+      "sql": "SELECT \r\n    t1.beneregistry AS \"Beneficiary Registry ID\", \r\n    t1.distequityidx AS \"Equity Value\", \r\n    CASE \r\n        WHEN t1.distequityidx > 0 THEN 'Resource Distribution Inequity' \r\n        ELSE 'Normal Distribution' \r\n    END AS \"Distribution Status\",\r\n    (t2.impactmetrics -> 'population' ->> 'affected')::int AS \"Disaster-Affected Population\"\r\nFROM \r\n    beneficiariesandassessments AS t1\r\nJOIN \r\n    disasterevents AS t2 ON t1.benedistref = t2.distregistry\r\nORDER BY \r\n    \"Beneficiary Registry ID\" ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "50347d92307fbb10d978b80ad18ca075cb7dcd90e64a6251d1fc397d85fa3e14",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Equity Value",
+          1700,
+          327686
+        ],
+        [
+          "Distribution Status",
+          25,
+          -1
+        ],
+        [
+          "Disaster-Affected Population",
+          23,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "806d5a7dc52c959614562c78926aa0ebe9335f579d6c638169a4f276dcfdf79b",
+      "values_digest": "44a9d2228cac77077b341d451f4b5f6c9a031be2a37bcc734d10322aea10511a",
+      "ordered_digest": "ba1c776712f6981de1254eb56bfc5cc91efc291853ead6bed8808d45f70ff864"
+    },
+    "6045474ed1b4b95fe96160b9960b86c84bcc5847151be984c15fc4e5ebbac374": {
+      "sql": "SELECT \r\n    t1.distregistry,\r\n    AVG(t2.deliverysuccessrate) AS avg_delivery_success_rate,\r\n    t2.lastmilestatus\r\nFROM \r\n    disasterevents AS t1\r\nJOIN \r\n    transportation AS t2 ON t1.distregistry = t2.transportdistref\r\nGROUP BY \r\n    t1.distregistry, t2.lastmilestatus;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "90f225a30a94c4346ad813399fb95bc62676c4fd21b5672aefdadd719e95c457",
+      "ordered": false,
+      "columns": [
+        [
+          "distregistry",
+          1043,
+          24
+        ],
+        [
+          "avg_delivery_success_rate",
+          1700,
+          -1
+        ],
+        [
+          "lastmilestatus",
+          22280,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "56da68200ada93908f3df65d96b73971d37647bfa10adfe408e14fe71f794106",
+      "values_digest": "b476cb8c94effdbbd15b933fb68dca55b292eff3c8eca14d2f8bb080dfe40a8d",
+      "ordered_digest": "4c70168e685ffa370af2d8ed63bbd35f0dba4949644c1b79cda335090d83a410"
+    },
+    "31fc445fa7fd809641e31176c441c27b1fe993a54e17970234fa90c39df7ba79": {
+      "sql": "SELECT \r\n    t1.opsregistry AS operation_id,\r\n    t2.coordeffectlvl AS performance_efficiency_score,\r\n    CASE \r\n        WHEN t2.coordeffectlvl = 'High' THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS meets_excellence_criteria\r\nFROM \r\n    operations AS t1\r\nJOIN \r\n    coordinationandevaluation AS t2\r\nON \r\n    t1.opsregistry = t2.coordopsref\r\nORDER BY \r\n    t2.coordeffectlvl DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3f862c2dab2fafe00ea3dcad70f507f6096fb0555c968ff98079bfbf2dbf1242",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_id",
+          1043,
+          24
+        ],
+        [
+          "performance_efficiency_score",
+          22174,
+          -1
+        ],
+        [
+          "meets_excellence_criteria",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "bf6561605f07a277fb2eed3e5f012b57dcf835b1d411ab019a08ef280661551a",
+      "values_digest": "68b0acbda39932a811e4e0aa82a6f4d48512341474a04abdc13584af343b881d",
+      "ordered_digest": "ecf7b0e22ed48556d44c4d521d756b32ed2d0675a17e797fefb43ad697877e5e"
+    },
+    "935a65f7bfc10dac3b3a3f7b155cd81dcd467b5efdb499a87ee37d8c0848a3ef": {
+      "sql": "SELECT \r\n    t1.opsregistry AS operation_id,\r\n    t2.reportcompliance AS performance_efficiency_score,\r\n    CASE \r\n        WHEN t2.reportcompliance >= 90 THEN 'Yes'\r\n        ELSE 'No'\r\n    END AS meets_excellence_criteria\r\nFROM \r\n    operations AS t1\r\nJOIN \r\n    coordinationandevaluation AS t2 ON t1.opsregistry = t2.coordopsref\r\nORDER BY \r\n    t2.reportcompliance DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5482802ee67d3697043700fda5977a830eba0a5058fc3883b81d7fddc5f49c6e",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_id",
+          1043,
+          24
+        ],
+        [
+          "performance_efficiency_score",
+          1700,
+          262149
+        ],
+        [
+          "meets_excellence_criteria",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "ab6920838e5ff3099043e4a6d574b3c91b927550dece8255cc8c1c927acb64b1",
+      "values_digest": "54b161c815696a089cb7b7e606df041ffbda650e4f543f827c3032fa556a18f0",
+      "ordered_digest": "af4f6547a307d1c721c34258cbd02a810b4abf8719db64a77b03968edfe8955a"
+    },
+    "5b2a6037a447707a1d5e9048323a417e26958bbcb425dee3721845593147eef4": {
+      "sql": "SELECT \r\n    t1.opsregistry AS operation_registry_id,\r\n    t2.storeavailm3 AS storage_details,\r\n    t1.supplyflowstate AS current_supply_flow_state\r\nFROM \r\n    operations AS t1\r\nJOIN \r\n    distributionhubs AS t2 ON t1.opshubref = t2.hubregistry\r\nWHERE \r\n    t1.resourceallocstate = 'Critical'\r\nORDER BY \r\n    operation_registry_id;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d429397ba5a6d9a4d402691af2b2846deec45819c463eb66d527653c0220d607",
+      "ordered": true,
+      "columns": [
+        [
+          "operation_registry_id",
+          1043,
+          24
+        ],
+        [
+          "storage_details",
+          1700,
+          524295
+        ],
+        [
+          "current_supply_flow_state",
+          22426,
+          -1
+        ]
+      ],
+      "rows": 329,
+      "bag_digest": "7445eaac2927fc349ac0f854cf7c2336eb741a8d77bf70cb4a707455a4c06594",
+      "values_digest": "bcd06d1d4d5d5bb4476a32ac5fdb667cc591d81442645b5b86ae3716f9113a1d",
+      "ordered_digest": "4dbf79d800a6212b1686490621368f20699c2a4c5469c825293671f77787b162"
+    },
+    "a8db8d8acc9d0d1bdf4e5bad7ec40b6ab233ae69aad1bd0c6dab8c93db98252c": {
+      "sql": "SELECT \r\n    t1.opsregistry AS registry_id,\r\n    t2.storeavailm3 AS storage_details,\r\n    t1.supplyflowstate AS current_supply_flow_state\r\nFROM \r\n    operations AS t1\r\nJOIN \r\n    distributionhubs AS t2 ON t1.opshubref = t2.hubregistry\r\nWHERE \r\n    t1.resourceallocstate = 'Critical'\r\nORDER BY \r\n    t1.opsregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "81d567b71e3187fe13a00e090629303f53c98f5f235cbd1275ae76e020c052b2",
+      "ordered": true,
+      "columns": [
+        [
+          "registry_id",
+          1043,
+          24
+        ],
+        [
+          "storage_details",
+          1700,
+          524295
+        ],
+        [
+          "current_supply_flow_state",
+          22426,
+          -1
+        ]
+      ],
+      "rows": 329,
+      "bag_digest": "953096e8d51e8baf2b118216a86b0b4cc4de885061e61401450e376fa5042dfe",
+      "values_digest": "bcd06d1d4d5d5bb4476a32ac5fdb667cc591d81442645b5b86ae3716f9113a1d",
+      "ordered_digest": "c43248d5692d19238036cbf187a0f5471308551b9c501150d5e1827cc77cef6f"
+    },
+    "99ef28ae7658fe56f225920a9c8e6272e57a51beb59491ba188f49f3c4b73874": {
+      "sql": "SELECT \r\n    transportregistry\r\nFROM \r\n    transportation\r\nWHERE \r\n    lastmilestatus = 'Suspended';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "98b3bce5f5433bf2a58b40167a9813a3ffda4c02b912dc12f650ffb83549538d",
+      "ordered": false,
+      "columns": [
+        [
+          "transportregistry",
+          1043,
+          24
+        ]
+      ],
+      "rows": 327,
+      "bag_digest": "80688f639c53906665da4bccc132f5fb8f5b89ec2846c72a7dc7cc4e2382bb2f",
+      "values_digest": "411c29de48370ad9e5832bdba56fd6f8126af047a407c0492971bc66ffa7ca32",
+      "ordered_digest": "1fda39df90e4ff82d98b4bc5a8cb71821a2ab88009a9c1edf8e4dce47fb60ba9"
+    },
+    "346879ffb4e9d27c96e68174acccf17cfe52300c9c70fe19494232e5dc520006": {
+      "sql": "SELECT \r\n  SUM((s.resourceinventory->'power'->>'generators')::INT) AS total_generators, \r\n  SUM((s.resourceinventory->'essentials'->>'water_liters')::FLOAT) AS total_water_liters \r\nFROM \r\n  supplies s \r\n  JOIN disasterevents d ON s.supplydistref = d.distregistry \r\nWHERE \r\n  d.impactmetrics->>'communication' IN ('Limited', 'Down');",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8d6a845a0d81d50d9a3621bb7fb182c935b0905334fdf072364d5434b6cbadee",
+      "ordered": false,
+      "columns": [
+        [
+          "total_generators",
+          20,
+          -1
+        ],
+        [
+          "total_water_liters",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "431635c4de4ee42f9a4e756ffe1d1e6b97851060dc3025ba762315e4cfc442b7",
+      "values_digest": "5e648f773d48849614ef5d26fb0f3e88d4eef0ebd3f3656944372487d383c9ce",
+      "ordered_digest": "431635c4de4ee42f9a4e756ffe1d1e6b97851060dc3025ba762315e4cfc442b7"
+    },
+    "e2fc15c5fddf1d53eccf64458d98d5b226427d86e05426126b799c2e5b276f77": {
+      "sql": "SELECT column_name\r\nFROM information_schema.columns\r\nWHERE table_name = 'disasterevents'\r\nAND column_name LIKE '%classification%';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "dadbc42e0179f0d77eff812a8fd7b16e34171c5e5bfd035300f784dc9141d052",
+      "ordered": false,
+      "columns": [
+        [
+          "column_name",
+          19,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "da5037610e754e22784cae00255afe72bcb57e9f34562942292cdf8977a5846e",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "da5037610e754e22784cae00255afe72bcb57e9f34562942292cdf8977a5846e"
+    },
+    "cfac80f57c88167740c9a708dfcfa868dcfe7a79c7ffb69abbb2692c730fe594": {
+      "sql": "SELECT financeregistry, fundingstate\r\nFROM financials;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f44637443169d444aaf9ea2d93daa0f399c50d5cf3696bff6cb55e4aebaff765",
+      "ordered": false,
+      "columns": [
+        [
+          "financeregistry",
+          1043,
+          24
+        ],
+        [
+          "fundingstate",
+          22234,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "dd02612329cdf4725a9e4fe441ca6fe4b3414b42e5221eaf9609bd4065d008b9",
+      "values_digest": "b00da3a12f6d12a2ac98347bb1b6a03c2ae0e71b307fe467f8cf5fcfbafa5e68",
+      "ordered_digest": "6ce4d53a7349b7e70ce23db1c17485cbeeea19a31b45d1cd606aad5b24b7b218"
+    },
+    "7bb38e857290f55d43653e93fff0c07ca458e03fb1620a49cd8b1b6b86087dfa": {
+      "sql": "SELECT reportcompliance\nFROM coordinationandevaluation\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "085b88c7534e08434fcdb4cc157cd456de8daf73eb3873fac8b349c8bf9cd3a9",
+      "ordered": false,
+      "columns": [
+        [
+          "reportcompliance",
+          1700,
+          262149
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "13d724f820acffcd27a627eaaf4c240b9df7479ccd39f4f224d17379af02d3a3",
+      "values_digest": "a79a6f4e9f76fb02d2a07a75a4da56272b408a10ef0dbdf659bab52771ded891",
+      "ordered_digest": "d37a8f9e66ad87d2f8f3ab585e7f2196e1983ccacccef2a506698c1d01a77729"
+    },
+    "a3c8535e2d985e1ad1886184aaadd0c6138a13bf53f5a6546230e04d3e49f46e": {
+      "sql": "SELECT reportcompliance\r\nFROM \"coordinationandevaluation\"\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "085b88c7534e08434fcdb4cc157cd456de8daf73eb3873fac8b349c8bf9cd3a9",
+      "ordered": false,
+      "columns": [
+        [
+          "reportcompliance",
+          1700,
+          262149
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "13d724f820acffcd27a627eaaf4c240b9df7479ccd39f4f224d17379af02d3a3",
+      "values_digest": "a79a6f4e9f76fb02d2a07a75a4da56272b408a10ef0dbdf659bab52771ded891",
+      "ordered_digest": "d37a8f9e66ad87d2f8f3ab585e7f2196e1983ccacccef2a506698c1d01a77729"
+    },
+    "2738b4cca2d6bc0a30b8ca98ebd4e5d023154bf3224b18ee04ba6c1cd38c5ecb": {
+      "sql": "SELECT reportcompliance\r\nFROM coordinationandevaluation\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "085b88c7534e08434fcdb4cc157cd456de8daf73eb3873fac8b349c8bf9cd3a9",
+      "ordered": false,
+      "columns": [
+        [
+          "reportcompliance",
+          1700,
+          262149
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "13d724f820acffcd27a627eaaf4c240b9df7479ccd39f4f224d17379af02d3a3",
+      "values_digest": "a79a6f4e9f76fb02d2a07a75a4da56272b408a10ef0dbdf659bab52771ded891",
+      "ordered_digest": "d37a8f9e66ad87d2f8f3ab585e7f2196e1983ccacccef2a506698c1d01a77729"
+    },
+    "537f91c0cb2decdbf6c3864be9aa67957a60e6b5a4f3840b0c387e68ffac9486": {
+      "sql": "SELECT reportcompliance\r\nFROM coordinationandevaluation;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5601d67f6d54bea66c18d15cc349ba92961967a1023defeeab625ef0b34d5b5e",
+      "ordered": false,
+      "columns": [
+        [
+          "reportcompliance",
+          1700,
+          262149
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "7347c98e35a167451e153c930ef816ac90ebe4a95fcdc2709061d0a629eca465",
+      "values_digest": "cfe9391bd631fe341f8c281127dd00a500e4323537c62a2b167dc60829952a9f",
+      "ordered_digest": "2bd80294c19af5c0469f62692aea913ebb79118e09701fd21e9c9043d4967eda"
+    },
+    "c76bca4f32733f41db57f507be2d4e5cea14c84657f31ac1f45e624b952bd9d5": {
+      "sql": "WITH EnvironmentalImpactFactor AS (\r\n    SELECT \r\n        t1.envhealthregistry AS environmental_registry,\r\n        t2.affectedarea AS affected_area,\r\n        t2.haztype AS hazard_type,\r\n        (t1.carbontons * t1.renewenergypct * t1.recyclepct) AS environmental_footprint_factor,\r\n        CASE \r\n            WHEN (t1.carbontons * t1.renewenergypct * t1.recyclepct) < 100 THEN 'Low'\r\n            WHEN (t1.carbontons * t1.renewenergypct * t1.recyclepct) BETWEEN 100 AND 500 THEN 'Medium'\r\n            ELSE 'High'\r\n        END AS environmental_impact_category\r\n    FROM \r\n        environmentandhealth AS t1\r\n    JOIN \r\n        disasterevents AS t2 ON t1.envdistref = t2.distregistry\r\n)\r\nSELECT * FROM EnvironmentalImpactFactor\r\nORDER BY environmental_registry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8a070b4bb2a43762c856637520c4fef9248fab37e34ea1b9488193bb64508704",
+      "ordered": true,
+      "columns": [
+        [
+          "environmental_registry",
+          1043,
+          24
+        ],
+        [
+          "affected_area",
+          1043,
+          104
+        ],
+        [
+          "hazard_type",
+          22254,
+          -1
+        ],
+        [
+          "environmental_footprint_factor",
+          1700,
+          -1
+        ],
+        [
+          "environmental_impact_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "685e0dd8152e81e15ae910a1acabcae748477fbaacf14069d8a93680c72804ef",
+      "values_digest": "f314de032db2f1e978c57b441827e8bb3928c6c1a862b6e1d6504938afb36c20",
+      "ordered_digest": "9aa64bef27d46697f878a0a1a0e420396a072744f7d9e1acaf7cfb85a9ace739"
+    },
+    "6b948fad8412e06d2f05ffe3ced6139fafe7d315b6767818940d5a017f7f54d4": {
+      "sql": "WITH RankedDisasters AS (\r\n    SELECT \r\n        ba.beneregistry AS \"Beneficiary Registry ID\",\r\n        de.distregistry AS \"Disaster Reference\",\r\n        ba.commengagelvl AS \"CEE Score\",\r\n        de.hazlevel AS \"Classification\",\r\n        ROW_NUMBER() OVER (PARTITION BY ba.commengagelvl ORDER BY de.hazlevel) AS rank\r\n    FROM \r\n        beneficiariesandassessments ba\r\n    JOIN \r\n        disasterevents de ON ba.benedistref = de.distregistry\r\n)\r\nSELECT \r\n    \"Beneficiary Registry ID\",\r\n    \"Disaster Reference\",\r\n    \"CEE Score\",\r\n    \"Classification\",\r\n    rank\r\nFROM \r\n    RankedDisasters\r\nORDER BY \r\n    \"CEE Score\", rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cad6774b1609d5be4b3d6b578ce4ba125594105dc3fa8e4c8f9054c0c9c2c301",
+      "ordered": true,
+      "columns": [
+        [
+          "Beneficiary Registry ID",
+          1043,
+          24
+        ],
+        [
+          "Disaster Reference",
+          1043,
+          24
+        ],
+        [
+          "CEE Score",
+          22134,
+          -1
+        ],
+        [
+          "Classification",
+          22242,
+          -1
+        ],
+        [
+          "rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "c0bc426593bb3589511cad5fbd145fda5a1b0cbf2899ce9ede01430a85de657c",
+      "values_digest": "86d2041243f7508b0c4cc217d204f20eae7b6bfbccd3db254e739d0828f8d750",
+      "ordered_digest": "d8e42256cc6af4df741ad600c69cfe7d981a1af768d8fdd0ffe67fe7df4ea971"
+    },
+    "5cfb36d2e5f00982c21263634d84b944053e07258ebfa3545ccefaa7976b6648": {
+      "sql": "WITH fsr_cte AS (\r\n    SELECT \r\n        financeregistry, \r\n        (donorcommitmentsusd / budgetallotusd) * (1 - fundsutilpct) * (1 - (resourcegapsusd / budgetallotusd)) AS fsr\r\n    FROM \r\n        financials\r\n),\r\nstatus_cte AS (\r\n    SELECT \r\n        financeregistry, \r\n        fsr, \r\n        CASE \r\n            WHEN fsr < 1 THEN 'Financial Crisis Risk' \r\n            ELSE 'Financially Stable' \r\n        END AS status\r\n    FROM \r\n        fsr_cte\r\n)\r\nSELECT \r\n    financeregistry, \r\n    fsr AS financial_health_index, \r\n    status \r\nFROM \r\n    status_cte \r\nORDER BY \r\n    fsr ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4693ba0cac213e726dd03e13af72c417a78403d774c931971a45021a88c03bfe",
+      "ordered": true,
+      "columns": [
+        [
+          "financeregistry",
+          1043,
+          24
+        ],
+        [
+          "financial_health_index",
+          1700,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "231c2810f9c5ecdaf51244026d807968315cf1ac1874e5634e40ff3bb4968d56",
+      "values_digest": "f57bd16ae44987c5c41e7c9f7134d2245498d52b973eb5887a3c85b53a7a68e3",
+      "ordered_digest": "b6ef6599f94e4d75f146dd84ea4cbe86ab1fedca037dabe451d66b39ba706ce8"
+    },
+    "a71a46f3bfd9c5b76df2de145a21e599dc2fb4b13eb2950fa8843bf549d7d7cb": {
+      "sql": "WITH health_scores AS (\r\n    SELECT \r\n        de.distregistry AS registry_id,\r\n        (\r\n            (\r\n                CASE \r\n                    WHEN eah.medicalemergencycapacity = 'Adequate' THEN 1.0\r\n                    WHEN eah.medicalemergencycapacity = 'Limited' THEN 0.6\r\n                    WHEN eah.medicalemergencycapacity = 'Critical' THEN 0.3\r\n                    ELSE 0.0\r\n                END\r\n            ) * (\r\n                CASE \r\n                    WHEN de.hazlevel = 'Level 1' THEN 1\r\n                    WHEN de.hazlevel = 'Level 2' THEN 2\r\n                    WHEN de.hazlevel = 'Level 3' THEN 3\r\n                    WHEN de.hazlevel = 'Level 4' THEN 4\r\n                    WHEN de.hazlevel = 'Level 5' THEN 5\r\n                    ELSE 0\r\n                END\r\n            ) * (\r\n                1 - (\r\n                    CASE \r\n                        WHEN de.hazlevel = 'Level 1' THEN 1\r\n                        WHEN de.hazlevel = 'Level 2' THEN 2\r\n                        WHEN de.hazlevel = 'Level 3' THEN 3\r\n                        WHEN de.hazlevel = 'Level 4' THEN 4\r\n                        WHEN de.hazlevel = 'Level 5' THEN 5\r\n                        ELSE 0\r\n                    END / 6.0\r\n                )\r\n            )\r\n        ) AS health_resilience_score\r\n    FROM \r\n        disasterevents de\r\n    JOIN \r\n        environmentandhealth eah ON de.distregistry = eah.envdistref\r\n),\r\nhealth_crisis AS (\r\n    SELECT \r\n        hs.registry_id,\r\n        hs.health_resilience_score,\r\n        CASE \r\n            WHEN eah.diseaserisk = 'High' \r\n            AND eah.waterqualityindex < 50 \r\n            AND hs.health_resilience_score < 40 THEN 'Health Crisis'\r\n            ELSE 'Normal Health Status'\r\n        END AS health_status\r\n    FROM \r\n        health_scores hs\r\n    JOIN \r\n        environmentandhealth eah ON hs.registry_id = eah.envdistref\r\n)\r\nSELECT \r\n    registry_id, health_resilience_score, health_status\r\nFROM \r\n    health_crisis\r\nORDER BY \r\n    health_resilience_score;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d5ff2e3aaacd878eb16922d789d23dda9615797cdb1ff6cdd44af3254ecfb981",
+      "ordered": true,
+      "columns": [
+        [
+          "registry_id",
+          1043,
+          24
+        ],
+        [
+          "health_resilience_score",
+          1700,
+          -1
+        ],
+        [
+          "health_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "73fb96df7b2eb7ee170a348485fe4bb1f30e1ff0bbb83f41a8d0f0d8de960dc9",
+      "values_digest": "c68b0abbeb397dca55480852c5f0dde36343813943991aec1484964c389c68f5",
+      "ordered_digest": "85c33b42871dad32125fd14a7513dd8509464e39972fef9aa7a67d44bd6444f3"
+    },
+    "830ba05135845a0c0a0220f59571322e1b2e377b97df471687e9682a0617c263": {
+      "sql": "WITH lpm_calc AS (\r\n    SELECT\r\n        t.transportregistry,\r\n        (t.totaldeliverytons / dh.hubcaptons) * t.deliverysuccessrate * (1 - t.vehiclebreakrate / 100) * 100 AS lpm,\r\n        CASE\r\n            WHEN (t.totaldeliverytons / dh.hubcaptons) * t.deliverysuccessrate * (1 - t.vehiclebreakrate / 100) * 100 < 30\r\n            AND t.lastmilestatus = 'Suspended'\r\n            AND t.vehiclebreakrate > 15 THEN 'Logistics Breakdown'\r\n            ELSE 'Normal Operation'\r\n        END AS status\r\n    FROM transportation t\r\n    JOIN distributionhubs dh ON t.transporthubref = dh.hubregistry\r\n)\r\nSELECT transportregistry, lpm, status\r\nFROM lpm_calc;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "32bc4792a4d648b4ec325e4b4d5ed40b7dad51feefc2c99db736c5b6a9fb7bfd",
+      "ordered": false,
+      "columns": [
+        [
+          "transportregistry",
+          1043,
+          24
+        ],
+        [
+          "lpm",
+          1700,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "e60b4b2f75708621c46b26580062837281c1acc307cedffddd9591224627bd58",
+      "values_digest": "4c68a6773ead0e4251988705957938bbd325f311661647c9b5e27b6c7300730f",
+      "ordered_digest": "271afb587f7f57d8d7c9715176de7aaaeb1fab07f4bbb0ac91a4f97ed5b5ad54"
+    },
+    "ac5b29036b7a4db067bd28bee6e4b05bef0e502eb77dbd7a8d4955eba4cc5a26": {
+      "sql": "WITH lpm_cte AS (\r\n    SELECT \r\n        t.transportregistry, \r\n        (\r\n            (totaldeliverytons / d.hubcaptons) * deliverysuccessrate * (\r\n                1 - (vehiclebreakrate / 100.0)\r\n            ) * 100\r\n        ) AS lpm\r\n    FROM transportation AS t\r\n    JOIN distributionhubs AS d ON t.transporthubref = d.hubregistry\r\n),\r\nlogistics_breakdown_cte AS (\r\n    SELECT \r\n        t.transportregistry, \r\n        CASE \r\n            WHEN lpm < 30 \r\n                AND lastmilestatus = 'Suspended' \r\n                AND vehiclebreakrate > 15 THEN 'Logistics Breakdown' \r\n            ELSE 'Normal Operation'\r\n        END AS status\r\n    FROM lpm_cte AS l\r\n    JOIN transportation AS t ON l.transportregistry = t.transportregistry\r\n)\r\nSELECT \r\n    l.transportregistry, \r\n    lpm, \r\n    status\r\nFROM lpm_cte AS l\r\nJOIN logistics_breakdown_cte AS lb ON l.transportregistry = lb.transportregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c4e8c87e7ebb7c8d5809b3b42901367e314e01811687618e6a7c4f4de04a54d6",
+      "ordered": false,
+      "columns": [
+        [
+          "transportregistry",
+          1043,
+          24
+        ],
+        [
+          "lpm",
+          1700,
+          -1
+        ],
+        [
+          "status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "e60b4b2f75708621c46b26580062837281c1acc307cedffddd9591224627bd58",
+      "values_digest": "4c68a6773ead0e4251988705957938bbd325f311661647c9b5e27b6c7300730f",
+      "ordered_digest": "271afb587f7f57d8d7c9715176de7aaaeb1fab07f4bbb0ac91a4f97ed5b5ad54"
+    },
+    "38c5c7538e8509205f3a8f55022b640a6d70b230dddc6b6ffc402f9daef836fd": {
+      "sql": "WITH operation_scores AS (\r\n    SELECT \r\n        opsregistry,\r\n        CASE \r\n            WHEN opsstatus = 'Completed' AND (resourceallocstate = 'Critical' OR supplyflowstate = 'Disrupted') THEN 0\r\n            WHEN opsstatus = 'Completed' AND (resourceallocstate = 'Limited' OR supplyflowstate = 'Strained') THEN 25\r\n            WHEN opsstatus = 'Completed' AND supplyflowstate = 'Stable' THEN 50\r\n            WHEN opsstatus = 'Scaling Down' AND (resourceallocstate = 'Critical' OR supplyflowstate = 'Disrupted') THEN 75\r\n            ELSE 100\r\n        END AS score\r\n    FROM operations\r\n)\r\nSELECT \r\n    opsregistry,\r\n    CASE \r\n        WHEN score >= 80 THEN 'Completed'\r\n        WHEN score BETWEEN 50 AND 80 THEN 'Scaling Down'\r\n        ELSE 'Active'\r\n    END AS new_status\r\nFROM operation_scores;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "082ce19487ff5a03db9eb801b2860ae0648158b64a4f3a437078db7be7fcbbd8",
+      "ordered": false,
+      "columns": [
+        [
+          "opsregistry",
+          1043,
+          24
+        ],
+        [
+          "new_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "3e574d8e4fedf70c983f682bc443151e89ee95b6b44ede168f6a721353698ab8",
+      "values_digest": "005b73542ad23693673e04aaf380670e34dc027828df206a662bdb90748cbdfe",
+      "ordered_digest": "6de2ffb55e7f95f063b20e3d3fcfc2ec7cde39b607f0fccd6fe0f1d8ba8602be"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "supplies": {
+      "supplyregistry": "varchar",
+      "supplydistref": "varchar",
+      "supplyhubref": "varchar",
+      "resourceinventory": "jsonb"
+    },
+    "humanresources": {
+      "hrregistry": "varchar",
+      "hrdistref": "varchar",
+      "hropsref": "varchar",
+      "staffingprofile": "jsonb"
+    }
+  }
+}

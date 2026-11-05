@@ -1,0 +1,270 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "vaccine_1",
+    "instance_id": "vaccine_1",
+    "database": "vaccine",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 211.5554747581482,
+    "budget_used": 4.0,
+    "budget_remaining": 18.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"shipments\" (\nshipmentregistry character varying NOT NULL,\ntimemark timestamp without time zone NOT NULL,\nroutealign character varying NULL,\ncustomsflag USER-DEFINED NULL,\nimppermitref character varying NULL,\nexppermitref character varying NULL,\nregprofile character varying NULL,\ninsureflag USER-DEFINED NULL,\ninsureref character varying NULL,\nqualcheck USER-DEFINED NULL,\nintegritymark USER-DEFINED NULL,\ncontamlevel USER-DEFINED NULL,\nsterilemark USER-DEFINED NULL,\npackagestate USER-DEFINED NULL,\nsealflag USER-DEFINED NULL,\nsealref character varying NULL,\ntampersign USER-DEFINED NULL,\nhandlingguide text NULL,\nstoragepose character varying NULL,\ngeneralnote text NULL,\n    PRIMARY KEY (shipmentregistry)\n);\n\nFirst 3 rows:\nshipmentregistry    timemark                    routealign    customsflag    imppermitref    exppermitref    regprofile     insureflag    insureref    qualcheck    integritymark        contamlevel    sterilemark    packagestate    sealflag    sealref    tampersign     handlingguide    storagepose    generalnote\n------------------  --------------------------  ------------  -------------  --------------  --------------  -------------  ------------  -----------  -----------  -------------------  -------------  -------------  --------------  ----------  ---------  -------------  ---------------  -------------  ------------------------------------------------\nVS113526            2024-12-07 05:24:11.095446  Compliant     Cleared        IP92460         EP46429         Non-Compliant  Active        INS97642     Failed       Intact               High           Unknown        Excellent       Broken      SEAL34744  None Detected  Urgent           Horizontal     Rise industry maintain year structure north.\nVS255467            2024-07-17 11:50:00.095446  Under Review  In Process     IP48778         EP89571         Non-Compliant  Active        INS90844     Passed       Intact               Low            Compromised    Fair            Broken      SEAL281...<truncated>",
+        "cost": 1.0,
+        "budget_before": 22.0,
+        "budget_after": 21.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"vaccine|shipments|shipmentregistry\": \"A VARCHAR(20) primary key uniquely identifying each shipment record in the database.\",\n  \"vaccine|shipments|timemark\": \"A TIMESTAMP field indicating the exact date and time this shipment record was logged.\",\n  \"vaccine|shipments|routealign\": \"A VARCHAR(30) descriptor for the routing alignment or path code used by the shipment.\",\n  \"vaccine|shipments|customsflag\": \"An enum (CustomsFlag_enum) representing the customs clearance status (e.g., 'Cleared', 'In Process', 'Pending').\",\n  \"vaccine|shipments|imppermitref\": \"A VARCHAR(50) referencing the import permit number or identifier for the shipment.\",\n  \"vaccine|shipments|exppermitref\": \"A VARCHAR(50) referencing the export permit number or identifier for the shipment.\",\n  \"vaccine|shipments|regprofile\": \"A VARCHAR(50) signifying the regulatory or profile reference for this shipment.\",\n  \"vaccine|shipments|insureflag\": \"An enum (InsuranceFlag_enum) capturing the insurance status (e.g., 'Active', 'Expired', 'Pending').\",\n  \"vaccine|shipments|insureref\": \"A VARCHAR(50) referencing the insurance policy or coverage document number.\",\n  \"vaccine|shipments|qualcheck\": \"An enum (QualityCheck_enum) indicating the quality check result (e.g., 'Failed', 'Passed', 'Pending').\",\n  \"vaccine|shipments|integritymark\": \"An enum (IntegrityStatus_enum) showing the shipment\\u2019s integrity status (e.g., 'Intact', 'Under Investigation', 'Compromised').\",\n  \"vaccine|shipments|contamlevel\": \"An enum (ContaminationRisk_enum) denoting potential contamination risk level (e.g., 'High', 'Low', 'Medium').\",\n  \"vaccine|shipments|sterilemark\": \"An enum (SterilityStatus_enum) indicating sterility status (e.g., 'Unknown', 'Compromised', 'Maintained').\",\n  \"vaccine|shipments|packagestate\": \"An enum (PackageCondition_enum) describing the package condition (e.g., 'Excellent', 'Fair', 'Poor', 'Good').\",\n  \"vaccine|shipments|sealflag\": \"An enum (SecuritySealStatus_enum) for the security seal status (e.g., 'Broken',...<truncated>",
+        "cost": 1.0,
+        "budget_before": 21.0,
+        "budget_after": 20.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(s.tempstabidx), 2) AS stability_score, \n    ROUND(MAX(s.tempmaxc), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;"
+        },
+        "result": "SQL Error: SQL error: function round(double precision, integer) does not exist\nLINE 3:     ROUND(AVG(s.tempstabidx), 2) AS stability_score, \n            ^\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\n",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(CAST(s.tempstabidx AS DECIMAL)), 2) AS stability_score, \n    ROUND(MAX(CAST(s.tempmaxc AS DECIMAL)), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;"
+        },
+        "result": "container_id | stability_score | max_temp_breach_severity | overall_status -------------------------------------------------------------------------- C21087 | 0.93 | -57.90 | Fair C26393 | 0.99 | -41.30 | Poor C89938 | 0.83 | -47.80 | Good C22915 | 0.89 | -44.90 | Poor C67647 | 0.86 | -43.80 | Fair C44922 | 0.86 | -55.00 | Poor C57615 | 0.90 | -54.80 | Fair C34298 | 0.97 | -52.50 | Good C85048 | 0.93 | -53.80 | Good C52964 | 0.97 | -50.70 | Poor C15462 | 0.87 | -40.40 | Good C88701 | 0.85 | -48.30 | Poor C12283 | 0.97 | -49.80 | Fair C89397 | 0.92 | -52.30 | Poor C93813 | 0.80 | -47.00 | Poor C31366 | 0.86 | -55.30 | Fair C55081 | 0.87 | -58.10 | Poor C58842 | 0.91 | -40.70 | Fair C31753 | 0.99 | -47.40 | Poor C81519 | 0.94 | -47.30 | Fair C89214 | 0.82 | -44.10 | Good C16912 | 0.84 | -57.10 | Poor C89332 | 0.90 | -50.70 | Good C19890 | 0.89 | -58.90 | Fair C20974 | 0.93 | -54.80 | Good C21440 | 0.86 | -45.70 | Good C30037 | 0.90 | -54.30 | Fair C79480 | 0.99 | -53.30 | Poor C20987 | 0.97 | -53.80 | Poor C42134 | 0.86 | -59.50 | Fair C59464 | 0.82 | -57.60 | Poor C93510 | 0.85 | -55.40 | Good C77984 | 0.89 | -52.60 | Good C56910 | 0.83 | -46.70 | Good C49014 | 0.81 | -50.60 | Poor C47546 | 0.92 | -58.90 | Good C70501 | 0.98 | -44.90 | Good C81335 | 0.90 | -46.60 | Good C94373 | 0.94 | -45.80 | Fair C15477 | 0.80 | -46.80 | Poor C76650 | 0.82 | -59.40 | Good C97429 | 0.99 | -52.40 | Good C67576 | 0.97 | -56.70 | Good C62313 | 0.85 | -56.00 | Poor C82935 | 0.97 | -47.40 | Good C71032 | 0.97 | -43.90 | Poor C16220 | 0.97 | -50.30 | Good C40872 | 0.97 | -44.50 | Fair C57762 | 0.90 | -55.50 | Fair C44069 | 0.87 | -41.30 | Poor C29292 | 0.99 | -45.80 | Good C89580 | 0.93 | -55.20 | Poor C45991 | 0.81 | -59.40 | Fair C41964 | 0.92 | -57.40 | Fair C73304 | 0.98 | -49.90 | Poor C38565 | 0.95 | -41.30 | Fair C31388 | 0.96 | -58.80 | Fair C94671 | 0.98 | -48.50 | Fair C63546 | 0.88 | -51.70 | Fair C91230 | 0.82 | -47.10 | Fair C88989 | 0.88 | -50.90 | Poor C37076 | 0.91 | -41....<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: vaccine\nTask ID: vaccine_1\n\nUser Query:\nShow me the health status of all vaccine storage containers, including their ID, stability score, maximum Temperature Breach Severity, and overall status for vaccine storage containers recently. Round the scores, and limit to 100 containers.\n\nYou have a budget of 22.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_9z1n9navamct",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_q5g0sgjxwhdb",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_9z1n9navamct",
+              "response": "{\"result\": \"CREATE TABLE \\\"shipments\\\" (\\nshipmentregistry character varying NOT NULL,\\ntimemark timestamp without time zone NOT NULL,\\nroutealign character varying NULL,\\ncustomsflag USER-DEFINED NULL,\\nimppermitref character varying NULL,\\nexppermitref character varying NULL,\\nregprofile character varying NULL,\\ninsureflag USER-DEFINED NULL,\\ninsureref character varying NULL,\\nqualcheck USER-DEFINED NULL,\\nintegritymark USER-DEFINED NULL,\\ncontamlevel USER-DEFINED NULL,\\nsterilemark USER-DEFINED NULL,\\npackagestate USER-DEFINED NULL,\\nsealflag USER-DEFINED NULL,\\nsealref character varying NULL,\\ntampersign USER-DEFINED NULL,\\nhandlingguide text NULL,\\nstoragepose character varying NULL,\\ngeneralnote text NULL,\\n    PRIMARY KEY (shipmentregistry)\\n);\\n\\nFirst 3 rows:\\nshipmentregistry    timemark                    routealign    customsflag    imppermitref    exppermitref    regprofile     insureflag    insureref    qualcheck    integritymark        contamlevel    sterilemark    packagestate    sealflag    sealref    tampersign     handlingguide    storagepose    generalnote\\n------------------  --------------------------  ------------  -------------  --------------  --------------  -------------  ------------  -----------  -----------  -------------------  -------------  -------------  --------------  ----------  ---------  -------------  ---------------  -------------  ------------------------------------------------\\nVS113526            2024-12-07 05:24:11.095446  Compliant     Cleared        IP92460         EP46429         Non-Compliant  Active        INS97642     Failed       Intact               High           Unknown        Excellent       Broken      SEAL34744  None Detected  Urgent           Horizontal     Rise industry maintain year structure north.\\nVS255467            2024-07-17 11:50:00.095446  Under Review  In Process     IP48778         EP89571         Non-Compliant  Active        INS90844     Passed       Intact               Low            Compromised    Fair            Broken      SEAL28196  Suspected      Standard         Horizontal\\nVS971688            2024-08-06 10:58:47.096472  Compliant     In Process     IP85517         EP33313         Under Review   Expired       INS69630     Failed       Under Investigation  Medium         Unknown        Fair            Broken      SEAL19194  Confirmed      Special Care     Not Specified  On within old stock president development total.\\n...\\n\\n\\nCREATE TABLE \\\"container\\\" (\\ncontainregistry character varying NOT NULL,\\ncontainmodel character varying NULL,\\nvolliters integer NULL,\\nmasskg real NULL,\\ncontainflag character varying NULL,\\ncoolkind character varying NULL,\\ncoolmass real NULL,\\ncoolremainpct numeric NULL,\\ncoolrefills smallint NULL,\\nrefilllatest date NULL,\\nrefillnext date NULL,\\nbatterypct real NULL,\\npwrfeed character varying NULL,\\npwrbackupflag character varying NULL,\\nshipown character varying NOT NULL,\\n    PRIMARY KEY (containregistry),\\n    FOREIGN KEY (shipown) REFERENCES shipments(shipmentregistry)\\n);\\n\\nFirst 3 rows:\\ncontainregistry    containmodel         volliters    masskg  containflag    coolkind      coolmass    coolremainpct    coolrefills  refilllatest    refillnext      batterypct  pwrfeed    pwrbackupflag    shipown\\n-----------------  -----------------  -----------  --------  -------------  ----------  ----------  ---------------  -------------  --------------  ------------  ------------  ---------  ---------------  ---------\\nC62575             Cryo Container             155     153.7  In Transit     Dry Ice           37.8             80.3              0  2025-02-09      2025-02-20              72  Battery    Available        VS113526\\nC52903             Ultra-Low Freezer          494      99.7  Active         Dry Ice           19.3             35.7              2  2025-02-14      2025-02-24              27  External   In Use           VS255467\\nC13929             Ultra-Low Freezer          321     148.6  Active         Dry Ice  ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_q5g0sgjxwhdb",
+              "response": "{\"result\": \"{\\n  \\\"vaccine|shipments|shipmentregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each shipment record in the database.\\\",\\n  \\\"vaccine|shipments|timemark\\\": \\\"A TIMESTAMP field indicating the exact date and time this shipment record was logged.\\\",\\n  \\\"vaccine|shipments|routealign\\\": \\\"A VARCHAR(30) descriptor for the routing alignment or path code used by the shipment.\\\",\\n  \\\"vaccine|shipments|customsflag\\\": \\\"An enum (CustomsFlag_enum) representing the customs clearance status (e.g., 'Cleared', 'In Process', 'Pending').\\\",\\n  \\\"vaccine|shipments|imppermitref\\\": \\\"A VARCHAR(50) referencing the import permit number or identifier for the shipment.\\\",\\n  \\\"vaccine|shipments|exppermitref\\\": \\\"A VARCHAR(50) referencing the export permit number or identifier for the shipment.\\\",\\n  \\\"vaccine|shipments|regprofile\\\": \\\"A VARCHAR(50) signifying the regulatory or profile reference for this shipment.\\\",\\n  \\\"vaccine|shipments|insureflag\\\": \\\"An enum (InsuranceFlag_enum) capturing the insurance status (e.g., 'Active', 'Expired', 'Pending').\\\",\\n  \\\"vaccine|shipments|insureref\\\": \\\"A VARCHAR(50) referencing the insurance policy or coverage document number.\\\",\\n  \\\"vaccine|shipments|qualcheck\\\": \\\"An enum (QualityCheck_enum) indicating the quality check result (e.g., 'Failed', 'Passed', 'Pending').\\\",\\n  \\\"vaccine|shipments|integritymark\\\": \\\"An enum (IntegrityStatus_enum) showing the shipment\\\\u2019s integrity status (e.g., 'Intact', 'Under Investigation', 'Compromised').\\\",\\n  \\\"vaccine|shipments|contamlevel\\\": \\\"An enum (ContaminationRisk_enum) denoting potential contamination risk level (e.g., 'High', 'Low', 'Medium').\\\",\\n  \\\"vaccine|shipments|sterilemark\\\": \\\"An enum (SterilityStatus_enum) indicating sterility status (e.g., 'Unknown', 'Compromised', 'Maintained').\\\",\\n  \\\"vaccine|shipments|packagestate\\\": \\\"An enum (PackageCondition_enum) describing the package condition (e.g., 'Excellent', 'Fair', 'Poor', 'Good').\\\",\\n  \\\"vaccine|shipments|sealflag\\\": \\\"An enum (SecuritySealStatus_enum) for the security seal status (e.g., 'Broken', 'Intact', 'Missing').\\\",\\n  \\\"vaccine|shipments|sealref\\\": \\\"A VARCHAR(50) referencing a security seal ID or documentation.\\\",\\n  \\\"vaccine|shipments|tampersign\\\": \\\"An enum (TamperEvidence_enum) noting tampering evidence (e.g., 'None Detected', 'Suspected', 'Confirmed').\\\",\\n  \\\"vaccine|shipments|handlingguide\\\": \\\"A TEXT field for special handling instructions or guidelines for the shipment.\\\",\\n  \\\"vaccine|shipments|storagepose\\\": \\\"A VARCHAR(40) specifying how the shipment must be positioned or oriented during storage/transport.\\\",\\n  \\\"vaccine|shipments|generalnote\\\": \\\"A TEXT field for any additional free-form notes regarding the shipment.\\\",\\n  \\\"vaccine|container|containregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each container record.\\\",\\n  \\\"vaccine|container|containmodel\\\": \\\"A VARCHAR(40) naming or describing the container model/type.\\\",\\n  \\\"vaccine|container|volliters\\\": \\\"An INTEGER specifying the container's internal volume in liters.\\\",\\n  \\\"vaccine|container|masskg\\\": \\\"A REAL number for the container\\\\u2019s mass in kilograms (when empty, if applicable).\\\",\\n  \\\"vaccine|container|containflag\\\": \\\"A VARCHAR(30) field capturing a container status or classification (e.g., \\\\u2018In Transit\\\\u2019, \\\\u2018Active\\\\u2019, \\\\u2018Return\\\\u2019, \\\\u2018Delivered\\\\u2019).\\\",\\n  \\\"vaccine|container|coolkind\\\": \\\"A VARCHAR(40) describing the coolant type used within the container (e.g., Dry Ice, Liquid Nitrogen, Phase Change Material).\\\",\\n  \\\"vaccine|container|coolmass\\\": \\\"A REAL number indicating the mass (in kilograms) of the coolant present.\\\",\\n  \\\"vaccine|container|coolremainpct\\\": \\\"A DECIMAL(5,2) representing the remaining percentage of coolant.\\\",\\n  \\\"vaccine|container|coolrefills\\\": \\\"A SMALLINT count of how many times coolant has been refilled.\\\",\\n  \\\"vaccine|container|refilllatest\\\": \\\"A DATE recording the most recent coolant refill date.\\\"...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_7c5y6cbxg930",
+              "args": {
+                "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(s.tempstabidx), 2) AS stability_score, \n    ROUND(MAX(s.tempmaxc), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_7c5y6cbxg930",
+              "response": "{\"result\": \"SQL Error: SQL error: function round(double precision, integer) does not exist\\nLINE 3:     ROUND(AVG(s.tempstabidx), 2) AS stability_score, \\n            ^\\nHINT:  No function matches the given name and argument types. You might need to add explicit type casts.\\n\\n\\n[SYSTEM NOTE: Remaining budget: 19.0/22.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_arr9wd849sdd",
+              "args": {
+                "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(CAST(s.tempstabidx AS DECIMAL)), 2) AS stability_score, \n    ROUND(MAX(CAST(s.tempmaxc AS DECIMAL)), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_arr9wd849sdd",
+              "response": "{\"result\": \"container_id | stability_score | max_temp_breach_severity | overall_status -------------------------------------------------------------------------- C21087 | 0.93 | -57.90 | Fair C26393 | 0.99 | -41.30 | Poor C89938 | 0.83 | -47.80 | Good C22915 | 0.89 | -44.90 | Poor C67647 | 0.86 | -43.80 | Fair C44922 | 0.86 | -55.00 | Poor C57615 | 0.90 | -54.80 | Fair C34298 | 0.97 | -52.50 | Good C85048 | 0.93 | -53.80 | Good C52964 | 0.97 | -50.70 | Poor C15462 | 0.87 | -40.40 | Good C88701 | 0.85 | -48.30 | Poor C12283 | 0.97 | -49.80 | Fair C89397 | 0.92 | -52.30 | Poor C93813 | 0.80 | -47.00 | Poor C31366 | 0.86 | -55.30 | Fair C55081 | 0.87 | -58.10 | Poor C58842 | 0.91 | -40.70 | Fair C31753 | 0.99 | -47.40 | Poor C81519 | 0.94 | -47.30 | Fair C89214 | 0.82 | -44.10 | Good C16912 | 0.84 | -57.10 | Poor C89332 | 0.90 | -50.70 | Good C19890 | 0.89 | -58.90 | Fair C20974 | 0.93 | -54.80 | Good C21440 | 0.86 | -45.70 | Good C30037 | 0.90 | -54.30 | Fair C79480 | 0.99 | -53.30 | Poor C20987 | 0.97 | -53.80 | Poor C42134 | 0.86 | -59.50 | Fair C59464 | 0.82 | -57.60 | Poor C93510 | 0.85 | -55.40 | Good C77984 | 0.89 | -52.60 | Good C56910 | 0.83 | -46.70 | Good C49014 | 0.81 | -50.60 | Poor C47546 | 0.92 | -58.90 | Good C70501 | 0.98 | -44.90 | Good C81335 | 0.90 | -46.60 | Good C94373 | 0.94 | -45.80 | Fair C15477 | 0.80 | -46.80 | Poor C76650 | 0.82 | -59.40 | Good C97429 | 0.99 | -52.40 | Good C67576 | 0.97 | -56.70 | Good C62313 | 0.85 | -56.00 | Poor C82935 | 0.97 | -47.40 | Good C71032 | 0.97 | -43.90 | Poor C16220 | 0.97 | -50.30 | Good C40872 | 0.97 | -44.50 | Fair C57762 | 0.90 | -55.50 | Fair C44069 | 0.87 | -41.30 | Poor C29292 | 0.99 | -45.80 | Good C89580 | 0.93 | -55.20 | Poor C45991 | 0.81 | -59.40 | Fair C41964 | 0.92 | -57.40 | Fair C73304 | 0.98 | -49.90 | Poor C38565 | 0.95 | -41.30 | Fair C31388 | 0.96 | -58.80 | Fair C94671 | 0.98 | -48.50 | Fair C63546 | 0.88 | -51.70 | Fair C91230 | 0.82 | -47.10 | Fair C88989 | 0.88 | -50.90 | Poor C37076 | 0.91 | -41.10 | Fair C70437 | 0.85 | -54.90 | Good C91830 | 0.98 | -57.10 | Poor C29160 | 0.96 | -54.90 | Poor C75680 | 0.98 | -41.10 | Good C33089 | 0.90 | -54.80 | Fair C71033 | 0.98 | -40.10 | Fair C28768 | 0.94 | -54.80 | Poor C77014 | 0.87 | -51.10 | Poor C60457 |...\\n\\n[SYSTEM NOTE: Remaining budget: 18.0/22.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-4335bbcb-0607-4f46-b28e-51f2c84ad82e",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is the health status of the first 100 vaccine storage containers:\n\n| container_id | stability_score | max_temp_breach_severity | overall_status |\n|---|---|---|---|\n| C21087 | 0.93 | -57.90 | Fair |\n| C26393 | 0.99 | -41.30 | Poor |\n| C89938 | 0.83 | -47.80 | Good |\n| C22915 | 0.89 | -44.90 | Poor |\n| C67647 | 0.86 | -43.80 | Fair |\n| C44922 | 0.86 | -55.00 | Poor |\n| C57615 | 0.90 | -54.80 | Fair |\n| C34298 | 0.97 | -52.50 | Good |\n| C85048 | 0.93 | -53.80 | Good |\n| C52964 | 0.97 | -50.70 | Poor |\n| C15462 | 0.87 | -40.40 | Good |\n| C88701 | 0.85 | -48.30 | Poor |\n| C12283 | 0.97 | -49.80 | Fair |\n| C89397 | 0.92 | -52.30 | Poor |\n| C93813 | 0.80 | -47.00 | Poor |\n| C31366 | 0.86 | -55.30 | Fair |\n| C55081 | 0.87 | -58.10 | Poor |\n| C58842 | 0.91 | -40.70 | Fair |\n| C31753 | 0.99 | -47.40 | Poor |\n| C81519 | 0.94 | -47.30 | Fair |\n| C89214 | 0.82 | -44.10 | Good |\n| C16912 | 0.84 | -57.10 | Poor |\n| C89332 | 0.90 | -50.70 | Good |\n| C19890 | 0.89 | -58.90 | Fair |\n| C20974 | 0.93 | -54.80 | Good |\n| C21440 | 0.86 | -45.70 | Good |\n| C30037 | 0.90 | -54.30 | Fair |\n| C79480 | 0.99 | -53.30 | Poor |\n| C20987 | 0.97 | -53.80 | Poor |\n| C42134 | 0.86 | -59.50 | Fair |\n| C59464 | 0.82 | -57.60 | Poor |\n| C93510 | 0.85 | -55.40 | Good |\n| C77984 | 0.89 | -52.60 | Good |\n| C56910 | 0.83 | -46.70 | Good |\n| C49014 | 0.81 | -50.60 | Poor |\n| C47546 | 0.92 | -58.90 | Good |\n| C70501 | 0.98 | -44.90 | Good |\n| C81335 | 0.90 | -46.60 | Good |\n| C94373 | 0.94 | -45.80 | Fair |\n| C15477 | 0.80 | -46.80 | Poor |\n| C76650 | 0.82 | -59.40 | Good |\n| C97429 | 0.99 | -52.40 | Good |\n| C67576 | 0.97 | -56.70 | Good |\n| C62313 | 0.85 | -56.00 | Poor |\n| C82935 | 0.97 | -47.40 | Good |\n| C71032 | 0.97 | -43.90 | Poor |\n| C16220 | 0.97 | -50.30 | Good |\n| C40872 | 0.97 | -44.50 | Fair |\n| C57762 | 0.90 | -55.50 | Fair |\n| C44069 | 0.87 | -41.30 | Poor |\n| C29292 | 0.99 | -45.80 | Good |\n| C89580 | 0.93 | -55.20 | Poor |\n| C45991 | 0.81 | -59.40 | Fair |\n| C41964 | 0.92 | -57.40 | Fair |\n| C73304 | 0.98 | -49.90 | Poor |\n| C38565 | 0.95 | -41.30 | Fair |\n| C31388 | 0.96 | -58.80 | Fair |\n| C94671 | 0.98 | -48.50 | Fair |\n| C63546 | 0.88 | -51.70 | Fair |\n| C91230 | 0.82 | -47.10 | Fair |\n| C88989 | 0.88 | -50.90"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is the health status of the first 100 vaccine storage containers:\n\n| container_id | stability_score | max_temp_breach_severity | overall_status |\n|---|---|---|---|\n| C21087 | 0.93 | -57.90 | Fair |\n| C26393 | 0.99 | -41.30 | Poor |\n| C89938 | 0.83 | -47.80 | Good |\n| C22915 | 0.89 | -44.90 | Poor |\n| C67647 | 0.86 | -43.80 | Fair |\n| C44922 | 0.86 | -55.00 | Poor |\n| C57615 | 0.90 | -54.80 | Fair |\n| C34298 | 0.97 | -52.50 | Good |\n| C85048 | 0.93 | -53.80 | Good |\n| C52964 | 0.97 | -50.70 | Poor |\n| C15462 | 0.87 | -40.40 | Good |\n| C88701 | 0.85 | -48.30 | Poor |\n| C12283 | 0.97 | -49.80 | Fair |\n| C89397 | 0.92 | -52.30 | Poor |\n| C93813 | 0.80 | -47.00 | Poor |\n| C31366 | 0.86 | -55.30 | Fair |\n| C55081 | 0.87 | -58.10 | Poor |\n| C58842 | 0.91 | -40.70 | Fair |\n| C31753 | 0.99 | -47.40 | Poor |\n| C81519 | 0.94 | -47.30 | Fair |\n| C89214 | 0.82 | -44.10 | Good |\n| C16912 | 0.84 | -57.10 | Poor |\n| C89332 | 0.90 | -50.70 | Good |\n| C19890 | 0.89 | -58.90 | Fair |\n| C20974 | 0.93 | -54.80 | Good |\n| C21440 | 0.86 | -45.70 | Good |\n| C30037 | 0.90 | -54.30 | Fair |\n| C79480 | 0.99 | -53.30 | Poor |\n| C20987 | 0.97 | -53.80 | Poor |\n| C42134 | 0.86 | -59.50 | Fair |\n| C59464 | 0.82 | -57.60 | Poor |\n| C93510 | 0.85 | -55.40 | Good |\n| C77984 | 0.89 | -52.60 | Good |\n| C56910 | 0.83 | -46.70 | Good |\n| C49014 | 0.81 | -50.60 | Poor |\n| C47546 | 0.92 | -58.90 | Good |\n| C70501 | 0.98 | -44.90 | Good |\n| C81335 | 0.90 | -46.60 | Good |\n| C94373 | 0.94 | -45.80 | Fair |\n| C15477 | 0.80 | -46.80 | Poor |\n| C76650 | 0.82 | -59.40 | Good |\n| C97429 | 0.99 | -52.40 | Good |\n| C67576 | 0.97 | -56.70 | Good |\n| C62313 | 0.85 | -56.00 | Poor |\n| C82935 | 0.97 | -47.40 | Good |\n| C71032 | 0.97 | -43.90 | Poor |\n| C16220 | 0.97 | -50.30 | Good |\n| C40872 | 0.97 | -44.50 | Fair |\n| C57762 | 0.90 | -55.50 | Fair |\n| C44069 | 0.87 | -41.30 | Poor |\n| C29292 | 0.99 | -45.80 | Good |\n| C89580 | 0.93 | -55.20 | Poor |\n| C45991 | 0.81 | -59.40 | Fair |\n| C41964 | 0.92 | -57.40 | Fair |\n| C73304 | 0.98 | -49.90 | Poor |\n| C38565 | 0.95 | -41.30 | Fair |\n| C31388 | 0.96 | -58.80 | Fair |\n| C94671 | 0.98 | -48.50 | Fair |\n| C63546 | 0.88 | -51.70 | Fair |\n| C91230 | 0.82 | -47.10 | Fair |\n| C88989 | 0.88 | -50.90"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "965e1be078284d4083eb6418c9347bb4",
+      "client": "vaccine_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/70748325a2ee4dea9ae3e60625eb8d1c/0",
+      "at": 1793851417.2997482,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.3358000034932047,
+      "response_bytes": 15671,
+      "response_digest": "5515d3048c8f937061932fa5373e70d974005ef838ced8afab1589d2a2f04397"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "e0937324ffb847b8bd7e1c6374692ae4",
+      "client": "vaccine_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/70748325a2ee4dea9ae3e60625eb8d1c/0",
+      "at": 1793851455.0094638,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.1553000003914349,
+      "response_bytes": 15671,
+      "response_digest": "5515d3048c8f937061932fa5373e70d974005ef838ced8afab1589d2a2f04397"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "9433a6b2b1794c129284ca4d2e5ecc2f",
+      "client": "vaccine_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/70748325a2ee4dea9ae3e60625eb8d1c/0",
+      "at": 1793851490.7136786,
+      "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(s.tempstabidx), 2) AS stability_score, \n    ROUND(MAX(s.tempmaxc), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 20.284199999878183,
+      "response_bytes": 293,
+      "response_digest": "8785a579b187ee784589b77b9d7310e5e8cec9fb4f82c95a77cbdb8a0b8effe5",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "7f06c930b07442d1b770442b1a177b6e",
+      "client": "vaccine_1",
+      "database": "vaccine",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/70748325a2ee4dea9ae3e60625eb8d1c/0",
+      "at": 1793851508.3838277,
+      "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(CAST(s.tempstabidx AS DECIMAL)), 2) AS stability_score, \n    ROUND(MAX(CAST(s.tempmaxc AS DECIMAL)), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 9.275299998989794,
+      "response_bytes": 2302,
+      "response_digest": "ba622bb083656bb3ebc3186c33ee6598903ec5124fd633afe710caaee683abd5",
+      "successful": true
+    }
+  ]
+}

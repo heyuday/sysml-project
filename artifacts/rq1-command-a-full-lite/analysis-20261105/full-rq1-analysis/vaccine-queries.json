@@ -1,0 +1,2200 @@
+{
+  "version": 2,
+  "database": "vaccine",
+  "queries": {
+    "5c66537d2f9b8fbfd524244cd79de60d40f271ae88ba878a73929e429b5d9efc": {
+      "sql": "SELECT\n    c.containregistry AS container_id,\n    sd.tempstabidx AS stability_score,\n    MAX(sd.tempmaxc) AS max_temp_breach_severity,\n    dl.syshealth AS overall_status\nFROM\n    sensordata sd\nJOIN\n    container c ON sd.containlink = c.containregistry\nJOIN\n    datalogger dl ON c.containregistry = dl.containlog\nGROUP BY\n    c.containregistry, sd.tempstabidx, dl.syshealth\nLIMIT 100;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6a8c2c6b54d91e73501d1969b1785061b7b8d02674d8baf51f56b439a3e581b0",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "stability_score",
+          700,
+          -1
+        ],
+        [
+          "max_temp_breach_severity",
+          1700,
+          -1
+        ],
+        [
+          "overall_status",
+          21000,
+          -1
+        ]
+      ],
+      "rows": 100,
+      "bag_digest": "42e275935a527c04b75f908522fa9e56fb25309db1a7c4296bf40d7bbb883445",
+      "values_digest": "6fe0fbac27a2ed003711cdb4b8242f6bbb437cee7face1cb37a232b2dd08bf0e",
+      "ordered_digest": "095d0a0cec0d69922c79973b2bd8e1cac76689169fb0d9bb000757ef1489781b"
+    },
+    "458562e42dbddd1e54117119b2941aac0c867cb7833a1088e08b958d76e33948": {
+      "sql": "SELECT \n    c.containregistry AS container_id,\n    (CASE \n        WHEN sd.tempnowc > sd.temptolc THEN 'High' \n        WHEN sd.tempnowc < -sd.temptolc THEN 'Low' \n        ELSE 'Normal' \n    END) AS temperature_breach_severity,\n    sd.tempdevcount AS temperature_deviations,\n    ARRAY_AGG(DISTINCT sd.alertkind) AS alert_types\nFROM \n    sensordata AS sd\nJOIN \n    container AS c ON sd.containlink = c.containregistry\nGROUP BY \n    c.containregistry, temperature_breach_severity, sd.tempdevcount\nORDER BY \n    temperature_deviations DESC\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ebd5a6d6f4ce4aa2e72f5e9bee815a5458d3db4ed9caad4a4119b98da7cc889b",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "temperature_breach_severity",
+          25,
+          -1
+        ],
+        [
+          "temperature_deviations",
+          21,
+          -1
+        ],
+        [
+          "alert_types",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "9c578502b855718336f3239e4a6649d1cc3dbd5861db77d72c214fefdd1ac7f9",
+      "values_digest": "3356412e933e8a3492d835d9ebac28575532f123d47b040310bd4f37f260423c",
+      "ordered_digest": "9c578502b855718336f3239e4a6649d1cc3dbd5861db77d72c214fefdd1ac7f9"
+    },
+    "70f2d5dc084f485f06ed4237de011b7a710972b09d3cd40a8190b47e21b6ddc4": {
+      "sql": "SELECT \n    c.containregistry AS container_id,\n    c.coolremainpct AS coolant_remaining_percentage,\n    (c.coolmass / NULLIF(c.coolrefills, 0)) AS coolant_depletion_rate,\n    RANK() OVER (ORDER BY (c.coolmass / NULLIF(c.coolrefills, 0)) DESC) AS coolant_depletion_rank\nFROM \n    container AS c\nJOIN \n    regulatoryandmaintenance AS r\nON \n    c.containregistry = r.shipgov\nWHERE \n    r.riskflag ILIKE '%critical%';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9ff5fb8e9a0c6eab7a455c5a39cabb7f61c0afb991646e89beb0b1ea883c02c8",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "coolant_remaining_percentage",
+          1700,
+          327686
+        ],
+        [
+          "coolant_depletion_rate",
+          701,
+          -1
+        ],
+        [
+          "coolant_depletion_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "2ef5b2081c893c4cd098572fb48ec7a4d5e62b052bacebd5543a776931da4249",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "2ef5b2081c893c4cd098572fb48ec7a4d5e62b052bacebd5543a776931da4249"
+    },
+    "d04535fdc434b81beb1dedd8aa84a62c9fdd132e4bdd4d8af3550bac9baf22ea": {
+      "sql": "SELECT \n    c.containregistry AS container_id,\n    sd.tempdevcount AS temperature_deviations,\n    ARRAY_AGG(sd.alertkind) AS alert_types\nFROM \n    SensorData sd\nJOIN \n    Container c ON sd.containlink = c.containregistry\nGROUP BY \n    c.containregistry, sd.tempdevcount\nORDER BY \n    temperature_deviations DESC\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "129a8ef19b4c9a6896c2778405ec5d5b5d3594ea3abc8016f25542fb78860c24",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "temperature_deviations",
+          21,
+          -1
+        ],
+        [
+          "alert_types",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "f35aa0fab2c363b3275bf6886a0d73deba453744a5a107cab4f0f4b1aa344016",
+      "values_digest": "65f0965968682e73c924293cfad3cffaaa9041136299a7d10ab8ff2471eb9d24",
+      "ordered_digest": "f35aa0fab2c363b3275bf6886a0d73deba453744a5a107cab4f0f4b1aa344016"
+    },
+    "b478fb03d1d81d71b59024325b769764683c834e2445e09fcc1703c9d192b213": {
+      "sql": "SELECT \n    c.containregistry AS container_id, \n    ROUND(AVG(CAST(s.tempstabidx AS DECIMAL)), 2) AS stability_score, \n    ROUND(MAX(CAST(s.tempmaxc AS DECIMAL)), 2) AS max_temp_breach_severity, \n    dl.syshealth AS overall_status \nFROM \n    container c \nJOIN \n    sensordata s ON c.containregistry = s.containlink \nJOIN \n    datalogger dl ON c.containregistry = dl.containlog \nGROUP BY \n    c.containregistry, dl.syshealth \nLIMIT 100;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "3e23a876277aea87831d0a16d64287f1be19cd88d4877d00ac56cf30ec2c9b00",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "stability_score",
+          1700,
+          -1
+        ],
+        [
+          "max_temp_breach_severity",
+          1700,
+          -1
+        ],
+        [
+          "overall_status",
+          21000,
+          -1
+        ]
+      ],
+      "rows": 100,
+      "bag_digest": "e44459a2abe3d234507eed00b36f4202bc2760b9de71052e9bec5bfa64879a7b",
+      "values_digest": "8ae0738e45cf2dc3f30770e39414f2eb48a54af83331c2304ad38f980fc7658c",
+      "ordered_digest": "055bdb71de9c8804032d6610ed0ccca5fb30b543585d7aad7f884c47009fd039"
+    },
+    "71924b73ab51bdb426953b2cc4beb0e1d3f4b4417366766ad0b67732e5447075": {
+      "sql": "SELECT \n    containlink AS \"Container ID\", \n    tempnowc AS \"Temperature Breach Severity\", \n    tempdevcount AS \"Number of Temperature Deviations\", \n    ARRAY_AGG(alertkind) AS \"Alert Types\" \nFROM \n    sensordata \nGROUP BY \n    containlink, tempnowc, tempdevcount \nORDER BY \n    \"Temperature Breach Severity\" DESC, \n    \"Number of Temperature Deviations\" DESC \nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "23550598ee77a1990569de4511feccd56f9f953b584068b114ce151a5bee10d8",
+      "ordered": true,
+      "columns": [
+        [
+          "Container ID",
+          1043,
+          24
+        ],
+        [
+          "Temperature Breach Severity",
+          700,
+          -1
+        ],
+        [
+          "Number of Temperature Deviations",
+          21,
+          -1
+        ],
+        [
+          "Alert Types",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "11db45252a40ddfc4dc36f73c23ff0423938cc57029d962671b2bab69466b4ec",
+      "values_digest": "a2d7e736de8f1f0fd25aeada6d71469c76fbb9c60caea9aba2f8597491321df2",
+      "ordered_digest": "192efa076b64b1bed5c72e09b3f3c94a0a868cc6210f40dbdd00a7e592b551ec"
+    },
+    "4caeb7c48f2f771e9a354ee17e91cf0f3f13daf99423911a6c64ede082efec37": {
+      "sql": "SELECT \n    regmaintregistry AS equipment_id,\n    compscore AS compliance_score,\n    (maintdatenext - CURRENT_DATE) AS delay,\n    CASE WHEN maintdatenext < CURRENT_DATE THEN 'Overdue' ELSE 'Not Overdue' END AS overdue_status\nFROM \n    regulatoryandmaintenance\nWHERE \n    compscore IS NOT NULL AND maintdatenext < CURRENT_DATE\nORDER BY \n    delay DESC\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "93885b3f23e9ad09344ace3ff756e4a474a242518ed7d598d96b9a61f986a27e",
+      "ordered": true,
+      "columns": [
+        [
+          "equipment_id",
+          23,
+          -1
+        ],
+        [
+          "compliance_score",
+          700,
+          -1
+        ],
+        [
+          "delay",
+          23,
+          -1
+        ],
+        [
+          "overdue_status",
+          25,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "4a38fef9b97abc1239cb9730eacfea7e87024ab36f3052610e36b8a697c328ec",
+      "values_digest": "82918d161c0d73401c002ad06f32a1d7e834ab95854b420aaa52ed04c2ed7a32",
+      "ordered_digest": "0bac41b7fd88e8ce466710784eb3cf15c4b413bf7a664b3ae28c09fe50624ea0"
+    },
+    "04ee31c0aa493e892067183a17b268c53308b014f5823f50f2781abf8d8383b0": {
+      "sql": "SELECT \n    rm.regmaintregistry AS equipment_id,\n    rm.compscore AS compliance_score,\n    (CURRENT_DATE - rm.maintdatenext) AS delay,\n    CASE WHEN rm.maintdatenext < CURRENT_DATE THEN 'Yes' ELSE 'No' END AS overdue\nFROM \n    regulatoryandmaintenance rm\nJOIN \n    container c ON rm.shipgov = c.shipown\nWHERE \n    rm.maintflag = 'Overdue'\nORDER BY \n    delay DESC\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7fcaff9a6e02e47ba36b82db00e31723d9ac14b288cb0435e8598889bdecbb8e",
+      "ordered": true,
+      "columns": [
+        [
+          "equipment_id",
+          23,
+          -1
+        ],
+        [
+          "compliance_score",
+          700,
+          -1
+        ],
+        [
+          "delay",
+          23,
+          -1
+        ],
+        [
+          "overdue",
+          25,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "ca673b499ccd98a9a13bc33c40bb5e372510a963ae21c4cb64c598040c0abc7b",
+      "values_digest": "cb2dfc8815ea129816eaf769e8e753b900ca2cc77249fcb788bd8ffdbb3ef659",
+      "ordered_digest": "0bee44423f553ee6aa693292eb91252b80d95ba7b4bf2459f9b26845707630b0"
+    },
+    "bc0d283771cc57fba44a4e3fb4a160c12560c6b87d67e916b611859ef7f974b8": {
+      "sql": "SELECT \n    t1.regmaintregistry,\n    t2.containregistry\nFROM \n    regulatoryandmaintenance AS t1\nJOIN \n    container AS t2 ON t1.shipgov = t2.shipown;",
+      "decisions": {
+        "N0": {
+          "key": "f16e2a43e7c8227c44842d35fa6efbb667cf4fb4c5758351735d2247a3e0b58f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "b4a53817492a09f184afaeba4cc7a954649d5264d0a7ccd06b68084e408f9adc",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "8b3bc77218a52d898721e375a5ac3ddf9a9822f8ff9f6fe33c1c956f78d77669",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "b09549e4a690c0f92e7e7de7bdef133f40b6b039a7d695e383dd0eae01a38a74",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "934f0dbcf1b326ea6cad1a5160772d1a45fdfeb8e44479c4e57357002d834ac8",
+      "ordered": false,
+      "columns": [
+        [
+          "regmaintregistry",
+          23,
+          -1
+        ],
+        [
+          "containregistry",
+          1043,
+          24
+        ]
+      ],
+      "rows": 900,
+      "bag_digest": "70efa0a8d740f6827d4a64b58e465b1dc9147f8343f7eb32194313c758ab93ac",
+      "values_digest": "e65ff0a1a243bdd84851b6cba8feb124416276ab3fe6455a2272d7d97dcbcf76",
+      "ordered_digest": "3651595874073355254cb0164edb1ba13f4454e308428878a98d2c2a5419a6fd"
+    },
+    "68efe0185b0226893e4d688c2dbbc92b6183da167cbc050706a9cc61bbe902ac": {
+      "sql": "SELECT \n    ti.vehiclereg AS vehicle_id,\n    ti.shiptransit AS shipment_id,\n    dl.datapct AS completion_percentage,\n    MAX(rm.riskflag) AS max_container_risk_index,\n    ti.distdonekm AS distance_km,\n    MAX(sd.tempdevcount) AS max_temperature_deviation_count,\n    MAX(sd.critevents) AS max_critical_events,\n    MAX(sd.tempstabidx) AS max_temperature_stability_index,\n    MAX(c.coolremainpct) AS max_coolant_remaining_percentage\nFROM \n    regulatoryandmaintenance rm\nJOIN \n    transportinfo ti ON rm.vehgov = ti.vehiclereg\nJOIN \n    container c ON ti.containtransit = c.containregistry\nJOIN \n    sensordata sd ON c.containregistry = sd.containlink\nJOIN \n    datalogger dl ON c.containregistry = dl.containlog\nWHERE \n    rm.riskflag = 'High Risk'\nGROUP BY \n    ti.vehiclereg, ti.shiptransit, dl.datapct, ti.distdonekm\nORDER BY \n    max_container_risk_index DESC\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5cba79b294c9426c1b6162febb9668e3964dfc5f6c2e98007d22c01401c624ca",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "completion_percentage",
+          700,
+          -1
+        ],
+        [
+          "max_container_risk_index",
+          25,
+          -1
+        ],
+        [
+          "distance_km",
+          1700,
+          589830
+        ],
+        [
+          "max_temperature_deviation_count",
+          21,
+          -1
+        ],
+        [
+          "max_critical_events",
+          21,
+          -1
+        ],
+        [
+          "max_temperature_stability_index",
+          700,
+          -1
+        ],
+        [
+          "max_coolant_remaining_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "875d3696da9e7578eb349762db14f330d80fad801e03c1af97d959bc2f7b4074",
+      "values_digest": "30bd94e719bea6ab2c9b5bd28735e92a55dbe85c193c8fcfeeef4750d37f34d6",
+      "ordered_digest": "a5787c95681e862ecbc64c35c390a3e86bb8d3939b26e0158a2e1de8dbe9550e"
+    },
+    "7991c11e43180bd3b98d7fae139e721d81216954e462c63d8a1adaf2232dbf97": {
+      "sql": "SELECT \n  containlink AS container_id, \n  tempstabidx AS efficiency_score, \n  tempnowc AS temperature_stability, \n  sensortrack AS rank \nFROM \n  sensordata \nORDER BY \n  rank \nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ff80262eb1be558ff86bbb42262113db141a3507be24a425159582ce3470eaf8",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "efficiency_score",
+          700,
+          -1
+        ],
+        [
+          "temperature_stability",
+          700,
+          -1
+        ],
+        [
+          "rank",
+          23,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "28a8f0f934a8218a7efd437fb45e7b3e239ba57807557a0c8dd6ce6e31092ca9",
+      "values_digest": "ae0ca5477387df5c8a1560f10ee8ee900b8cfac7af0a83340687110bc88d4673",
+      "ordered_digest": "6df8be8174d36534a780b6bb6c41e47bbfd9cb1e3cfc0186d8a83ce8ee48998e"
+    },
+    "ac2581f8e16f03fd3fa5e4affd769adcd30f5c07ee8f96e0cbcb574020fa1ee3": {
+      "sql": "SELECT \n  regmaintregistry AS equipment_id, \n  compscore AS compliance_score, \n  maintdatenext - maintdatelast AS delay, \n  CASE WHEN maintdatenext < CURRENT_DATE THEN 'Yes' ELSE 'No' END AS overdue \nFROM \n  regulatoryandmaintenance \nWHERE \n  compscore IS NOT NULL \nORDER BY \n  delay DESC \nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "17871fec526d538d3d06a3e409f786dacbc8bef44f55b1ea8a33652de693deef",
+      "ordered": true,
+      "columns": [
+        [
+          "equipment_id",
+          23,
+          -1
+        ],
+        [
+          "compliance_score",
+          700,
+          -1
+        ],
+        [
+          "delay",
+          23,
+          -1
+        ],
+        [
+          "overdue",
+          25,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "510a14c167236499092f1299735b05becccf2f894e7aa1b74892890baa335b0a",
+      "values_digest": "aece1a496f638c8b34ac717c3cb6ee095a130c19a167bb4cb6816be7f2277cf1",
+      "ordered_digest": "d1732eb829ddd16f4bef699ce5a004ad1b5500d2a67a0fced91a745fc648e769"
+    },
+    "46b22a706611ef7f1c9e69c89d04d311d4724af761f142ce80d88cf36721dada": {
+      "sql": "SELECT \r\n    containregistry AS container_id,\r\n    coolremainpct AS coolant_remaining_percentage,\r\n    coolkind AS Coolant_Depletion_Rate,\r\n    RANK() OVER (ORDER BY coolremainpct) AS Depletion_Rank\r\nFROM \r\n    container\r\nORDER BY \r\n    coolremainpct\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "cd37879877cb7fc38e6d488d1adc1b8a22524ab2588fdedb05d47a8792793f1d",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "coolant_remaining_percentage",
+          1700,
+          327686
+        ],
+        [
+          "coolant_depletion_rate",
+          1043,
+          44
+        ],
+        [
+          "depletion_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "f72299ef07e0d472d597b7550c570c5b7468857e35bb9d3b7cc6e1acd3dd5678",
+      "values_digest": "8b4515943733c3b8241861d278aef757d2c677dea14d96f1e906b8e58ccd1075",
+      "ordered_digest": "bcde6e22c6ca81629b29bb033c2781ae0bff6a3ad7b67c293f9e0b4d1a1f0c3a"
+    },
+    "800257e86f7c67d2806e18d9223633ce01736cc4a143c51c1f5e43e568f78e38": {
+      "sql": "SELECT \r\n    s.shipmentregistry AS shipment_id,\r\n    COUNT(r.incidents) AS incident_count\r\nFROM \r\n    shipments s\r\nJOIN \r\n    regulatoryandmaintenance r ON s.shipmentregistry = r.shipgov\r\nGROUP BY \r\n    s.shipmentregistry\r\nORDER BY \r\n    incident_count DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "55b07bc5827be24890ae348633be82b821dc94731592a4afe448f6ffe0b9373c",
+      "ordered": true,
+      "columns": [
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "incident_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 900,
+      "bag_digest": "999743dfa5f194ea9decfb50072ff2048e628092e4cb8ecff776e211cc7c4ad0",
+      "values_digest": "68e6c23f00ff0a3ecb042550b0664fe8947653b2359c467a9d9b58321f5f6962",
+      "ordered_digest": "9389cb710c85dbbe1f6c70c5e9eeb26814fce7b1e94ff0d12403eb2651dd5a87"
+    },
+    "ced2b9aff97b5a972c47c26ba8086a5eb619cc62b44d0b101b5934ba0a3cd238": {
+      "sql": "SELECT \r\n    s.shipmentregistry AS shipment_id,\r\n    COUNT(r.incidents) AS incident_count\r\nFROM \r\n    shipments s\r\nJOIN \r\n    regulatoryandmaintenance r ON s.shipmentregistry = r.shipgov\r\nWHERE \r\n    s.integritymark = 'Compromised' OR s.sterilemark = 'Compromised'\r\nGROUP BY \r\n    s.shipmentregistry \r\nORDER BY \r\n    incident_count DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "83105e539ceeaecb60b53686507c714485494e1279e0353259fdd40519916cee",
+      "ordered": true,
+      "columns": [
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "incident_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 519,
+      "bag_digest": "95b0023912b2a380baf2885f0f1cce0cb25189a49b228da0cb576f8158822616",
+      "values_digest": "38272cd15e4c99ee9ef8324c0f78a91cdaf989d770242722b2383b0e24d765f3",
+      "ordered_digest": "de30df02c7cc78813319645f4767edc12eaeec7528168f792e053110974672f1"
+    },
+    "ad134b111d061537b562c6aa4290eef93640175c8b7aeb78e13fdb8d645a5a7c": {
+      "sql": "SELECT \r\n    s.shipmentregistry AS shipment_id,\r\n    s.integritymark AS status,\r\n    COUNT(rm.incidents) AS incident_count,\r\n    array_agg(rm.regmaintregistry) AS maintenance_record_ids\r\nFROM \r\n    shipments AS s\r\nJOIN \r\n    regulatoryandmaintenance AS rm ON s.shipmentregistry = rm.shipgov\r\nWHERE \r\n    s.integritymark = 'Compromised'\r\nGROUP BY \r\n    s.shipmentregistry, s.integritymark\r\nORDER BY \r\n    incident_count DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "55ee7e30ae300305e4952602475bc9c8bfdee6645b659bd4bf9116f16f99abc3",
+      "ordered": true,
+      "columns": [
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "status",
+          20890,
+          -1
+        ],
+        [
+          "incident_count",
+          20,
+          -1
+        ],
+        [
+          "maintenance_record_ids",
+          1007,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "7b874dce8eb684b707a6d3f01cc9de23dbcc6e7dabb33bf579103cd9d5341818",
+      "values_digest": "183aeaedad02a71807d3e882e9d5f3f290f2b2d4e36c17e352e37d0452c564a4",
+      "ordered_digest": "c7ea6be8fa45cc3afc1377455a3aa3e1b00db4271aab5c4d4e766973e61b2e2c"
+    },
+    "06ebd4c6fadb9861bff0156c2320f413c3738b0d9ceebe64ca81b59e839e83b9": {
+      "sql": "SELECT \r\n    s.shipmentregistry AS shipment_id,\r\n    s.packagestate AS status,\r\n    rm.incidents AS number_of_incidents,\r\n    ARRAY_AGG(rm.regmaintregistry) AS maintenance_record_ids\r\nFROM \r\n    shipments AS s\r\nJOIN \r\n    regulatoryandmaintenance AS rm ON s.shipmentregistry = rm.shipgov\r\nWHERE \r\n    CAST(s.integritymark AS TEXT) ILIKE 'Compromised'\r\n    OR CAST(s.sealflag AS TEXT) ILIKE 'Broken'\r\n    OR CAST(s.tampersign AS TEXT) ILIKE 'Confirmed'\r\nGROUP BY \r\n    s.shipmentregistry, s.packagestate, rm.incidents\r\nORDER BY \r\n    number_of_incidents DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e03a39986ea2a13d8dd270633e188a905456f4fe5f9cc1fbf61c01256a8d2e90",
+      "ordered": true,
+      "columns": [
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "status",
+          20914,
+          -1
+        ],
+        [
+          "number_of_incidents",
+          21,
+          -1
+        ],
+        [
+          "maintenance_record_ids",
+          1007,
+          -1
+        ]
+      ],
+      "rows": 642,
+      "bag_digest": "42611fd3da4e5c1c4514e6a51867b559e61bcf6a878c99d8ace18f6c0b9b80be",
+      "values_digest": "8e02655335853d9873d1766b1e4796d453867e1129ae48edfacfa7b5e21d975b",
+      "ordered_digest": "83d5898f3e1a29f7b85cfd8f8367effeb229a8a3ec915c64366bac95ccc2f026"
+    },
+    "4fe9d743d9c2e0761146299b8fd2943c3a0142568c54f711cac964abe8757a41": {
+      "sql": "SELECT \r\n    sd.containlink AS container_id,\r\n    ROUND(sd.tempstabidx) AS stability_score,\r\n    ROUND(sd.tempmaxc) AS max_temp_breach_severity,\r\n    c.containflag AS overall_status\r\nFROM \r\n    SensorData sd\r\nJOIN \r\n    Container c ON sd.containlink = c.containregistry\r\nLIMIT 100;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "fd02eac776f2bc7eb24dc5d23f06e8646cc0274196394b70c8308cb948639b82",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "stability_score",
+          701,
+          -1
+        ],
+        [
+          "max_temp_breach_severity",
+          1700,
+          -1
+        ],
+        [
+          "overall_status",
+          1043,
+          34
+        ]
+      ],
+      "rows": 100,
+      "bag_digest": "178be2c4201582cdbbf1396259cc741ea2af36957e5e191cc80bcfeb9637ca87",
+      "values_digest": "fe23b263a045e1cd72d8a1bc1297757a6fe9603689d448e8b80a1963a99afa92",
+      "ordered_digest": "78bfe8220e7b9713841e38b9d40da3a458021cc9b84fc5ef35e995babaced813"
+    },
+    "1973258a7ce7ab2a775379ff3dafc69847200b8d6cbadaff0e3aa3e885abc733": {
+      "sql": "SELECT \r\n    sd.containlink AS container_id,\r\n    ROUND(sd.tempstabidx) AS stability_score,\r\n    ROUND(sd.tempmaxc) AS max_temp_breach_severity,\r\n    dl.syshealth AS overall_status\r\nFROM \r\n    sensordata AS sd\r\nJOIN \r\n    datalogger AS dl ON sd.containlink = dl.containlog\r\nLIMIT 100;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "64c62f466def799a6a74455cd36a81dbf6f1da82943ffd3d4d601273b3b3eee5",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "stability_score",
+          701,
+          -1
+        ],
+        [
+          "max_temp_breach_severity",
+          1700,
+          -1
+        ],
+        [
+          "overall_status",
+          21000,
+          -1
+        ]
+      ],
+      "rows": 100,
+      "bag_digest": "253d3ae823f5f226063fcb8afd7ca3c474ed6f447ff99d642f2159e30c31da69",
+      "values_digest": "791447d85de23f43c109bb29567e1c01ee74a73d0f7ba87c2ac367031dec47b8",
+      "ordered_digest": "c50c4700d6b795e238d24ee85d4b097dde582381a9f05057b6332eb402576a9b"
+    },
+    "103020e51310cb0f1026b779810f48456f352b5c4ee1d7a542642c4482d4b101": {
+      "sql": "SELECT \r\n    shipgov AS shipment_id,\r\n    maintflag AS status,\r\n    incidents AS incident_count,\r\n    ARRAY_AGG(regmaintregistry) AS maintenance_record_ids\r\nFROM \r\n    RegulatoryandMaintenance\r\nWHERE \r\n    maintflag = 'Compromised'\r\nGROUP BY \r\n    shipgov, maintflag, incidents\r\nORDER BY \r\n    incidents DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "87c27d72fce90c199725ab5f24238f4d1c767595ea3608ba383f076687315150",
+      "ordered": true,
+      "columns": [
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "status",
+          1043,
+          24
+        ],
+        [
+          "incident_count",
+          21,
+          -1
+        ],
+        [
+          "maintenance_record_ids",
+          1007,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "6f14ed011c22223517e15dac4136941bc49606a8bb9a5e9f9813282d5533a2e8",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "6f14ed011c22223517e15dac4136941bc49606a8bb9a5e9f9813282d5533a2e8"
+    },
+    "78746e123832c90b83f4dd369f8ae4883e3103d3e732d7f037a88904b0108354": {
+      "sql": "SELECT \r\n    t.vehiclereg AS vehicle_id,\r\n    t.shiptransit AS shipment_id,\r\n    dl.datapct AS completion_percentage,\r\n    MAX(rm.compscore) AS max_container_risk_index,\r\n    t.distdonekm AS distance_km,\r\n    MAX(sd.tempdevcount) AS max_temperature_deviation_count,\r\n    MAX(sd.critevents) AS max_critical_events,\r\n    MAX(sd.tempstabidx) AS max_temperature_stability_index,\r\n    c.coolremainpct AS max_coolant_remaining_percentage\r\nFROM \r\n    regulatoryandmaintenance rm\r\nJOIN \r\n    transportinfo t ON rm.vehgov = t.vehiclereg\r\nJOIN \r\n    container c ON t.containtransit = c.containregistry\r\nJOIN \r\n    datalogger dl ON c.containregistry = dl.containlog\r\nJOIN \r\n    sensordata sd ON c.containregistry = sd.containlink\r\nWHERE \r\n    rm.riskflag = 'High Risk'\r\nGROUP BY \r\n    t.vehiclereg, t.shiptransit, dl.datapct, t.distdonekm, c.coolremainpct\r\nORDER BY \r\n    max_container_risk_index DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c740ccb03d225369a408118d57751b0da4ddad050b3d966ba8edcb0b6369e415",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "completion_percentage",
+          700,
+          -1
+        ],
+        [
+          "max_container_risk_index",
+          700,
+          -1
+        ],
+        [
+          "distance_km",
+          1700,
+          589830
+        ],
+        [
+          "max_temperature_deviation_count",
+          21,
+          -1
+        ],
+        [
+          "max_critical_events",
+          21,
+          -1
+        ],
+        [
+          "max_temperature_stability_index",
+          700,
+          -1
+        ],
+        [
+          "max_coolant_remaining_percentage",
+          1700,
+          327686
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "1e38573cc2ed015d624583af07b35c1692ed6ddba5fef2ab59b9d51cce03abb7",
+      "values_digest": "2c7aa23fc085bcbadd6a62ad978fb19ca055ddafa419520854adba375e66905e",
+      "ordered_digest": "2093b71a7ef80b9155854d1f28062c8ae2e17cdf1859cf7e5fdc87073e638353"
+    },
+    "7859a3506461793ee44bdd5434191c1295b5814807f7095d0d8442a0baad1612": {
+      "sql": "SELECT \r\n    t2.containregistry AS container_id,\r\n    COUNT(t1.tempdevcount) AS temperature_deviations,\r\n    ARRAY_AGG(DISTINCT t1.alertkind) AS alert_types\r\nFROM \r\n    sensordata AS t1\r\nJOIN \r\n    container AS t2 ON t1.containlink = t2.containregistry\r\nGROUP BY \r\n    t2.containregistry\r\nORDER BY \r\n    temperature_deviations DESC\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "d6246d0940eaaef395def1c7d2811aec1965efef3401aee0ac6926fedd56babf",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "temperature_deviations",
+          20,
+          -1
+        ],
+        [
+          "alert_types",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "968f09d15fd282978370e614fe31d1a5426c67cb08212778deb97032015258a3",
+      "values_digest": "2c1369f23076fe6df333e24781d1a0b3bace7d3030e7ae0d41a82eb425f78202",
+      "ordered_digest": "7c21f272fd26528191722086b32470237bdcab265a9ba36b82fa82af6ac04f31"
+    },
+    "2f94f0c0cb4f64934ff6206bc40546866428c1355a3534d98fec74fed6993b82": {
+      "sql": "SELECT \r\n    t2.containregistry AS container_id,\r\n    COUNT(t1.tempdevcount) AS temperature_deviations,\r\n    ARRAY_AGG(t1.alertkind) AS alert_types\r\nFROM \r\n    sensordata AS t1\r\nJOIN \r\n    container AS t2 ON t1.containlink = t2.containregistry\r\nGROUP BY \r\n    t2.containregistry\r\nORDER BY \r\n    temperature_deviations DESC\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "14f8cc6c0232b7423e59ee5477fca155718ee28611e7bbf39999633312e69d18",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "temperature_deviations",
+          20,
+          -1
+        ],
+        [
+          "alert_types",
+          1015,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "968f09d15fd282978370e614fe31d1a5426c67cb08212778deb97032015258a3",
+      "values_digest": "2c1369f23076fe6df333e24781d1a0b3bace7d3030e7ae0d41a82eb425f78202",
+      "ordered_digest": "7c21f272fd26528191722086b32470237bdcab265a9ba36b82fa82af6ac04f31"
+    },
+    "c9467622f8fb0d6675086cc4b6caf47bf56cb4cfbc2a0b525637177631f66991": {
+      "sql": "SELECT \r\n    t3.vehiclereg AS vehicle_id,\r\n    t3.shiptransit AS shipment_id,\r\n    t1.datapct AS completion_percentage,\r\n    MAX(t2.compscore) AS max_container_risk_index,\r\n    t3.distdonekm AS distance_km,\r\n    MAX(t4.tempdevcount) AS max_temperature_deviation_count,\r\n    MAX(t4.critevents) AS max_critical_events,\r\n    MAX(t4.tempstabidx) AS max_temperature_stability_index,\r\n    MAX(t5.coolremainpct) AS max_coolant_remaining_percentage\r\nFROM \r\n    regulatoryandmaintenance AS t2\r\nJOIN \r\n    datalogger AS t1 ON t2.shipgov = t1.shiplog\r\nJOIN \r\n    transportinfo AS t3 ON t2.vehgov = t3.vehiclereg\r\nJOIN \r\n    sensordata AS t4 ON t3.vehiclereg = t4.vehsenseref\r\nJOIN \r\n    container AS t5 ON t4.containlink = t5.containregistry\r\nWHERE \r\n    t2.riskflag = 'High Risk'\r\nGROUP BY \r\n    t3.vehiclereg, t3.shiptransit, t1.datapct, t3.distdonekm\r\nORDER BY \r\n    max_container_risk_index DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "93b0a2411f9a47845d61ac46dadebf4be688ea7eed40a16ab443593815e5ae35",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "completion_percentage",
+          700,
+          -1
+        ],
+        [
+          "max_container_risk_index",
+          700,
+          -1
+        ],
+        [
+          "distance_km",
+          1700,
+          589830
+        ],
+        [
+          "max_temperature_deviation_count",
+          21,
+          -1
+        ],
+        [
+          "max_critical_events",
+          21,
+          -1
+        ],
+        [
+          "max_temperature_stability_index",
+          700,
+          -1
+        ],
+        [
+          "max_coolant_remaining_percentage",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "af88026b99c73e6d783406478c1c6ebe08b0779c4bd71409be71b95931678fe3",
+      "values_digest": "2c7aa23fc085bcbadd6a62ad978fb19ca055ddafa419520854adba375e66905e",
+      "ordered_digest": "2830c83607e3df1914475fccd35b3a63867f5f81dbd7b1eaa6741fc64dee0bcf"
+    },
+    "2a4e565c8024cfec996e17b52459364320c8dc37f793ae28d6b6fc6ff3007eed": {
+      "sql": "SELECT \r\n    t3.vehiclereg AS vehicle_id,\r\n    t3.shiptransit AS shipment_id,\r\n    t1.datapct AS completion_percentage,\r\n    MAX(t5.compscore) AS max_container_risk_index,\r\n    t3.distdonekm AS distance_km,\r\n    MAX(t4.tempdevcount) AS max_temperature_deviation_count,\r\n    MAX(t4.critevents) AS max_critical_events,\r\n    MAX(t4.tempstabidx) AS max_temperature_stability_index,\r\n    t2.coolremainpct AS max_coolant_remaining_percentage\r\nFROM \r\n    datalogger AS t1\r\nJOIN \r\n    container AS t2 ON t1.containlog = t2.containregistry\r\nJOIN \r\n    transportinfo AS t3 ON t2.containregistry = t3.containtransit\r\nJOIN \r\n    sensordata AS t4 ON t2.containregistry = t4.containlink\r\nJOIN \r\n    regulatoryandmaintenance AS t5 ON t3.vehiclereg = t5.vehgov\r\nWHERE \r\n    t5.riskflag = 'High Risk'\r\nGROUP BY \r\n    t3.vehiclereg, t3.shiptransit, t1.datapct, t3.distdonekm, t2.coolremainpct\r\nORDER BY \r\n    max_container_risk_index DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "e383c69d213588e6e5bae0c4b7346aea9dc2a9e5d716d443be15e03a6c3f555e",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "completion_percentage",
+          700,
+          -1
+        ],
+        [
+          "max_container_risk_index",
+          700,
+          -1
+        ],
+        [
+          "distance_km",
+          1700,
+          589830
+        ],
+        [
+          "max_temperature_deviation_count",
+          21,
+          -1
+        ],
+        [
+          "max_critical_events",
+          21,
+          -1
+        ],
+        [
+          "max_temperature_stability_index",
+          700,
+          -1
+        ],
+        [
+          "max_coolant_remaining_percentage",
+          1700,
+          327686
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "1e38573cc2ed015d624583af07b35c1692ed6ddba5fef2ab59b9d51cce03abb7",
+      "values_digest": "2c7aa23fc085bcbadd6a62ad978fb19ca055ddafa419520854adba375e66905e",
+      "ordered_digest": "2093b71a7ef80b9155854d1f28062c8ae2e17cdf1859cf7e5fdc87073e638353"
+    },
+    "6f02e4f468e471262d4ee4095d1c0e36dc0944b64b37b3e226978564c210fef8": {
+      "sql": "SELECT \r\n    t3.vehiclereg AS vehicle_id,\r\n    t3.shiptransit AS shipment_id,\r\n    t1.datapct AS completion_percentage,\r\n    NULL AS max_container_risk_index,\r\n    t3.distdonekm AS distance_km,\r\n    t2.tempdevcount AS max_temperature_deviation_count,\r\n    t2.critevents AS max_critical_events,\r\n    t2.tempstabidx AS max_temperature_stability_index,\r\n    t5.coolremainpct AS max_coolant_remaining_percentage\r\nFROM \r\n    datalogger AS t1\r\nJOIN \r\n    sensordata AS t2 ON t1.containlog = t2.containlink\r\nJOIN \r\n    transportinfo AS t3 ON t2.vehsenseref = t3.vehiclereg\r\nJOIN \r\n    regulatoryandmaintenance AS t4 ON t3.vehiclereg = t4.vehgov\r\nJOIN \r\n    container AS t5 ON t2.containlink = t5.containregistry\r\nWHERE \r\n    t4.riskflag = 'High Risk'\r\nORDER BY \r\n    max_container_risk_index\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "23a8bdac24f9e7830a4d088ecb4ba5259dddc3468b5af8fa5bed7cc8e62e85d8",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "completion_percentage",
+          700,
+          -1
+        ],
+        [
+          "max_container_risk_index",
+          25,
+          -1
+        ],
+        [
+          "distance_km",
+          1700,
+          589830
+        ],
+        [
+          "max_temperature_deviation_count",
+          21,
+          -1
+        ],
+        [
+          "max_critical_events",
+          21,
+          -1
+        ],
+        [
+          "max_temperature_stability_index",
+          700,
+          -1
+        ],
+        [
+          "max_coolant_remaining_percentage",
+          1700,
+          327686
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "9a107f066c332ef5681f5e8693e97c480e27ca307dea2e2a05976d2711a1d6ae",
+      "values_digest": "9c7ca568de39ddcf414da91c163c44d7bae13b4f71a2cc1974b1a1e7275073cf",
+      "ordered_digest": "a8b27ba6a3f67e5c51feab9ca18de49ce2f05cacbdf1cd653ef78963f6c8af03"
+    },
+    "d76ff66582887d4717573bfefc89a197a0e48fc6b9d1f17ff08d3a89b1c39bc7": {
+      "sql": "SELECT DISTINCT maintflag\nFROM RegulatoryandMaintenance;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "753ca4dd19306e40da58a424acc94778b6d949273ae991df8f730285afa648f8",
+      "ordered": false,
+      "columns": [
+        [
+          "maintflag",
+          1043,
+          24
+        ]
+      ],
+      "rows": 3,
+      "bag_digest": "4b8bfd5cf1c3f9e53f85c680f75dc3c9af5ed5ba9d22aa790201042e7c423f84",
+      "values_digest": "51c5ce2d215b807d7560e742f58412c97a9f5dfa0e25145f6f75c03f1b4e48ee",
+      "ordered_digest": "2ad90f02e2b32d9e583518c309c8f365284eed73ac4fa4444566a4fc2b9f771c"
+    },
+    "c37bedcb36c287564fea8e0698bcdd2a6f7832ef272cc7d691de91be669ea844": {
+      "sql": "SELECT containregistry, coolremainpct, coolmass, \r\nRANK() OVER (ORDER BY coolmass DESC) AS depletion_rank\r\nFROM container\r\nORDER BY coolmass DESC\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "9a178d33ea363363cf554bc1b93bfb3e8ff418c32a976a45c5ef8572b6e74b13",
+      "ordered": true,
+      "columns": [
+        [
+          "containregistry",
+          1043,
+          24
+        ],
+        [
+          "coolremainpct",
+          1700,
+          327686
+        ],
+        [
+          "coolmass",
+          700,
+          -1
+        ],
+        [
+          "depletion_rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "0e4b52920eb098ac0405bf28589293b89b376035188799fad7fe91c17e4d02dd",
+      "values_digest": "0f03779e575ba56b55ed9888cdb869a2cbbdcef6a0edc4f0fccda8f77f897258",
+      "ordered_digest": "bdb7f7742b7c5a52e75bb2bd7ee7671a3640547a8f105896f1bca30dd08dc82e"
+    },
+    "a379ca949a751c60e15e058d144e9fe8a1c4e2ce2c0843bfc72fe304740ae26d": {
+      "sql": "WITH MaintenanceDelays AS (\r\n    SELECT \r\n        regmaintregistry AS EquipmentID,\r\n        compscore AS ComplianceScore,\r\n        maintdatenext - maintdatelast AS Delay,\r\n        CASE WHEN maintdatenext < CURRENT_DATE THEN TRUE ELSE FALSE END AS IsOverdue\r\n    FROM \r\n        regulatoryandmaintenance\r\n    WHERE \r\n        compscore IS NOT NULL\r\n),\r\nRankedDelays AS (\r\n    SELECT \r\n        EquipmentID,\r\n        ComplianceScore,\r\n        Delay,\r\n        IsOverdue,\r\n        ROW_NUMBER() OVER (ORDER BY Delay DESC) AS DelayRank\r\n    FROM \r\n        MaintenanceDelays\r\n)\r\nSELECT \r\n    EquipmentID,\r\n    ComplianceScore,\r\n    Delay,\r\n    IsOverdue\r\nFROM \r\n    RankedDelays\r\nWHERE \r\n    DelayRank <= 5\r\nORDER BY \r\n    Delay DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "20fe06297314a78d012012aea8776ac80e0a4cf8aad607d6b57658360d187e93",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmentid",
+          23,
+          -1
+        ],
+        [
+          "compliancescore",
+          700,
+          -1
+        ],
+        [
+          "delay",
+          23,
+          -1
+        ],
+        [
+          "isoverdue",
+          16,
+          -1
+        ]
+      ],
+      "rows": 5,
+      "bag_digest": "e6bc938925c94f2ef28951e0eb4121971082ba09cbfaf5acbc79e3c60150849c",
+      "values_digest": "ccdcd2b146a7695c71a318eda00c611943b5d23a185918477fb61a393c27eeeb",
+      "ordered_digest": "82390eb39bf3347c6ba41ea5cae0062eb963cb10e0df8e42dc3ebf0aed040258"
+    },
+    "4c8694989f4e28b7c3100c818a8075a34c876ccd42ec32da35c1ba4ed87ec08b": {
+      "sql": "WITH RecentSensorReadings AS (\r\n    SELECT \r\n        vehsenseref, \r\n        MAX(sensortrack) as recent_sensortrack\r\n    FROM \r\n        sensordata\r\n    GROUP BY \r\n        vehsenseref\r\n),\r\nTransportDetails AS (\r\n    SELECT \r\n        ti.vehiclereg, \r\n        ti.shiptransit AS shipment_id, \r\n        sd.tempstabidx AS handling_quality_index, \r\n        sd.tempstabidx AS temperature_stability_score\r\n    FROM \r\n        transportinfo ti\r\n    JOIN \r\n        RecentSensorReadings rsr\r\n    ON \r\n        ti.vehiclereg = rsr.vehsenseref\r\n    JOIN \r\n        sensordata sd\r\n    ON \r\n        rsr.vehsenseref = sd.vehsenseref \r\n    AND \r\n        rsr.recent_sensortrack = sd.sensortrack\r\n)\r\nSELECT \r\n    vehiclereg, \r\n    shipment_id, \r\n    handling_quality_index, \r\n    ROUND(CAST(temperature_stability_score AS NUMERIC), 2) AS temperature_stability_score\r\nFROM \r\n    TransportDetails\r\nORDER BY \r\n    temperature_stability_score;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "af5fb16d9a6b25ef985263771652474ea898ef8fb6d0753c87ba9ad0396b4176",
+      "ordered": true,
+      "columns": [
+        [
+          "vehiclereg",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "handling_quality_index",
+          700,
+          -1
+        ],
+        [
+          "temperature_stability_score",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 900,
+      "bag_digest": "d42fa054efc03b6a146b722d1d724469d885226fe1c3ac4a93b25d3ae06ce799",
+      "values_digest": "ee134b29a866e981fa14ab91fb74f5d28449f8fb6474fbf6144b510fd4871ccb",
+      "ordered_digest": "66c9feefae0d7ff5f89c0af396c3b7c65a541bc8ec8f93d6c603dab20bc49e7a"
+    },
+    "a127a023f983ece41cd181fd8e81417ef241e02d82721c48369462ac321fb1ae": {
+      "sql": "WITH ReliableTransport AS (\r\n    SELECT\r\n        t1.transmode,\r\n        t2.handleevents,\r\n        t2.tempstabidx,\r\n        t2.vehsenseref\r\n    FROM\r\n        transportinfo AS t1\r\n    JOIN\r\n        sensordata AS t2 ON t1.vehiclereg = t2.vehsenseref\r\n    WHERE\r\n        t2.tempstabidx > 0.8 \r\n        AND t2.handleevents > 0.9\r\n)\r\nSELECT\r\n    transmode AS mode_name,\r\n    AVG(handleevents) AS avg_handling_quality,\r\n    COUNT(DISTINCT vehsenseref) AS vehicles_stable_transport,\r\n    COUNT(*) AS count_reliable_instances\r\nFROM\r\n    ReliableTransport\r\nGROUP BY\r\n    transmode\r\nORDER BY\r\n    avg_handling_quality DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "7f2565c6a1caaa823c2f62680693d06bf21a8393e324fbf40d8a5f143f02af99",
+      "ordered": true,
+      "columns": [
+        [
+          "mode_name",
+          20956,
+          -1
+        ],
+        [
+          "avg_handling_quality",
+          1700,
+          -1
+        ],
+        [
+          "vehicles_stable_transport",
+          20,
+          -1
+        ],
+        [
+          "count_reliable_instances",
+          20,
+          -1
+        ]
+      ],
+      "rows": 4,
+      "bag_digest": "73b1e9f38f674204b05ce69180e3ce4d818ad40a709635e59c565a991c82c004",
+      "values_digest": "111dbb5ae5003f5227cfe87cba35ef4110f8b5587bee1eabac4168b7e2c85f3b",
+      "ordered_digest": "c3a2bb1d59e4738ce3f4512cb45170d42a4f65fba997fa408f0781322b8a9196"
+    },
+    "2e55fa68eea73290a0c3e6268a55016783ab7c2de1676edac359f20e9b9b2b38": {
+      "sql": "WITH SensorMetrics AS (\r\n    SELECT \r\n        containlink,\r\n        MAX(tempdevcount) AS max_tempdevcount,\r\n        MAX(critevents) AS max_critevents,\r\n        MAX(tempstabidx) AS max_tempstabidx,\r\n        MAX(tempnowc) AS max_tempnowc\r\n    FROM sensordata\r\n    GROUP BY containlink\r\n),\r\nContainerMetrics AS (\r\n    SELECT \r\n        c.containregistry,\r\n        sm.max_tempdevcount,\r\n        sm.max_critevents,\r\n        sm.max_tempstabidx,\r\n        c.coolremainpct,\r\n        sm.max_tempnowc\r\n    FROM container c\r\n    LEFT JOIN SensorMetrics sm ON c.containregistry = sm.containlink\r\n)\r\n\r\nSELECT \r\n    cm.containregistry AS container_id,\r\n    cm.max_tempstabidx AS max_temperature_stability_score,\r\n    -- Assuming Container Risk Index is calculated based on critical events and temperature deviations\r\n    (cm.max_critevents * 10 + cm.max_tempdevcount) AS container_risk_index,\r\n    -- Assuming Risk Rank is based on the Container Risk Index\r\n    RANK() OVER (ORDER BY (cm.max_critevents * 10 + cm.max_tempdevcount) DESC) AS risk_rank,\r\n    -- Assuming sensor data status is based on the presence of critical events\r\n    CASE WHEN cm.max_critevents > 0 THEN 'Critical' ELSE 'Normal' END AS sensor_data_status,\r\n    -- Diagnostic JSON summary\r\n    json_build_object(\r\n        'TempDevCount', cm.max_tempdevcount,\r\n        'CritEvents', cm.max_critevents,\r\n        'TempStabIdx', cm.max_tempstabidx,\r\n        'CoolRemainPct', cm.coolremainpct,\r\n        -- Assuming Temperature Breach Severity is based on max_tempnowc\r\n        'TempBreachSeverity', CASE WHEN cm.max_tempnowc > 0 THEN 'High' ELSE 'Low' END\r\n    ) AS diagnostic_summary\r\nFROM ContainerMetrics cm\r\nORDER BY risk_rank\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f9694e20816f70eaa71ae3a2e21bda3d83ef0852fa749f3aa7f9b005208dd06c",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "max_temperature_stability_score",
+          700,
+          -1
+        ],
+        [
+          "container_risk_index",
+          23,
+          -1
+        ],
+        [
+          "risk_rank",
+          20,
+          -1
+        ],
+        [
+          "sensor_data_status",
+          25,
+          -1
+        ],
+        [
+          "diagnostic_summary",
+          114,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "7648db9a6b721e9c8bc291419b21c6a9a160bf9d7a874f9e74a579407e124ac3",
+      "values_digest": "6fe4e946204cb666f6f12a159dd31c84b30a905416da263fc363e83a98d81afc",
+      "ordered_digest": "ee7f1197b655386c1cddad41f4bfc94ff9e66365f0da07c6ca61ac2de1176336"
+    },
+    "d446ae2ef7062924c5bb8317d59a66323de17c1f765bb43eeb8395592e14c58a": {
+      "sql": "WITH SensorMetrics AS (\r\n    SELECT \r\n        sd.containlink, \r\n        MAX(sd.tempdevcount) AS max_tempdevcount, \r\n        MAX(sd.critevents) AS max_critevents, \r\n        MAX(sd.tempstabidx) AS max_tempstabidx, \r\n        -- Assuming 'alertkind' contains status information\r\n        STRING_AGG(DISTINCT sd.alertkind, ', ') AS sensor_data_status\r\n    FROM \r\n        sensordata sd\r\n    GROUP BY \r\n        sd.containlink\r\n),\r\nContainerMetrics AS (\r\n    SELECT \r\n        c.containregistry, \r\n        c.coolremainpct, \r\n        -- Assuming 'coolremainpct' is the coolant percentage remaining\r\n        sm.max_tempdevcount, \r\n        sm.max_critevents, \r\n        sm.max_tempstabidx, \r\n        sm.sensor_data_status\r\n    FROM \r\n        container c\r\n    LEFT JOIN \r\n        SensorMetrics sm ON c.containregistry = sm.containlink\r\n),\r\nRiskMetrics AS (\r\n    SELECT \r\n        cm.containregistry, \r\n        cm.coolremainpct, \r\n        cm.max_tempdevcount, \r\n        cm.max_critevents, \r\n        cm.max_tempstabidx, \r\n        cm.sensor_data_status, \r\n        -- Assuming 'Container Risk Index (CRI)' is calculated based on available data\r\n        (cm.max_tempdevcount + cm.max_critevents) AS cri, \r\n        -- Assuming 'Temperature Breach Severity (TBS)' is calculated based on available data\r\n        (cm.max_tempdevcount * cm.max_critevents) AS tbs, \r\n        -- Assuming 'Risk Rank' is calculated based on available data\r\n        (cm.max_tempdevcount + cm.max_critevents + cm.max_tempstabidx) AS risk_rank\r\n    FROM \r\n        ContainerMetrics cm\r\n),\r\nFinalResults AS (\r\n    SELECT \r\n        rm.containregistry AS container_id, \r\n        rm.max_tempstabidx AS max_temp_stability_score, \r\n        rm.cri AS container_risk_index, \r\n        rm.risk_rank, \r\n        rm.sensor_data_status, \r\n        JSON_BUILD_OBJECT(\r\n            'TempDevCount', rm.max_tempdevcount,\r\n            'CritEvents', rm.max_critevents,\r\n            'TempStabIdx', rm.max_tempstabidx,\r\n            'CoolRemainPct', rm.coolremainpct,\r\n            'TempBreachSeverity', rm.tbs\r\n        ) AS diagnostic_summary\r\n    FROM \r\n        RiskMetrics rm\r\n)\r\nSELECT \r\n    container_id, \r\n    max_temp_stability_score, \r\n    container_risk_index, \r\n    risk_rank, \r\n    sensor_data_status, \r\n    diagnostic_summary\r\nFROM \r\n    FinalResults\r\nORDER BY \r\n    risk_rank DESC\r\nLIMIT 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "274ef2d4c098fc7b1ebcd21abebb4c855819e5950488837d262ecff58c2a738a",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "max_temp_stability_score",
+          700,
+          -1
+        ],
+        [
+          "container_risk_index",
+          21,
+          -1
+        ],
+        [
+          "risk_rank",
+          701,
+          -1
+        ],
+        [
+          "sensor_data_status",
+          25,
+          -1
+        ],
+        [
+          "diagnostic_summary",
+          114,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "0b23973809a87bc07fd381963ab63710f01da3eb5ac9afcec87b3b439dbb1671",
+      "values_digest": "523ea4d215fb65d17f89660245e45f98d76c936f081a42bd3724eba45e048167",
+      "ordered_digest": "bba9f3a3170ce3a0a147868b76099add523fb2a9b19c9dc0e52d0f5df868cc58"
+    },
+    "a374ee41ad103da292ab1bf89a3214f9ae938fe7255e3495cd9eace19787984d": {
+      "sql": "WITH container_efficiency AS (\r\n    SELECT \r\n        c.containregistry AS container_id,\r\n        (sd.tempstabidx * (1 - rm.compscore) * (1 - sd.tempdevcount)) AS efficiency_score,\r\n        sd.tempstabidx AS temperature_stability,\r\n        DENSE_RANK() OVER (ORDER BY (sd.tempstabidx * (1 - rm.compscore) * (1 - sd.tempdevcount)) DESC) AS rank\r\n    FROM \r\n        container c\r\n    JOIN \r\n        sensordata sd ON c.containregistry = sd.containlink\r\n    JOIN \r\n        regulatoryandmaintenance rm ON c.containregistry = rm.shipgov\r\n)\r\nSELECT \r\n    container_id, \r\n    efficiency_score, \r\n    temperature_stability, \r\n    rank\r\nFROM \r\n    container_efficiency\r\nORDER BY \r\n    rank\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "12e6a5603014e7043564daad56ee38f9dc764637ab2c0bdaa1d95756fc2e4397",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "efficiency_score",
+          701,
+          -1
+        ],
+        [
+          "temperature_stability",
+          700,
+          -1
+        ],
+        [
+          "rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "8b3c24d79296ee984b73503d1baedfe04e3c42deec69c13fc843a421d4727122",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "8b3c24d79296ee984b73503d1baedfe04e3c42deec69c13fc843a421d4727122"
+    },
+    "bcc46be044cf69263b2388758040bf4b1b0670029cc4dac1ae4f4850c2276946": {
+      "sql": "WITH container_efficiency AS (\r\n    SELECT \r\n        c.containregistry AS container_id,\r\n        (sd.tempstabidx * c.coolremainpct * (1 - rm.compscore)) AS efficiency_score,\r\n        sd.tempstabidx AS temperature_stability,\r\n        DENSE_RANK() OVER (ORDER BY (sd.tempstabidx * c.coolremainpct * (1 - rm.compscore)) DESC) AS rank\r\n    FROM \r\n        container c\r\n    JOIN \r\n        sensordata sd ON c.containregistry = sd.containlink\r\n    JOIN \r\n        regulatoryandmaintenance rm ON c.containregistry = rm.shipgov\r\n)\r\nSELECT \r\n    container_id, \r\n    efficiency_score, \r\n    temperature_stability, \r\n    rank\r\nFROM \r\n    container_efficiency\r\nORDER BY \r\n    rank\r\nLIMIT 5;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported locking/limit/distinct/window",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "10fb53d87028465bf6ca5e454924811a213596c781cca11d49b64b1aea6d48f9",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "efficiency_score",
+          701,
+          -1
+        ],
+        [
+          "temperature_stability",
+          700,
+          -1
+        ],
+        [
+          "rank",
+          20,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "8b3c24d79296ee984b73503d1baedfe04e3c42deec69c13fc843a421d4727122",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "8b3c24d79296ee984b73503d1baedfe04e3c42deec69c13fc843a421d4727122"
+    },
+    "7f3ef46442d28ddc9c7657a0ed78ac65e6d475bc9bb1161a9aa55dbe27302e2a": {
+      "sql": "WITH ranked_containers AS (\r\n    SELECT \r\n        c.containregistry AS container_id,\r\n        MAX(sd.tempstabidx) AS max_temp_stability_score,\r\n        -- Assuming Container Risk Index (CRI) is an external knowledge and not directly in the database\r\n        -- For demonstration, using a placeholder value. Replace with actual logic if available.\r\n        0 AS container_risk_index, \r\n        -- Assuming Risk Rank is an external knowledge and not directly in the database\r\n        -- For demonstration, using a placeholder value. Replace with actual logic if available.\r\n        0 AS risk_rank,\r\n        dl.logflag AS sensor_data_status,\r\n        ROW_NUMBER() OVER (ORDER BY MAX(sd.tempstabidx) DESC) AS row_num\r\n    FROM \r\n        Container c\r\n    JOIN \r\n        SensorData sd ON c.containregistry = sd.containlink\r\n    JOIN \r\n        DataLogger dl ON c.containregistry = dl.containlog\r\n    GROUP BY \r\n        c.containregistry, dl.logflag\r\n)\r\nSELECT \r\n    container_id,\r\n    max_temp_stability_score,\r\n    container_risk_index,\r\n    risk_rank,\r\n    sensor_data_status,\r\n    json_build_object(\r\n        'TempDevCount', MAX(sd.tempdevcount),\r\n        'CritEvents', MAX(sd.critevents),\r\n        'TempStabIdx', MAX(sd.tempstabidx),\r\n        'CoolRemainPct', c.coolremainpct,\r\n        -- Assuming Temperature Breach Severity (TBS) is an external knowledge and not directly in the database\r\n        -- For demonstration, using a placeholder value. Replace with actual logic if available.\r\n        'TempBreachSeverity', 0\r\n    ) AS diagnostic_summary\r\nFROM \r\n    ranked_containers rc\r\nJOIN \r\n    Container c ON rc.container_id = c.containregistry\r\nJOIN \r\n    SensorData sd ON c.containregistry = sd.containlink\r\nWHERE \r\n    rc.row_num <= 10\r\nGROUP BY \r\n    rc.container_id, rc.max_temp_stability_score, rc.container_risk_index, rc.risk_rank, rc.sensor_data_status, c.coolremainpct\r\nORDER BY \r\n    risk_rank;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "dc1e896c3f709c59ac3d188f922137dd1efb4da6a798d861de31b24360513c32",
+      "ordered": true,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "max_temp_stability_score",
+          700,
+          -1
+        ],
+        [
+          "container_risk_index",
+          23,
+          -1
+        ],
+        [
+          "risk_rank",
+          23,
+          -1
+        ],
+        [
+          "sensor_data_status",
+          20984,
+          -1
+        ],
+        [
+          "diagnostic_summary",
+          114,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "16d6d2f9d7d6d33e0706c1ebc0dbaf437e13b676a6ab1edcc93ce3129b22c451",
+      "values_digest": "7450b09384af0a1710cda1543d40e4c70838b5224d6b2e5810ad8e209dc8e338",
+      "ordered_digest": "750ae0a1faeb0b3b0644748bc4aa9d549ebafe9e1ad8054c14d44aaf22b995c7"
+    },
+    "4a222d5947e38c92e3a70a1d9e4c0086e7d31afd040df78180faf5602d807791": {
+      "sql": "WITH recent_sensor_readings AS (\n    SELECT \n        vehsenseref AS vehicle_id,\n        sensortrack,\n        tempstabidx AS tss,\n        ROW_NUMBER() OVER (PARTITION BY vehsenseref ORDER BY sensortrack DESC) AS rn\n    FROM \n        sensordata\n)\n\nSELECT \n    r.vehicle_id,\n    t.shiptransit AS shipment_id,\n    -- Handling Quality Index column not found in database\n    r.tss\nFROM \n    recent_sensor_readings r\nJOIN \n    transportinfo t ON r.vehicle_id = t.vehiclereg\nWHERE \n    r.rn = 1\nORDER BY \n    r.tss;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c78f6b9cfb1662b51b891dc5c47b969f21a241c5fb015a1ee1fae30c6e90bf78",
+      "ordered": true,
+      "columns": [
+        [
+          "vehicle_id",
+          1043,
+          24
+        ],
+        [
+          "shipment_id",
+          1043,
+          24
+        ],
+        [
+          "tss",
+          700,
+          -1
+        ]
+      ],
+      "rows": 900,
+      "bag_digest": "f0a9c4237c9421428d63962dae17ff332ab0ace80886d558871da7f90e44e4b8",
+      "values_digest": "d95e23586e2424ef3d35edffad065404f36c0fd27e8ce834a131953c3f99d6f6",
+      "ordered_digest": "9ce0452cae996471636611eaed0e7d812e34dbfa89d6d437568c3a74396babf3"
+    },
+    "3cdb68eb122bfda66a5e54a374c5ec85fc50445fe262792f19202d245dbd9ac7": {
+      "sql": "WITH sensor_data_with_risk_metrics AS (\r\n    SELECT \r\n        T2.containregistry AS container_id,\r\n        T1.tempstabidx AS max_temp_stability_score,\r\n        (1 - T1.tempstabidx) * (1 - T2.coolremainpct/100) AS container_risk_index,\r\n        ABS(T1.tempnowc - T1.storetempc)/T1.temptolc * T1.tempdevcount AS temp_breach_severity,\r\n        T1.tempdevcount AS max_temp_deviation_count,\r\n        T1.critevents AS max_critical_events,\r\n        T2.coolremainpct AS current_coolant_percentage_remaining,\r\n        T1.tempmaxc AS max_temp_stability_index,\r\n        T1.containlink\r\n    FROM \r\n        sensordata AS T1\r\n    JOIN \r\n        container AS T2 ON T1.containlink = T2.containregistry\r\n),\r\ncontainer_risk_ranking AS (\r\n    SELECT \r\n        *,\r\n        RANK() OVER (ORDER BY container_risk_index DESC) AS risk_rank\r\n    FROM \r\n        sensor_data_with_risk_metrics\r\n)\r\nSELECT \r\n    container_id,\r\n    max_temp_stability_score,\r\n    container_risk_index,\r\n    risk_rank,\r\n    JSON_BUILD_OBJECT(\r\n        'TempDevCount', max_temp_deviation_count,\r\n        'CritEvents', max_critical_events,\r\n        'TempStabIdx', max_temp_stability_index,\r\n        'CoolRemainPct', current_coolant_percentage_remaining,\r\n        'TempBreachSeverity', temp_breach_severity\r\n    ) AS diagnostic_summary\r\nFROM \r\n    container_risk_ranking\r\nWHERE \r\n    risk_rank <= 10;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "c8490e4da76e8f796ef3354f2af9421c76bebd146b09f453f85c206c71e3d23c",
+      "ordered": false,
+      "columns": [
+        [
+          "container_id",
+          1043,
+          24
+        ],
+        [
+          "max_temp_stability_score",
+          700,
+          -1
+        ],
+        [
+          "container_risk_index",
+          701,
+          -1
+        ],
+        [
+          "risk_rank",
+          20,
+          -1
+        ],
+        [
+          "diagnostic_summary",
+          114,
+          -1
+        ]
+      ],
+      "rows": 10,
+      "bag_digest": "acca60cfc68b0abc7e019aa8f80582507576b938b825226377f58073c6a5f530",
+      "values_digest": "b58b2eae4e3aa05761238351c969925d0961daa89d7a99a373bf13e58c1fe806",
+      "ordered_digest": "bdc4279cc6c9c81f526d7e1a4dd72b142ecbb622d48644adf476e63bcf885aa9"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "container": {
+      "containregistry": "varchar",
+      "containmodel": "varchar",
+      "volliters": "int4",
+      "masskg": "float4",
+      "containflag": "varchar",
+      "coolkind": "varchar",
+      "coolmass": "float4",
+      "coolremainpct": "numeric",
+      "coolrefills": "int2",
+      "refilllatest": "date",
+      "refillnext": "date",
+      "batterypct": "float4",
+      "pwrfeed": "varchar",
+      "pwrbackupflag": "varchar",
+      "shipown": "varchar"
+    },
+    "vaccinedetails": {
+      "vacregistry": "int4",
+      "vacvariant": "varchar",
+      "mfgsource": "text",
+      "batchlabel": "varchar",
+      "prodday": "date",
+      "expireday": "date",
+      "lotmeasure": "int8",
+      "vialtally": "int2",
+      "dosepervial": "int2",
+      "dosetotal": "int4",
+      "shipinject": "varchar",
+      "containvac": "varchar"
+    },
+    "regulatoryandmaintenance": {
+      "regmaintregistry": "int4",
+      "maintflag": "varchar",
+      "maintdatelast": "date",
+      "maintdatenext": "date",
+      "calibflag": "varchar",
+      "calibdatelast": "date",
+      "calibdatenext": "date",
+      "docuflag": "varchar",
+      "compscore": "float4",
+      "riskflag": "varchar",
+      "incidents": "int2",
+      "resolveflag": "varchar",
+      "respperson": "varchar",
+      "contactno": "varchar",
+      "contactemerg": "varchar",
+      "inspectdatelast": "date",
+      "inspectdatenext": "date",
+      "inspectoutcome": "varchar",
+      "correctactions": "text",
+      "preventsteps": "text",
+      "validflag": "varchar",
+      "verifymethod": "varchar",
+      "shipgov": "varchar",
+      "vehgov": "varchar"
+    },
+    "sensordata": {
+      "sensortrack": "int4",
+      "storetempc": "float4",
+      "temptolc": "numeric",
+      "tempnowc": "float4",
+      "tempdevcount": "int2",
+      "tempmaxc": "numeric",
+      "tempminc": "numeric",
+      "tempstabidx": "float4",
+      "humiditypct": "numeric",
+      "presskpa": "float4",
+      "shockflag": "varchar",
+      "tiltflag": "varchar",
+      "impactflag": "varchar",
+      "vibelvlmms": "numeric",
+      "lightlux": "int4",
+      "acceldata": "float4",
+      "handleevents": "int2",
+      "critevents": "int2",
+      "alerts": "int2",
+      "alerttime": "timestamp",
+      "alertkind": "varchar",
+      "containlink": "varchar",
+      "vehsenseref": "varchar"
+    }
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "wave": 1,
+  "result": {
+    "task_id": "museum_M_1",
+    "instance_id": "museum_M_1",
+    "database": "museum",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 124.17722630500793,
+    "budget_used": 3.5,
+    "budget_remaining": 14.5,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"artifactscore\" (\nartregistry character NOT NULL,\nartname character varying NOT NULL,\nartdynasty character varying NULL,\nartageyears integer NULL,\nmattype USER-DEFINED NULL,\nconservestatus USER-DEFINED NULL,\n    PRIMARY KEY (artregistry)\n);\n\nFirst 3 rows:\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\n-------------  ----------------  ------------  -------------  ---------  ----------------\nART54317       Culture Painting  Ming                    943  Stone      Good\nART54254       Poor Vase         Song                   2179  Textile    Fair\nART69978       Order Painting    Qing                    366  Bronze     Poor\n...\n\n\nCREATE TABLE \"surfaceandphysicalreadings\" (\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\nenvreadref bigint NOT NULL,\nvibralvlmms2 real NULL,\nnoisedb smallint NULL,\ndustaccummgm2 numeric NULL,\nmicrobialcountcfu integer NULL,\nmoldriskidx numeric NULL,\npestactivitylvl character varying NULL,\npesttrapcount smallint NULL,\npestspeciesdetected text NULL,\nsurfaceph numeric NULL,\nmatmoistcontent numeric NULL,\nsaltcrystalrisk character NULL,\nmetalcorroderate numeric NULL,\norganicdegradidx numeric NULL,\ncolorchangedeltae real NULL,\nsurfacetempc numeric NULL,\nsurfacerh numeric NULL,\ncondenserisk character varying NULL,\nthermalimgstatus character NULL,\nstructstability character varying NULL,\ncrackmonitor text NULL,\ndeformmm numeric NULL,\nwtchangepct numeric NULL,\nsurfdustcoverage smallint NULL,\no2concentration numeric NULL,\nn2concentration numeric NULL,\n    PRIMARY KEY (surfphysregistry),\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\n);\n\nFirst 3 rows:\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegr...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Conservation Priority Index (CPI)\", \"Sensitivity Weight Values\", \"Environmental Risk Factor (ERF)\", \"Artifact Vulnerability Score (AVS)\", \"Display Safety Duration (DSD)\", \"Showcase Environmental Stability Rating (SESR)\", \"Artifact Exhibition Compatibility (AEC)\", \"Material Deterioration Rate (MDR)\", \"Light Exposure Risk (LER)\", \"Conservation Budget Efficiency (CBE)\", \"Visitor Impact Risk (VIR)\", \"High-Value Artifact\", \"Conservation Emergency\", \"Environmental Instability Event\", \"Accelerated Deterioration Scenario\", \"Exhibition Rotation Candidate\", \"Showcase Failure Risk\", \"Conservation Budget Crisis\", \"Dynasty Value Artifact\", \"Visitor Crowd Risk\", \"Organic Material Vulnerability\", \"ArtifactsCore.ConserveStatus\", \"ArtifactRatings.HistSignRating\", \"SensitivityData.LightSensitivity\", \"SensitivityData.HumiditySensitivity\", \"ExhibitionHalls.CCTVCoverage\", \"Showcases.Airtightness\", \"EnvironmentalReadingsCore.TempC\", \"EnvironmentalReadingsCore.RelHumidity\", \"LightAndRadiationReadings.LightLux\", \"AirQualityReadings.PM25Conc\", \"Total Environmental Threat Level (TETL)\", \"Showcase Protection Adequacy (SPA)\", \"Conservation Backlog Risk (CBR)\", \"Visitor Capacity Safety Factor (VCSF)\", \"Exhibition Safety Quotient (ESQ)\", \"Conservation Resource Allocation Efficiency (CRAE)\", \"Material Aging Projection (MAP)\", \"Exhibition Rotation Priority Score (ERPS)\", \"Environmental Compliance Index (ECI)\", \"Security Risk Exposure (SRE)\", \"Critical Conservation Alert\", \"High Deterioration Risk Artifact\", \"Exhibition Rotation Urgency\", \"Showcase Compatibility Issue\", \"Conservation Resource Crisis\", \"Dynasty Artifact at Risk\", \"Environmental Control Failure\", \"High Security Priority Artifact\", \"Visitor Traffic Safety Concern\", \"Organic Material Emergency\", \"High-Value Category\", \"ERPS Decision Threshold\", \"Light Exposure Thresholds\", \"Conservation Environment Chronology (CEC)\", \"Artifact Rarity & Valuation (ARV)\", \"Conservation Priority Level\"]",
+        "cost": 0.5,
+        "budget_before": 17.0,
+        "budget_after": 16.5
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Critical Conservation Alert"
+        },
+        "result": "{\n  \"id\": 41,\n  \"knowledge\": \"Critical Conservation Alert\",\n  \"description\": \"Identifies artifacts in critical condition requiring immediate intervention.\",\n  \"definition\": \"An artifact that meets both the Conservation Emergency criteria AND has an AVS > 8.\"\n}",
+        "cost": 0.5,
+        "budget_before": 16.5,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_knowledge_definition",
+        "args": {
+          "knowledge_name": "Conservation Emergency"
+        },
+        "result": "{\n  \"id\": 12,\n  \"knowledge\": \"Conservation Emergency\",\n  \"description\": \"Identifies artifacts requiring immediate conservation intervention.\",\n  \"definition\": \"A situation where an artifact has ConserveStatus='Critical' AND a TreatPriority='Urgent'.\"\n}",
+        "cost": 0.5,
+        "budget_before": 16.0,
+        "budget_after": 15.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "UPDATE ConservationAndMaintenance\r\nSET maintlog = maintlog || ' - CRITICAL CONSERVATION ALERT: ' || NOW()\r\nWHERE artrefmaintained IN (\r\n    SELECT artregistry\r\n    FROM artifactscore\r\n    WHERE conservestatus = 'Critical'\r\n)\r\nAND treatpriority = 'Urgent';"
+        },
+        "result": "SQL Error: Only SELECT queries allowed in execute_sql",
+        "cost": 1.0,
+        "budget_before": 15.5,
+        "budget_after": 14.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: museum\nTask ID: museum_M_1\n\nUser Query:\nFor any maintenance record in the 'ConservationAndMaintenance' table where the associated artifact meets urgent conservation criteria, update the log by appending an alert message with the current timestamp.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_hdpjx2n0v4zk",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_636qkxe5yfkc",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_hdpjx2n0v4zk",
+              "response": "{\"result\": \"CREATE TABLE \\\"artifactscore\\\" (\\nartregistry character NOT NULL,\\nartname character varying NOT NULL,\\nartdynasty character varying NULL,\\nartageyears integer NULL,\\nmattype USER-DEFINED NULL,\\nconservestatus USER-DEFINED NULL,\\n    PRIMARY KEY (artregistry)\\n);\\n\\nFirst 3 rows:\\nartregistry    artname           artdynasty      artageyears  mattype    conservestatus\\n-------------  ----------------  ------------  -------------  ---------  ----------------\\nART54317       Culture Painting  Ming                    943  Stone      Good\\nART54254       Poor Vase         Song                   2179  Textile    Fair\\nART69978       Order Painting    Qing                    366  Bronze     Poor\\n...\\n\\n\\nCREATE TABLE \\\"surfaceandphysicalreadings\\\" (\\nsurfphysregistry bigint NOT NULL DEFAULT nextval('surfaceandphysicalreadings_surfphysregistry_seq'::regclass),\\nenvreadref bigint NOT NULL,\\nvibralvlmms2 real NULL,\\nnoisedb smallint NULL,\\ndustaccummgm2 numeric NULL,\\nmicrobialcountcfu integer NULL,\\nmoldriskidx numeric NULL,\\npestactivitylvl character varying NULL,\\npesttrapcount smallint NULL,\\npestspeciesdetected text NULL,\\nsurfaceph numeric NULL,\\nmatmoistcontent numeric NULL,\\nsaltcrystalrisk character NULL,\\nmetalcorroderate numeric NULL,\\norganicdegradidx numeric NULL,\\ncolorchangedeltae real NULL,\\nsurfacetempc numeric NULL,\\nsurfacerh numeric NULL,\\ncondenserisk character varying NULL,\\nthermalimgstatus character NULL,\\nstructstability character varying NULL,\\ncrackmonitor text NULL,\\ndeformmm numeric NULL,\\nwtchangepct numeric NULL,\\nsurfdustcoverage smallint NULL,\\no2concentration numeric NULL,\\nn2concentration numeric NULL,\\n    PRIMARY KEY (surfphysregistry),\\n    FOREIGN KEY (envreadref) REFERENCES environmentalreadingscore(envreadregistry)\\n);\\n\\nFirst 3 rows:\\n  surfphysregistry    envreadref    vibralvlmms2    noisedb    dustaccummgm2    microbialcountcfu    moldriskidx  pestactivitylvl      pesttrapcount  pestspeciesdetected      surfaceph    matmoistcontent  saltcrystalrisk      metalcorroderate    organicdegradidx    colorchangedeltae    surfacetempc    surfacerh  condenserisk    thermalimgstatus    structstability    crackmonitor           deformmm    wtchangepct    surfdustcoverage    o2concentration    n2concentration\\n------------------  ------------  --------------  ---------  ---------------  -------------------  -------------  -----------------  ---------------  ---------------------  -----------  -----------------  -----------------  ------------------  ------------------  -------------------  --------------  -----------  --------------  ------------------  -----------------  -------------------  ----------  -------------  ------------------  -----------------  -----------------\\n                 1             1           0.461         47             1.74                  234           0.1   Medium                          10                                 6.7               10.3  High                             0.04                0.47                 1.99           19.11         45.5  Medium          Normal              Stable             Significant Changes        0.08         -0.001                   5              20.8               78.75\\n                 2             2           0.053         50             0.39                  450           0.33  Low                              6                                 6.5               11    High                             0.05                0.37                 0.87           20.09         53                    Critical            Stable             Significant Changes        0.07         -0.011                   4              20.53              78.3\\n                 3             3           0.018         42             2.77                  486           0.43  Low                              7  Beetles                        6.6               10.1  Low                              0.02                0.92                 1.48       ...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_636qkxe5yfkc",
+              "response": "{\"result\": \"[\\\"Conservation Priority Index (CPI)\\\", \\\"Sensitivity Weight Values\\\", \\\"Environmental Risk Factor (ERF)\\\", \\\"Artifact Vulnerability Score (AVS)\\\", \\\"Display Safety Duration (DSD)\\\", \\\"Showcase Environmental Stability Rating (SESR)\\\", \\\"Artifact Exhibition Compatibility (AEC)\\\", \\\"Material Deterioration Rate (MDR)\\\", \\\"Light Exposure Risk (LER)\\\", \\\"Conservation Budget Efficiency (CBE)\\\", \\\"Visitor Impact Risk (VIR)\\\", \\\"High-Value Artifact\\\", \\\"Conservation Emergency\\\", \\\"Environmental Instability Event\\\", \\\"Accelerated Deterioration Scenario\\\", \\\"Exhibition Rotation Candidate\\\", \\\"Showcase Failure Risk\\\", \\\"Conservation Budget Crisis\\\", \\\"Dynasty Value Artifact\\\", \\\"Visitor Crowd Risk\\\", \\\"Organic Material Vulnerability\\\", \\\"ArtifactsCore.ConserveStatus\\\", \\\"ArtifactRatings.HistSignRating\\\", \\\"SensitivityData.LightSensitivity\\\", \\\"SensitivityData.HumiditySensitivity\\\", \\\"ExhibitionHalls.CCTVCoverage\\\", \\\"Showcases.Airtightness\\\", \\\"EnvironmentalReadingsCore.TempC\\\", \\\"EnvironmentalReadingsCore.RelHumidity\\\", \\\"LightAndRadiationReadings.LightLux\\\", \\\"AirQualityReadings.PM25Conc\\\", \\\"Total Environmental Threat Level (TETL)\\\", \\\"Showcase Protection Adequacy (SPA)\\\", \\\"Conservation Backlog Risk (CBR)\\\", \\\"Visitor Capacity Safety Factor (VCSF)\\\", \\\"Exhibition Safety Quotient (ESQ)\\\", \\\"Conservation Resource Allocation Efficiency (CRAE)\\\", \\\"Material Aging Projection (MAP)\\\", \\\"Exhibition Rotation Priority Score (ERPS)\\\", \\\"Environmental Compliance Index (ECI)\\\", \\\"Security Risk Exposure (SRE)\\\", \\\"Critical Conservation Alert\\\", \\\"High Deterioration Risk Artifact\\\", \\\"Exhibition Rotation Urgency\\\", \\\"Showcase Compatibility Issue\\\", \\\"Conservation Resource Crisis\\\", \\\"Dynasty Artifact at Risk\\\", \\\"Environmental Control Failure\\\", \\\"High Security Priority Artifact\\\", \\\"Visitor Traffic Safety Concern\\\", \\\"Organic Material Emergency\\\", \\\"High-Value Category\\\", \\\"ERPS Decision Threshold\\\", \\\"Light Exposure Thresholds\\\", \\\"Conservation Environment Chronology (CEC)\\\", \\\"Artifact Rarity & Valuation (ARV)\\\", \\\"Conservation Priority Level\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 16.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_713a8t710qvv",
+              "args": {
+                "knowledge_name": "Critical Conservation Alert"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_2qve17wf5hk4",
+              "args": {
+                "knowledge_name": "Conservation Emergency"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_713a8t710qvv",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 41,\\n  \\\"knowledge\\\": \\\"Critical Conservation Alert\\\",\\n  \\\"description\\\": \\\"Identifies artifacts in critical condition requiring immediate intervention.\\\",\\n  \\\"definition\\\": \\\"An artifact that meets both the Conservation Emergency criteria AND has an AVS > 8.\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 16.0/18.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "get_knowledge_definition",
+              "id": "get_knowledge_definition_2qve17wf5hk4",
+              "response": "{\"result\": \"{\\n  \\\"id\\\": 12,\\n  \\\"knowledge\\\": \\\"Conservation Emergency\\\",\\n  \\\"description\\\": \\\"Identifies artifacts requiring immediate conservation intervention.\\\",\\n  \\\"definition\\\": \\\"A situation where an artifact has ConserveStatus='Critical' AND a TreatPriority='Urgent'.\\\"\\n}\\n\\n[SYSTEM NOTE: Remaining budget: 15.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_z90zdbder3q0",
+              "args": {
+                "sql": "UPDATE ConservationAndMaintenance\r\nSET maintlog = maintlog || ' - CRITICAL CONSERVATION ALERT: ' || NOW()\r\nWHERE artrefmaintained IN (\r\n    SELECT artregistry\r\n    FROM artifactscore\r\n    WHERE conservestatus = 'Critical'\r\n)\r\nAND treatpriority = 'Urgent';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_z90zdbder3q0",
+              "response": "{\"result\": \"SQL Error: Only SELECT queries allowed in execute_sql\\n\\n[SYSTEM NOTE: Remaining budget: 14.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-c7715c5d-413b-4ce0-aba9-2c3e30594304",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "I have found that the ConservationAndMaintenance table contains a column called maintlog which is likely the log you are referring to.\n\nI have also found that the ArtifactScore table contains a column called conservestatus which is likely the column that contains the conservation status of the artifact.\n\nI have also found that the ConservationAndMaintenance table contains a column called treatpriority which is likely the column that contains the treatment priority of the artifact.\n\nI have also found that there is a knowledge definition called \"Critical Conservation Alert\" which is defined as \"An artifact that meets both the Conservation Emergency criteria AND has an AVS > 8.\"\n\nI have also found that there is a knowledge definition called \"Conservation Emergency\" which is defined as \"A situation where an artifact has ConserveStatus='Critical' AND a TreatPriority='Urgent'.\"\n\nUnfortunately, I am unable to update the database as the execute_sql tool only allows SELECT queries.\n\nHere is the SQL query that you can use to update the maintlog column in the ConservationAndMaintenance table where the associated artifact meets urgent conservation criteria:\n\n```sql\nUPDATE ConservationAndMaintenance\nSET maintlog = maintlog || ' - CRITICAL CONSERVATION ALERT: ' || NOW()\nWHERE artrefmaintained IN (\n    SELECT artregistry\n    FROM artifactscore\n    WHERE conservestatus = 'Critical'\n)\nAND treatpriority = 'Urgent';\n```"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "I have found that the ConservationAndMaintenance table contains a column called maintlog which is likely the log you are referring to.\n\nI have also found that the ArtifactScore table contains a column called conservestatus which is likely the column that contains the conservation status of the artifact.\n\nI have also found that the ConservationAndMaintenance table contains a column called treatpriority which is likely the column that contains the treatment priority of the artifact.\n\nI have also found that there is a knowledge definition called \"Critical Conservation Alert\" which is defined as \"An artifact that meets both the Conservation Emergency criteria AND has an AVS > 8.\"\n\nI have also found that there is a knowledge definition called \"Conservation Emergency\" which is defined as \"A situation where an artifact has ConserveStatus='Critical' AND a TreatPriority='Urgent'.\"\n\nUnfortunately, I am unable to update the database as the execute_sql tool only allows SELECT queries.\n\nHere is the SQL query that you can use to update the maintlog column in the ConservationAndMaintenance table where the associated artifact meets urgent conservation criteria:\n\n```sql\nUPDATE ConservationAndMaintenance\nSET maintlog = maintlog || ' - CRITICAL CONSERVATION ALERT: ' || NOW()\nWHERE artrefmaintained IN (\n    SELECT artregistry\n    FROM artifactscore\n    WHERE conservestatus = 'Critical'\n)\nAND treatpriority = 'Urgent';\n```"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "53a035aae73d48b1b0ddefed6a4b6358",
+      "client": "museum_M_1",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/56d845bfa8914215b3fafc601b1e2124/0",
+      "at": 1793838600.1815119,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.6414999992994126,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "9addded351ac47f5ada54a2813ee5eb0",
+      "client": "museum_M_1",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/56d845bfa8914215b3fafc601b1e2124/0",
+      "at": 1793838604.978373,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.2790000000677537,
+      "response_bytes": 25802,
+      "response_digest": "feb0c1cc432ad4c715161f6090ae6a88ffa1dd96a39f16f1733c4da38111c09f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "293bc748c1774fd58d44599b4b55e2b4",
+      "client": "museum_M_1",
+      "database": "museum",
+      "scope": "7f4bec459f8a44669bd4ee3a1ddbdbd0/56d845bfa8914215b3fafc601b1e2124/0",
+      "at": 1793838699.774873,
+      "sql": "UPDATE ConservationAndMaintenance\r\nSET maintlog = maintlog || ' - CRITICAL CONSERVATION ALERT: ' || NOW()\r\nWHERE artrefmaintained IN (\r\n    SELECT artregistry\r\n    FROM artifactscore\r\n    WHERE conservestatus = 'Critical'\r\n)\r\nAND treatpriority = 'Urgent';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.2778999989677686,
+      "response_bytes": 82,
+      "response_digest": "aede9b8ea77a5fb18a6af8dd4fb207f1ee0e3c92b09c11fe28826e6750b7e42f",
+      "successful": false
+    }
+  ]
+}

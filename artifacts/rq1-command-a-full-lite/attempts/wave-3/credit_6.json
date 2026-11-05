@@ -1,0 +1,205 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "credit_6",
+    "instance_id": "credit_6",
+    "database": "credit",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 497.7232756614685,
+    "budget_used": 3.0,
+    "budget_remaining": 17.0,
+    "dialogue_history": [],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"core_record\" (\ncoreregistry character varying NOT NULL,\ntimemark timestamp without time zone NULL,\nclientref character varying NULL,\nappref character varying NULL,\nmodelline character varying NULL,\nscoredate date NULL,\nnextcheck date NULL,\ndataqscore numeric NULL,\nconfscore numeric NULL,\noverridestat USER-DEFINED NULL,\noverridenote USER-DEFINED NULL,\ndecidestat USER-DEFINED NULL,\ndecidedate date NULL,\nagespan smallint NULL,\ngendlabel USER-DEFINED NULL,\nmaritalform USER-DEFINED NULL,\ndepcount smallint NULL,\nresdform USER-DEFINED NULL,\naddrstab smallint NULL,\nphonestab smallint NULL,\nemailstab character varying NULL,\nclientseg USER-DEFINED NULL,\ntenureyrs smallint NULL,\ncrossratio numeric NULL,\nprofitscore numeric NULL,\nchurnrate numeric NULL,\n    PRIMARY KEY (coreregistry)\n);\n\nFirst 3 rows:\ncoreregistry    timemark                    clientref    appref    modelline    scoredate    nextcheck      dataqscore    confscore  overridestat    overridenote         decidestat    decidedate      agespan  gendlabel    maritalform      depcount  resdform      addrstab    phonestab    emailstab  clientseg      tenureyrs    crossratio    profitscore    churnrate\n--------------  --------------------------  -----------  --------  -----------  -----------  -----------  ------------  -----------  --------------  -------------------  ------------  ------------  ---------  -----------  -------------  ----------  ----------  ----------  -----------  -----------  -----------  -----------  ------------  -------------  -----------\nCS206405        2025-02-19 08:29:36.526509  CU338528     AP186206  v1.3         2025-02-19   2025-04-07          0.806        0.107  Policy          Policy Exception     Pending       2025-02-19           22  M            Widowed                 3  Temporary            0            8            0  Premium                1         0.604          0.154        0.763\nCS834424        2025-02-19 08:29:36.526509  CU209954     AP343846  v3.2         2025-02...<truncated>",
+        "cost": 1.0,
+        "budget_before": 20.0,
+        "budget_after": 19.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"credit|core_record|coreregistry\": \"A VARCHAR(20) primary key uniquely identifying each core record (e.g., 'CRD001234').\",\n  \"credit|core_record|timemark\": \"A TIMESTAMP(6) indicating when the record was created (e.g., '2025-02-19 14:23:15.123456').\",\n  \"credit|core_record|clientref\": \"A VARCHAR(20) referencing the customer ID (e.g., 'CUST00987').\",\n  \"credit|core_record|appref\": \"A VARCHAR(20) referencing the application ID (e.g., 'APP001122').\",\n  \"credit|core_record|modelline\": \"A VARCHAR(10) storing the model or version reference (e.g., '1.2').\",\n  \"credit|core_record|scoredate\": \"A DATE capturing when scoring took place (e.g., '2025-02-19').\",\n  \"credit|core_record|nextcheck\": \"A DATE noting the next review date (e.g., '2026-02-19').\",\n  \"credit|core_record|dataqscore\": \"A NUMERIC(5,3) tracking data quality (e.g., '0.975').\",\n  \"credit|core_record|confscore\": \"A NUMERIC(5,3) indicating confidence in the model\\u2019s output (e.g., '0.835').\",\n  \"credit|core_record|overridestat\": \"An enum (OverrideStatus_enum) describing override status (Policy, Manual).\",\n  \"credit|core_record|overridenote\": \"An enum (OverrideReason_enum) capturing why an override occurred (Policy Exception, Management Decision).\",\n  \"credit|core_record|decidestat\": \"An enum (DecisionStatus_enum) storing the final decision (Pending, Rejected, Approved).\",\n  \"credit|core_record|decidedate\": \"A DATE recording when the final decision was made (e.g., '2025-02-19').\",\n  \"credit|core_record|agespan\": \"A SMALLINT for the customer\\u2019s age in years (e.g., '35').\",\n  \"credit|core_record|gendlabel\": \"An enum (Gender_enum) for gender (M, F).\",\n  \"credit|core_record|maritalform\": \"An enum (MaritalStatus_enum) capturing marital status (Single, Married, Widowed, Divorced).\",\n  \"credit|core_record|depcount\": \"A SMALLINT counting how many dependents (e.g., '2').\",\n  \"credit|core_record|resdform\": \"An enum (ResidentialStatus_enum) describing residency (Temporary, Permanent, Foreign).\",\n  \"credit|core_record...<truncated>",
+        "cost": 1.0,
+        "budget_before": 19.0,
+        "budget_after": 18.0
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT\n    cr.clientref,\n    eai.annlincome,\n    eai.mthincome,\n    eai.addincome,\n    eai.hshincome,\n    eai.debincratio,\n    eaa.mthexp,\n    eaa.savamount,\n    eaa.investamt,\n    eaa.liqassets,\n    eaa.totassets,\n    eaa.totliabs,\n    eaa.networth,\n    eaa.vehvalue,\n    eaa.bankaccbal,\n    eaa.propfinancialdata->>'propvalue' AS propvalue,\n    eaa.propfinancialdata->'mortgagebits'->>'mortbalance' AS mortbalance,\n    bat.banktxamt,\n    bat.lifeinsval,\n    cac.credscore,\n    cah.totcredlimit,\n    cah.credutil,\n    cah.totloanamt,\n    cah.custlifeval\nFROM\n    core_record AS cr\nJOIN\n    employment_and_income AS eai ON cr.coreregistry = eai.emplcoreref\nJOIN\n    expenses_and_assets AS eaa ON eai.emplcoreref = eaa.expemplref\nJOIN\n    bank_and_transactions AS bat ON eaa.expemplref = bat.bankexpref\nJOIN\n    credit_and_compliance AS cac ON bat.bankexpref = cac.compbankref\nJOIN\n    credit_accounts_and_history AS cah ON cac.compbankref = cah.histcompref;"
+        },
+        "result": "clientref | annlincome | mthincome | addincome | hshincome | debincratio | mthexp | savamount | investamt | liqassets | totassets | totliabs | networth | vehvalue | bankaccbal | propvalue | mortbalance | banktxamt | lifeinsval | credscore | totcredlimit | credutil | totloanamt | custlifeval -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- CU488662 | 64821.00 | 5401.75 | 41911.00 | 699585.00 | 0.150 | 9600.00 | 188526.00 | 285627.00 | 172739.00 | 277451.00 | 450724.00 | -448621.00 | 57573.00 | 8394.00 | 615904.00 | 1148577.00 | 9668.00 | 569099.00 | 517 | 194858.00 | 0.897 | 292185 | 77803.88 CU390121 | 357356.00 | 29779.67 | 23503.00 | 260592.00 | 0.443 | 2291.00 | 340293.00 | 377119.00 | 284607.00 | 1190666.00 | 411616.00 | 910773.00 | 95198.00 | 7295.00 | 1201841.00 | 450289.00 | 9186.00 | 736340.00 | 537 | 50413.00 | 0.823 | 291422 | 89771.61 CU259187 | 90990.00 | 7582.50 | 2525.00 | 262111.00 | 0.326 | 1218.00 | 200459.00 | 698147.00 | 50319.00 | 1079715.00 | 137420.00 | 1242573.00 | 32878.00 | 21542.00 | 339977.00 | 4809.00 | 5338.00 | 342076.00 | 497 | 11599.00 | 0.407 | 154540 | 38024.57 CU596654 | 248543.00 | 20711.92 | 32345.00 | 266120.00 | 0.213 | 4895.00 | 68674.00 | 108554.00 | 262653.00 | 1838678.00 | 562371.00 | 1230671.00 | 56141.00 | 55603.00 | 1234339.00 | 1387602.00 | 3255.00 | 734432.00 | 758 | 91882.00 | 0.755 | 77356 | 4339.76 CU572395 | 37268.00 | 3105.67 | 41029.00 | 587816.00 | 0.083 | 8388.00 | 73218.00 | 706349.00 | 114233.00 | 663194.00 | 357036.00 | 981353.00 | 72965.00 | 16993.00 | 1799995.00 | 682803.00 | 3441.00 | 973494.00 | 423 | 187279.00 | 0.195 | 285393 | 93308.24 CU646174 | 344905.00 | 28742.08 | 40434.00 | 30111.00 | 0.014 | 7495.00 | 170188.00 | 675468.00 | 200195.00 | 631745.00 | 577841.00 | 735988.00 | 7227.00 | 50840.00 | 448006.00 | 983084.00 | 4667.00 | 31201.00 | 497 | 92...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: credit\nTask ID: credit_6\n\nUser Query:\nI want to analyze customer financial standing. Please show the customer identifier, each customer's financial metrics.\n\nYou have a budget of 20.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-a5d0883e-0b7b-4604-bc8d-376bbe0bf726",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_8cf1v706bwjv",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_r0kzszjhj8pq",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-a5d0883e-0b7b-4604-bc8d-376bbe0bf726",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_8cf1v706bwjv",
+              "response": "{\"result\": \"CREATE TABLE \\\"core_record\\\" (\\ncoreregistry character varying NOT NULL,\\ntimemark timestamp without time zone NULL,\\nclientref character varying NULL,\\nappref character varying NULL,\\nmodelline character varying NULL,\\nscoredate date NULL,\\nnextcheck date NULL,\\ndataqscore numeric NULL,\\nconfscore numeric NULL,\\noverridestat USER-DEFINED NULL,\\noverridenote USER-DEFINED NULL,\\ndecidestat USER-DEFINED NULL,\\ndecidedate date NULL,\\nagespan smallint NULL,\\ngendlabel USER-DEFINED NULL,\\nmaritalform USER-DEFINED NULL,\\ndepcount smallint NULL,\\nresdform USER-DEFINED NULL,\\naddrstab smallint NULL,\\nphonestab smallint NULL,\\nemailstab character varying NULL,\\nclientseg USER-DEFINED NULL,\\ntenureyrs smallint NULL,\\ncrossratio numeric NULL,\\nprofitscore numeric NULL,\\nchurnrate numeric NULL,\\n    PRIMARY KEY (coreregistry)\\n);\\n\\nFirst 3 rows:\\ncoreregistry    timemark                    clientref    appref    modelline    scoredate    nextcheck      dataqscore    confscore  overridestat    overridenote         decidestat    decidedate      agespan  gendlabel    maritalform      depcount  resdform      addrstab    phonestab    emailstab  clientseg      tenureyrs    crossratio    profitscore    churnrate\\n--------------  --------------------------  -----------  --------  -----------  -----------  -----------  ------------  -----------  --------------  -------------------  ------------  ------------  ---------  -----------  -------------  ----------  ----------  ----------  -----------  -----------  -----------  -----------  ------------  -------------  -----------\\nCS206405        2025-02-19 08:29:36.526509  CU338528     AP186206  v1.3         2025-02-19   2025-04-07          0.806        0.107  Policy          Policy Exception     Pending       2025-02-19           22  M            Widowed                 3  Temporary            0            8            0  Premium                1         0.604          0.154        0.763\\nCS834424        2025-02-19 08:29:36.526509  CU209954     AP343846  v3.2         2025-02-19   2025-06-28          0.139        0.8                    Policy Exception     Rejected      2025-02-19           20  M            Single                  2  Permanent            5           11            2  Standard               0         0.625          0.923        0.185\\nCS904970        2025-02-19 08:29:36.528191  CU314145     AP536324  v2.5         2025-02-19   2025-09-16          0.733        0.297  Manual          Management Decision  Pending       2025-02-19           47  M            Divorced                5  Permanent           18           13            7  Standard              24         0.802          0.335        0.179\\n...\\n\\n\\nCREATE TABLE \\\"employment_and_income\\\" (\\nemplcoreref character varying NOT NULL,\\nemplstat USER-DEFINED NULL,\\nempllen smallint NULL,\\njoblabel USER-DEFINED NULL,\\nindsector USER-DEFINED NULL,\\nemployerref text NULL,\\nannlincome numeric NULL,\\nmthincome numeric NULL,\\nincverify USER-DEFINED NULL,\\nincstabscore real NULL,\\naddincome numeric NULL,\\naddincomesrc USER-DEFINED NULL,\\nhshincome numeric NULL,\\nemplstable smallint NULL,\\nindrisklvl USER-DEFINED NULL,\\noccrisklvl USER-DEFINED NULL,\\nincsrcrisk USER-DEFINED NULL,\\ngeorisk USER-DEFINED NULL,\\ndemrisk USER-DEFINED NULL,\\nedulevel USER-DEFINED NULL,\\ndebincratio numeric NULL,\\n    PRIMARY KEY (emplcoreref),\\n    FOREIGN KEY (emplcoreref) REFERENCES core_record(coreregistry)\\n);\\n\\nFirst 3 rows:\\nemplcoreref    emplstat         empllen  joblabel    indsector    employerref               annlincome    mthincome  incverify      incstabscore    addincome  addincomesrc      hshincome    emplstable  indrisklvl    occrisklvl    incsrcrisk    georisk    demrisk    edulevel       debincratio\\n-------------  -------------  ---------  ----------  -----------  ----------------------  ------------  -----------  -----------  --------------  -----------  --------------  -----------  ------------  ------------  ------------  -----------...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_r0kzszjhj8pq",
+              "response": "{\"result\": \"{\\n  \\\"credit|core_record|coreregistry\\\": \\\"A VARCHAR(20) primary key uniquely identifying each core record (e.g., 'CRD001234').\\\",\\n  \\\"credit|core_record|timemark\\\": \\\"A TIMESTAMP(6) indicating when the record was created (e.g., '2025-02-19 14:23:15.123456').\\\",\\n  \\\"credit|core_record|clientref\\\": \\\"A VARCHAR(20) referencing the customer ID (e.g., 'CUST00987').\\\",\\n  \\\"credit|core_record|appref\\\": \\\"A VARCHAR(20) referencing the application ID (e.g., 'APP001122').\\\",\\n  \\\"credit|core_record|modelline\\\": \\\"A VARCHAR(10) storing the model or version reference (e.g., '1.2').\\\",\\n  \\\"credit|core_record|scoredate\\\": \\\"A DATE capturing when scoring took place (e.g., '2025-02-19').\\\",\\n  \\\"credit|core_record|nextcheck\\\": \\\"A DATE noting the next review date (e.g., '2026-02-19').\\\",\\n  \\\"credit|core_record|dataqscore\\\": \\\"A NUMERIC(5,3) tracking data quality (e.g., '0.975').\\\",\\n  \\\"credit|core_record|confscore\\\": \\\"A NUMERIC(5,3) indicating confidence in the model\\\\u2019s output (e.g., '0.835').\\\",\\n  \\\"credit|core_record|overridestat\\\": \\\"An enum (OverrideStatus_enum) describing override status (Policy, Manual).\\\",\\n  \\\"credit|core_record|overridenote\\\": \\\"An enum (OverrideReason_enum) capturing why an override occurred (Policy Exception, Management Decision).\\\",\\n  \\\"credit|core_record|decidestat\\\": \\\"An enum (DecisionStatus_enum) storing the final decision (Pending, Rejected, Approved).\\\",\\n  \\\"credit|core_record|decidedate\\\": \\\"A DATE recording when the final decision was made (e.g., '2025-02-19').\\\",\\n  \\\"credit|core_record|agespan\\\": \\\"A SMALLINT for the customer\\\\u2019s age in years (e.g., '35').\\\",\\n  \\\"credit|core_record|gendlabel\\\": \\\"An enum (Gender_enum) for gender (M, F).\\\",\\n  \\\"credit|core_record|maritalform\\\": \\\"An enum (MaritalStatus_enum) capturing marital status (Single, Married, Widowed, Divorced).\\\",\\n  \\\"credit|core_record|depcount\\\": \\\"A SMALLINT counting how many dependents (e.g., '2').\\\",\\n  \\\"credit|core_record|resdform\\\": \\\"An enum (ResidentialStatus_enum) describing residency (Temporary, Permanent, Foreign).\\\",\\n  \\\"credit|core_record|addrstab\\\": \\\"A SMALLINT indicating address stability (e.g., '5').\\\",\\n  \\\"credit|core_record|phonestab\\\": \\\"A SMALLINT for phone number stability (e.g., '3').\\\",\\n  \\\"credit|core_record|emailstab\\\": \\\"A VARCHAR(50) capturing email stability or validation result (e.g., 'Valid12m').\\\",\\n  \\\"credit|core_record|clientseg\\\": \\\"An enum (CustomerSegment_enum) labeling the customer segment (Premium, Standard, Basic).\\\",\\n  \\\"credit|core_record|tenureyrs\\\": \\\"A SMALLINT for how many years the customer has been with the institution (e.g., '4').\\\",\\n  \\\"credit|core_record|crossratio\\\": \\\"A NUMERIC(4,3) ratio measuring cross-sell opportunities (e.g., '0.275').\\\",\\n  \\\"credit|core_record|profitscore\\\": \\\"A NUMERIC(4,3) indicating profitability (e.g., '0.765').\\\",\\n  \\\"credit|core_record|churnrate\\\": \\\"A NUMERIC(4,3) risk of customer churn (e.g., '0.220').\\\",\\n  \\\"credit|employment_and_income|emplcoreref\\\": \\\"A VARCHAR(20) primary key referencing core_record(CoreRegistry).\\\",\\n  \\\"credit|employment_and_income|emplstat\\\": \\\"An enum (EmploymentStatus_enum) for employment status (Self-employed, Employed, Unemployed, Retired).\\\",\\n  \\\"credit|employment_and_income|empllen\\\": \\\"A SMALLINT indicating length of employment in years (e.g., '5').\\\",\\n  \\\"credit|employment_and_income|joblabel\\\": \\\"An enum (JobTitle_enum) labeling the job (Manager, Teacher, Doctor, Other, Engineer).\\\",\\n  \\\"credit|employment_and_income|indsector\\\": \\\"An enum (IndustrySector_enum) naming the sector (Education, Technology, Healthcare, Finance, Other).\\\",\\n  \\\"credit|employment_and_income|employerref\\\": \\\"A TEXT field storing the employer name (e.g., 'ABC Corp').\\\",\\n  \\\"credit|employment_and_income|annlincome\\\": \\\"A DECIMAL(12,2) capturing annual income in currency units (e.g., '65000.00').\\\",\\n  \\\"credit|employment_and_income|mthincome\\\": \\\"A DECIMAL(12,2) capturing monthly income (e.g., '5400.00').\\\",\\n...<truncated>"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-a5d0883e-0b7b-4604-bc8d-376bbe0bf726",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_7s4nr2517e7v",
+              "args": {
+                "sql": "SELECT\n    cr.clientref,\n    eai.annlincome,\n    eai.mthincome,\n    eai.addincome,\n    eai.hshincome,\n    eai.debincratio,\n    eaa.mthexp,\n    eaa.savamount,\n    eaa.investamt,\n    eaa.liqassets,\n    eaa.totassets,\n    eaa.totliabs,\n    eaa.networth,\n    eaa.vehvalue,\n    eaa.bankaccbal,\n    eaa.propfinancialdata->>'propvalue' AS propvalue,\n    eaa.propfinancialdata->'mortgagebits'->>'mortbalance' AS mortbalance,\n    bat.banktxamt,\n    bat.lifeinsval,\n    cac.credscore,\n    cah.totcredlimit,\n    cah.credutil,\n    cah.totloanamt,\n    cah.custlifeval\nFROM\n    core_record AS cr\nJOIN\n    employment_and_income AS eai ON cr.coreregistry = eai.emplcoreref\nJOIN\n    expenses_and_assets AS eaa ON eai.emplcoreref = eaa.expemplref\nJOIN\n    bank_and_transactions AS bat ON eaa.expemplref = bat.bankexpref\nJOIN\n    credit_and_compliance AS cac ON bat.bankexpref = cac.compbankref\nJOIN\n    credit_accounts_and_history AS cah ON cac.compbankref = cah.histcompref;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-a5d0883e-0b7b-4604-bc8d-376bbe0bf726",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_7s4nr2517e7v",
+              "response": "{\"result\": \"clientref | annlincome | mthincome | addincome | hshincome | debincratio | mthexp | savamount | investamt | liqassets | totassets | totliabs | networth | vehvalue | bankaccbal | propvalue | mortbalance | banktxamt | lifeinsval | credscore | totcredlimit | credutil | totloanamt | custlifeval -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- CU488662 | 64821.00 | 5401.75 | 41911.00 | 699585.00 | 0.150 | 9600.00 | 188526.00 | 285627.00 | 172739.00 | 277451.00 | 450724.00 | -448621.00 | 57573.00 | 8394.00 | 615904.00 | 1148577.00 | 9668.00 | 569099.00 | 517 | 194858.00 | 0.897 | 292185 | 77803.88 CU390121 | 357356.00 | 29779.67 | 23503.00 | 260592.00 | 0.443 | 2291.00 | 340293.00 | 377119.00 | 284607.00 | 1190666.00 | 411616.00 | 910773.00 | 95198.00 | 7295.00 | 1201841.00 | 450289.00 | 9186.00 | 736340.00 | 537 | 50413.00 | 0.823 | 291422 | 89771.61 CU259187 | 90990.00 | 7582.50 | 2525.00 | 262111.00 | 0.326 | 1218.00 | 200459.00 | 698147.00 | 50319.00 | 1079715.00 | 137420.00 | 1242573.00 | 32878.00 | 21542.00 | 339977.00 | 4809.00 | 5338.00 | 342076.00 | 497 | 11599.00 | 0.407 | 154540 | 38024.57 CU596654 | 248543.00 | 20711.92 | 32345.00 | 266120.00 | 0.213 | 4895.00 | 68674.00 | 108554.00 | 262653.00 | 1838678.00 | 562371.00 | 1230671.00 | 56141.00 | 55603.00 | 1234339.00 | 1387602.00 | 3255.00 | 734432.00 | 758 | 91882.00 | 0.755 | 77356 | 4339.76 CU572395 | 37268.00 | 3105.67 | 41029.00 | 587816.00 | 0.083 | 8388.00 | 73218.00 | 706349.00 | 114233.00 | 663194.00 | 357036.00 | 981353.00 | 72965.00 | 16993.00 | 1799995.00 | 682803.00 | 3441.00 | 973494.00 | 423 | 187279.00 | 0.195 | 285393 | 93308.24 CU646174 | 344905.00 | 28742.08 | 40434.00 | 30111.00 | 0.014 | 7495.00 | 170188.00 | 675468.00 | 200195.00 | 631745.00 | 577841.00 | 735988.00 | 7227.00 | 50840.00 | 448006.00 | 983084.00 | 4667.00 | 31201.00 | 497 | 92202.00 | 0.549 | 38476 | 89780.92 CU466756 | 131980.00 | 10998.33 | 29623.00 | 588178.00 | 0.226 | 8469.00 | 322140.00 | 383086.00 | 374806.00 | 634974.00 | 573822.00 | -353781.00 | 11514.00 | 30476.00 | 1551182.00 | 602359.00 | 4675.00 | 459259.00 | 318 | 168416.00 | 0.782 | 15575 | 97534.22 CU478628 | 363153.00 | 30262.75 | 25226.00 | 29528.00 | 0.340 | 7291.00 | 379945.00 | 933147.00 | 4920.00 | 449712.00 | 704236.00 | 1449318.00 | 18414.00 | 50529.00 | 66103.00 | 1164642.00 | 4179.00 | 371895.00 | 640 | 186844.00 | 0.302 | 468624 | 19852.16 CU133084 | 155467.00 | 12955.58 | 23844.00 | 588039.00 | 0.049 | 6045.00 | 346045.00 | 303766.00 | 275510.00 | 829580.00 | 437983.00 | 240722.00 | 81254.00 | 54989.00 | 1707270.00 | 1428142.00 | 3379.00 | 582885.00 | 604 | 176481.00 | 0.752 | 382123 | 73222.78 CU993201 | 322544.00 | 26878.67 | 38034.00 | 573953.00 | 0.349 | 8350.00 | 170654.00 | 845844.00 | 225367.00 | 382490.00 | 169726.00 | 516888.00 | 18932.00 | 47584.00...\\n\\n[SYSTEM NOTE: Remaining budget: 17.0/20.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-a5d0883e-0b7b-4604-bc8d-376bbe0bf726",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Here is a table containing the customer identifier and financial metrics for each customer:\n\n| Customer ID | Annual Income | Monthly Income | Additional Income | Household Income | Debt-to-Income Ratio | Monthly Expenses | Savings | Investments | Liquid Assets | Total Assets | Total Liabilities | Net Worth | Vehicle Value | Bank Account Balance | Property Value | Mortgage Balance | Monthly Transaction Amount | Life Insurance Value | Credit Score | Total Credit Limit | Credit Utilization | Total Loan Amount | Customer Lifetime Value |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| CU488662 | 64821.00 | 5401.75 | 41911.00 | 699585.00 | 0.150 | 9600.00 | 188526.00 | 285627.00 | 172739.00 | 277451.00 | 450724.00 | -448621.00 | 57573.00 | 8394.00 | 615904.00 | 1148577.00 | 9668.00 | 569099.00 | 517 | 194858.00 | 0.897 | 292185 | 77803.88 |\n| CU390121 | 357356.00 | 29779.67 | 23503.00 | 260592.00 | 0.443 | 2291.00 | 340293.00 | 377119.00 | 284607.00 | 1190666.00 | 411616.00 | 910773.00 | 95198.00 | 7295.00 | 1201841.00 | 450289.00 | 9186.00 | 736340.00 | 537 | 50413.00 | 0.823 | 291422 | 89771.61 |\n| CU259187 | 90990.00 | 7582.50 | 2525.00 | 262111.00 | 0.326 | 1218.00 | 200459.00 | 698147.00 | 50319.00 | 1079715.00 | 137420.00 | 1242573.00 | 32878.00 | 21542.00 | 339977.00 | 4809.00 | 5338.00 | 342076.00 | 497 | 11599.00 | 0.407 | 154540 | 38024.57 |\n| CU596654 | 248543.00 | 20711.92 | 32345.00 | 266120.00 | 0.213 | 4895.00 | 68674.00 | 108554.00 | 262653.00 | 1838678.00 | 562371.00 | 1230671.00 | 56141.00 | 55603.00 | 1234339.00 | 1387602.00 | 3255.00 | 734432.00 | 758 | 91882.00 | 0.755 | 77356 | 4339.76 |\n| CU572395 | 37268.00 | 3105.67 | 41029.00 | 587816.00 | 0.083 | 8388.00 | 73218.00 | 706349.00 | 114233.00 | 663194.00 | 357036.00 | 981353.00 | 72965.00 | 16993.00 | 1799995.00 | 682803.00 | 3441.00 | 973494.00 | 423 | 187279.00 | 0.195 | 285393 | 93308.24 |\n| CU646174 | 344905.00 | 28742.08 | 40434.00 | 30111.00 | 0.014 | 7495.00 | 170188.00 | 675468.00 | 200195.00 | 631745.00 | 577841.00 | 735988.00 | 7227.00 | 50840.00 | 448006.00 | 983084.00 | 4667.00 | 31201.00 | 497 | 92202.00 | 0.549 | 38476 | 89780.92 |\n| CU466756 | 131980.00 | 10998.33 | 29623.00 | 588178.00 | 0.226 | 8469.00 | 322140.00 | 383086.00 | 374806.00 | 634974.00 | 573822.00 | -353781.00 | 11514.00 | 30476.00 | 1551182.00 | 602359.00 | 4675.00 | 459259.00 | 318 | 168416.00 | 0.782 | 15575 | 97534.22 |\n| CU478628 | 363153.00 | 30262.75 | 25226.00 | 29528.00 | 0.340 | 7291.00 | 379945.00 | 933147.00 | 4920.00 | 449712.00 | 704236.00 | 1449318.00 | 18414.00 | 50529.00 | 66103.00 | 1164642.00 | 4179.00 | 371895.00"
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Here is a table containing the customer identifier and financial metrics for each customer:\n\n| Customer ID | Annual Income | Monthly Income | Additional Income | Household Income | Debt-to-Income Ratio | Monthly Expenses | Savings | Investments | Liquid Assets | Total Assets | Total Liabilities | Net Worth | Vehicle Value | Bank Account Balance | Property Value | Mortgage Balance | Monthly Transaction Amount | Life Insurance Value | Credit Score | Total Credit Limit | Credit Utilization | Total Loan Amount | Customer Lifetime Value |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| CU488662 | 64821.00 | 5401.75 | 41911.00 | 699585.00 | 0.150 | 9600.00 | 188526.00 | 285627.00 | 172739.00 | 277451.00 | 450724.00 | -448621.00 | 57573.00 | 8394.00 | 615904.00 | 1148577.00 | 9668.00 | 569099.00 | 517 | 194858.00 | 0.897 | 292185 | 77803.88 |\n| CU390121 | 357356.00 | 29779.67 | 23503.00 | 260592.00 | 0.443 | 2291.00 | 340293.00 | 377119.00 | 284607.00 | 1190666.00 | 411616.00 | 910773.00 | 95198.00 | 7295.00 | 1201841.00 | 450289.00 | 9186.00 | 736340.00 | 537 | 50413.00 | 0.823 | 291422 | 89771.61 |\n| CU259187 | 90990.00 | 7582.50 | 2525.00 | 262111.00 | 0.326 | 1218.00 | 200459.00 | 698147.00 | 50319.00 | 1079715.00 | 137420.00 | 1242573.00 | 32878.00 | 21542.00 | 339977.00 | 4809.00 | 5338.00 | 342076.00 | 497 | 11599.00 | 0.407 | 154540 | 38024.57 |\n| CU596654 | 248543.00 | 20711.92 | 32345.00 | 266120.00 | 0.213 | 4895.00 | 68674.00 | 108554.00 | 262653.00 | 1838678.00 | 562371.00 | 1230671.00 | 56141.00 | 55603.00 | 1234339.00 | 1387602.00 | 3255.00 | 734432.00 | 758 | 91882.00 | 0.755 | 77356 | 4339.76 |\n| CU572395 | 37268.00 | 3105.67 | 41029.00 | 587816.00 | 0.083 | 8388.00 | 73218.00 | 706349.00 | 114233.00 | 663194.00 | 357036.00 | 981353.00 | 72965.00 | 16993.00 | 1799995.00 | 682803.00 | 3441.00 | 973494.00 | 423 | 187279.00 | 0.195 | 285393 | 93308.24 |\n| CU646174 | 344905.00 | 28742.08 | 40434.00 | 30111.00 | 0.014 | 7495.00 | 170188.00 | 675468.00 | 200195.00 | 631745.00 | 577841.00 | 735988.00 | 7227.00 | 50840.00 | 448006.00 | 983084.00 | 4667.00 | 31201.00 | 497 | 92202.00 | 0.549 | 38476 | 89780.92 |\n| CU466756 | 131980.00 | 10998.33 | 29623.00 | 588178.00 | 0.226 | 8469.00 | 322140.00 | 383086.00 | 374806.00 | 634974.00 | 573822.00 | -353781.00 | 11514.00 | 30476.00 | 1551182.00 | 602359.00 | 4675.00 | 459259.00 | 318 | 168416.00 | 0.782 | 15575 | 97534.22 |\n| CU478628 | 363153.00 | 30262.75 | 25226.00 | 29528.00 | 0.340 | 7291.00 | 379945.00 | 933147.00 | 4920.00 | 449712.00 | 704236.00 | 1449318.00 | 18414.00 | 50529.00 | 66103.00 | 1164642.00 | 4179.00 | 371895.00"
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "7bad200a310e4d7cb4a85651e1dd3ac1",
+      "client": "credit_6",
+      "database": "credit",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/bd62a8c5c7da4c008a84334db523fc9c/0",
+      "at": 1793849209.8725815,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 4.382900006021373,
+      "response_bytes": 13947,
+      "response_digest": "54c4abe64c12292d01abf3fdea9091673363724c3834b06b25a8c928c00319a2"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "4a9cb75868a1479283e38c555dd0bbff",
+      "client": "credit_6",
+      "database": "credit",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/bd62a8c5c7da4c008a84334db523fc9c/0",
+      "at": 1793849233.0199878,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.7674999946611933,
+      "response_bytes": 13947,
+      "response_digest": "54c4abe64c12292d01abf3fdea9091673363724c3834b06b25a8c928c00319a2"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "b2c7a52839a0404db87dbe1e8123a47d",
+      "client": "credit_6",
+      "database": "credit",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/bd62a8c5c7da4c008a84334db523fc9c/0",
+      "at": 1793849297.2353926,
+      "sql": "SELECT\n    cr.clientref,\n    eai.annlincome,\n    eai.mthincome,\n    eai.addincome,\n    eai.hshincome,\n    eai.debincratio,\n    eaa.mthexp,\n    eaa.savamount,\n    eaa.investamt,\n    eaa.liqassets,\n    eaa.totassets,\n    eaa.totliabs,\n    eaa.networth,\n    eaa.vehvalue,\n    eaa.bankaccbal,\n    eaa.propfinancialdata->>'propvalue' AS propvalue,\n    eaa.propfinancialdata->'mortgagebits'->>'mortbalance' AS mortbalance,\n    bat.banktxamt,\n    bat.lifeinsval,\n    cac.credscore,\n    cah.totcredlimit,\n    cah.credutil,\n    cah.totloanamt,\n    cah.custlifeval\nFROM\n    core_record AS cr\nJOIN\n    employment_and_income AS eai ON cr.coreregistry = eai.emplcoreref\nJOIN\n    expenses_and_assets AS eaa ON eai.emplcoreref = eaa.expemplref\nJOIN\n    bank_and_transactions AS bat ON eaa.expemplref = bat.bankexpref\nJOIN\n    credit_and_compliance AS cac ON bat.bankexpref = cac.compbankref\nJOIN\n    credit_accounts_and_history AS cah ON cac.compbankref = cah.histcompref;",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 43.77250000106869,
+      "response_bytes": 3022,
+      "response_digest": "9cb18fede37084908dc4a189ac60161cfc3863c21d164dd16cc0a8c8c8a9ee87",
+      "successful": true
+    }
+  ]
+}

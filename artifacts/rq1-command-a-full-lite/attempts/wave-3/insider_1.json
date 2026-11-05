@@ -1,0 +1,513 @@
+{
+  "wave": 3,
+  "simulator": "command-a-03-2025",
+  "result": {
+    "task_id": "insider_1",
+    "instance_id": "insider_1",
+    "database": "insider",
+    "phase1_passed": false,
+    "phase2_passed": false,
+    "has_follow_up": true,
+    "total_reward": 0.0,
+    "elapsed_seconds": 345.69284653663635,
+    "budget_used": 13.5,
+    "budget_remaining": 4.5,
+    "dialogue_history": [
+      {
+        "role": "agent",
+        "content": "Does 'high-risk trading group' refer to traders with a 'High' risk level in the trading_performance column?"
+      },
+      {
+        "role": "user",
+        "content": "No, 'high-risk trading group' refers to traders who meet specific criteria: either their Trader Leverage Exposure (TLE) is greater than 5.0 and their risk level is 'Aggressive', or their Daily Turnover Rate (DTR) is greater than 0.5."
+      },
+      {
+        "role": "agent",
+        "content": "Does 'Significant Enforcement Action' refer to an enforcement action with an escalation level of 'Significant' in the esclvl column?"
+      },
+      {
+        "role": "user",
+        "content": "Sorry, this question is out of scope, so I can not answer your question."
+      },
+      {
+        "role": "agent",
+        "content": "What does 'recently' mean in terms of the last review date in the lastrevdt column?"
+      },
+      {
+        "role": "user",
+        "content": "In this context, 'recently' refers to any compliance case where the last review date in the lastrevdt column is within the past 12 months from the current date."
+      },
+      {
+        "role": "agent",
+        "content": "Does 'related compliance case' refer to the compliance case linked to the enforcement action?"
+      },
+      {
+        "role": "user",
+        "content": "Sorry, this question is out of scope, so I can not answer your question."
+      }
+    ],
+    "tool_trajectory": [
+      {
+        "type": "tool",
+        "tool": "get_schema",
+        "args": {},
+        "result": "CREATE TABLE \"trader\" (\ntradereg character varying NOT NULL,\ntradekind USER-DEFINED NULL,\nacctdays integer NULL,\nacctbal numeric NULL,\nfreqscope USER-DEFINED NULL,\nvoldaily numeric NULL,\nposavg numeric NULL,\nposspan USER-DEFINED NULL,\ntrading_performance jsonb NULL,\n    PRIMARY KEY (tradereg)\n);\n\nFirst 3 rows:\ntradereg    tradekind      acctdays      acctbal  freqscope      voldaily    posavg  posspan    trading_performance\n----------  -----------  ----------  -----------  -----------  ----------  --------  ---------  ------------------------------------------------------------------------------------------------------------------\nTR32485     Broker             1386  8.04279e+06  Medium          79650.9     68768  Intraday   {'winpct': 34.88, 'plratio': 2.3, 'risklevel': {'margpct': 24.48, 'levratio': 9.44, 'risklevel': 'Conservative'}}\nTR16169     Individual         3206  1.41456e+06  Medium         494564      111835  Intraday   {'winpct': 68.01, 'plratio': 2.71, 'risklevel': {'margpct': 58.43, 'levratio': 7.47, 'risklevel': 'Moderate'}}\nTR67490     Broker             1061  9.01803e+06  Medium         151127      293964  Long-term  {'winpct': 42.62, 'plratio': 1.79, 'risklevel': {'margpct': 51.07, 'levratio': 5.87, 'risklevel': 'Conservative'}}\n...\n\n\nCREATE TABLE \"transactionrecord\" (\ntransreg character varying NOT NULL,\ntranstime timestamp without time zone NOT NULL,\ntrdref character varying NOT NULL,\nordervar numeric NULL,\nordertimepat USER-DEFINED NULL,\nordertypedist USER-DEFINED NULL,\ncancelpct numeric NULL,\nmodfreq numeric NULL,\ndarkusage character varying NULL,\noffmkt character varying NULL,\ncrossfreq numeric NULL,\nrisk_indicators jsonb NULL,\n    PRIMARY KEY (transreg),\n    FOREIGN KEY (trdref) REFERENCES trader(tradereg)\n);\n\nFirst 3 rows:\ntransreg    transtime                   trdref      ordervar  ordertimepat    ordertypedist      cancelpct    modfreq    darkusage    offmkt    crossfreq  risk_indicators\n----------  --------------------------  --------  -...<truncated>",
+        "cost": 1.0,
+        "budget_before": 18.0,
+        "budget_after": 17.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_column_meanings",
+        "args": {},
+        "result": "{\n  \"insider|trader|tradereg\": \"VARCHAR(50). Primary key uniquely identifying each trader account (e.g., 'TRD\\u2011987654').\",\n  \"insider|trader|tradekind\": \"trader_type_enum (enum: 'Market Maker', 'Broker', 'Individual', 'Institution'). Broad category of the trader.\",\n  \"insider|trader|acctdays\": \"INT. Age of the trading account in days since opening (e.g., 782).\",\n  \"insider|trader|acctbal\": \"NUMERIC(20,2). Current cash equity in the trader\\u2019s account in USD (e.g., 2\\u00a0150\\u00a0345.75).\",\n  \"insider|trader|freqscope\": \"trading_frequency_enum (enum: 'Low', 'Medium', 'High'). Average trading frequency classification.\",\n  \"insider|trader|voldaily\": \"NUMERIC(20,4). Mean daily share volume traded across all symbols (e.g., 1\\u00a0250\\u00a0000.0000).\",\n  \"insider|trader|posavg\": \"NUMERIC(20,4). Average position size in USD held per trade (e.g., 350\\u00a0000.0000).\",\n  \"insider|trader|posspan\": \"position_holding_period_enum (enum: 'Intraday', 'Position', 'Long-term', 'Swing'). Typical holding\\u2011period style.\",\n  \"insider|transactionrecord|transreg\": \"VARCHAR(50). Primary key for an individual trade\\u2011day record (e.g., 'REC\\u201120250117\\u20110001').\",\n  \"insider|transactionrecord|transtime\": \"TIMESTAMP. Date\\u2011time the trade blotter snapshot was taken (e.g., '2025\\u201104\\u201117 13:42:05').\",\n  \"insider|transactionrecord|trdref\": \"VARCHAR(50). Foreign\\u2011key linking this record to Trader.TradeReg.\",\n  \"insider|transactionrecord|ordervar\": \"NUMERIC(20,4). Variance of order sizes submitted during the session.\",\n  \"insider|transactionrecord|ordertimepat\": \"order_timing_pattern_enum (enum: 'Irregular', 'Regular', 'Suspicious'). Pattern of order entry times.\",\n  \"insider|transactionrecord|ordertypedist\": \"order_type_distribution_enum (enum: 'Market', 'Mixed', 'Limit'). Distribution of order types used.\",\n  \"insider|transactionrecord|cancelpct\": \"NUMERIC(7,4). Percentage of orders cancelled before execution (e.g., 35.8125).\",\n  \"insider|transactionrecord|modf...<truncated>",
+        "cost": 1.0,
+        "budget_before": 17.0,
+        "budget_after": 16.0
+      },
+      {
+        "type": "tool",
+        "tool": "get_all_external_knowledge_names",
+        "args": {},
+        "result": "[\"Daily Turnover Rate (DTR)\", \"Order Modification Intensity (OMI)\", \"Trader Leverage Exposure (TLE)\", \"Suspicious Activity Index (SAI)\", \"Pattern Anomaly Score (PAS)\", \"Compliance Recidivism Score (CRS)\", \"Investigation Intensity Index (III)\", \"Sentiment Divergence Factor (SDF)\", \"Relative Short Interest (RSI)\", \"Enforcement Financial Impact Ratio (EFIR)\", \"High-Risk Trader Profile\", \"Potential Insider Trading Flag\", \"Market Manipulation Pattern: Layering/Spoofing\", \"Collusion Network Indicator\", \"Elevated Regulatory Scrutiny\", \"Problematic Compliance History\", \"Wash Trading Alert\", \"Event-Driven Trader\", \"High Cancellation/Modification Trader\", \"Significant Enforcement Action\", \"Trader Position Holding Style\", \"Dark Pool Usage Venues\", \"Off-Market Trading Activity\", \"Order Type Distribution\", \"Momentum Ignition Signals\", \"Marking the Close Patterns\", \"Unusual Option Activity Level\", \"Information Leakage Score Interpretation\", \"Pattern Similarity Score Context\", \"Trading Restriction Period Types\", \"Risk-Adjusted Turnover (RAT)\", \"Combined Manipulation Indicator (CMI)\", \"Compliance Health Score (CHS)\", \"Weighted Investigation Score (WIS)\", \"Sentiment-Weighted Option Volume (SWOV)\", \"Logarithmic Enforcement Fine Impact (LEFI)\", \"Aggressive Trading Intensity (ATI)\", \"Suspicion-Weighted Turnover (SWT)\", \"Boosted Insider Leakage Score (BILS)\", \"Market-Adjusted Pattern Anomaly (MAPA)\", \"High-Frequency High-Risk Trader\", \"Suspected Event-Driven Insider\", \"Confirmed Manipulator Under Scrutiny\", \"High-Risk Collusion Group Member\", \"Chronic Compliance Violator\", \"High-Volume Wash Trading Concern\", \"Aggressive Event Speculator\", \"Potentially Evasive Order Modifier\", \"Financially Impactful Enforcement Case\", \"Peer Mimicry Suspicion\", \"Investigation Compliance Risk Index (ICRI)\", \"Sentiment-Driven Leakage Risk (SDLR)\", \"Unique Pattern Deviation Ratio (UPDR)\", \"Recidivism Enforcement Severity (RES)\", \"Aggressive Suspicion Score (ASS)\", \"Capital-Adjusted Investigation Intensity (C...<truncated>",
+        "cost": 0.5,
+        "budget_before": 16.0,
+        "budget_after": 15.5
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "Does 'high-risk trading group' refer to traders with a 'High' risk level in the trading_performance column?"
+        },
+        "result": "No, 'high-risk trading group' refers to traders who meet specific criteria: either their Trader Leverage Exposure (TLE) is greater than 5.0 and their risk level is 'Aggressive', or their Daily Turnover Rate (DTR) is greater than 0.5.",
+        "cost": 2.0,
+        "budget_before": 15.5,
+        "budget_after": 13.5
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "Does 'Significant Enforcement Action' refer to an enforcement action with an escalation level of 'Significant' in the esclvl column?"
+        },
+        "result": "Sorry, this question is out of scope, so I can not answer your question.",
+        "cost": 2.0,
+        "budget_before": 13.5,
+        "budget_after": 11.5
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "What does 'recently' mean in terms of the last review date in the lastrevdt column?"
+        },
+        "result": "In this context, 'recently' refers to any compliance case where the last review date in the lastrevdt column is within the past 12 months from the current date.",
+        "cost": 2.0,
+        "budget_before": 11.5,
+        "budget_after": 9.5
+      },
+      {
+        "type": "tool",
+        "tool": "ask_user",
+        "args": {
+          "question": "Does 'related compliance case' refer to the compliance case linked to the enforcement action?"
+        },
+        "result": "Sorry, this question is out of scope, so I can not answer your question.",
+        "cost": 2.0,
+        "budget_before": 9.5,
+        "budget_after": 7.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT trdref\n    FROM (\n        SELECT trdref, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.trdref\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+        },
+        "result": "SQL Error: SQL error: column \"trdref\" does not exist\nLINE 6:         SELECT trdref, trading_performance->'risklevel'->>'r...\n                       ^\nHINT:  Perhaps you meant to reference the column \"trader.tradereg\" or the column \"t.tradereg\".\n",
+        "cost": 1.0,
+        "budget_before": 7.5,
+        "budget_after": 6.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+        },
+        "result": "SQL Error: SQL error: operator does not exist: escalation_level_enum ~~* unknown\nLINE 17: WHERE (ea.esclvl ILIKE '%significant%'\n                          ^\nHINT:  No operator matches the given name and argument types. You might need to add explicit type casts.\n",
+        "cost": 1.0,
+        "budget_before": 6.5,
+        "budget_after": 5.5
+      },
+      {
+        "type": "tool",
+        "tool": "execute_sql",
+        "args": {
+          "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl::TEXT ILIKE '%significant%'\n    OR ea.acttake::TEXT ILIKE '%significant%'\n    OR ea.resstat::TEXT ILIKE '%significant%'\n    OR ea.penimp::TEXT ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+        },
+        "result": "Query executed, empty result set.",
+        "cost": 1.0,
+        "budget_before": 5.5,
+        "budget_after": 4.5
+      }
+    ],
+    "adk_events": [
+      {
+        "type": "user_message",
+        "message": "Database: insider\nTask ID: insider_1\n\nUser Query:\nCan you generate a list of trader IDs who are in the high-risk trading group? From that group, please only include those who have also faced a Significant Enforcement Action where the related compliance case was last reviewed recently. Just provide the traders' information.\n\nYou have a budget of 18.0 bird-coins. Use your tools to explore the database, clarify ambiguities with the user, and submit your final SQL efficiently."
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "get_schema",
+              "id": "get_schema_2tw7fxbazfzd",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_savymksjdmmw",
+              "args": {}
+            },
+            {
+              "type": "function_call",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_mkpej8xhep7q",
+              "args": {}
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "get_schema",
+              "id": "get_schema_2tw7fxbazfzd",
+              "response": "{\"result\": \"CREATE TABLE \\\"trader\\\" (\\ntradereg character varying NOT NULL,\\ntradekind USER-DEFINED NULL,\\nacctdays integer NULL,\\nacctbal numeric NULL,\\nfreqscope USER-DEFINED NULL,\\nvoldaily numeric NULL,\\nposavg numeric NULL,\\nposspan USER-DEFINED NULL,\\ntrading_performance jsonb NULL,\\n    PRIMARY KEY (tradereg)\\n);\\n\\nFirst 3 rows:\\ntradereg    tradekind      acctdays      acctbal  freqscope      voldaily    posavg  posspan    trading_performance\\n----------  -----------  ----------  -----------  -----------  ----------  --------  ---------  ------------------------------------------------------------------------------------------------------------------\\nTR32485     Broker             1386  8.04279e+06  Medium          79650.9     68768  Intraday   {'winpct': 34.88, 'plratio': 2.3, 'risklevel': {'margpct': 24.48, 'levratio': 9.44, 'risklevel': 'Conservative'}}\\nTR16169     Individual         3206  1.41456e+06  Medium         494564      111835  Intraday   {'winpct': 68.01, 'plratio': 2.71, 'risklevel': {'margpct': 58.43, 'levratio': 7.47, 'risklevel': 'Moderate'}}\\nTR67490     Broker             1061  9.01803e+06  Medium         151127      293964  Long-term  {'winpct': 42.62, 'plratio': 1.79, 'risklevel': {'margpct': 51.07, 'levratio': 5.87, 'risklevel': 'Conservative'}}\\n...\\n\\n\\nCREATE TABLE \\\"transactionrecord\\\" (\\ntransreg character varying NOT NULL,\\ntranstime timestamp without time zone NOT NULL,\\ntrdref character varying NOT NULL,\\nordervar numeric NULL,\\nordertimepat USER-DEFINED NULL,\\nordertypedist USER-DEFINED NULL,\\ncancelpct numeric NULL,\\nmodfreq numeric NULL,\\ndarkusage character varying NULL,\\noffmkt character varying NULL,\\ncrossfreq numeric NULL,\\nrisk_indicators jsonb NULL,\\n    PRIMARY KEY (transreg),\\n    FOREIGN KEY (trdref) REFERENCES trader(tradereg)\\n);\\n\\nFirst 3 rows:\\ntransreg    transtime                   trdref      ordervar  ordertimepat    ordertypedist      cancelpct    modfreq    darkusage    offmkt    crossfreq  risk_indicators\\n----------  --------------------------  --------  ----------  --------------  ---------------  -----------  ---------  -----------  --------  -----------  ---------------------------------------------------------------------------------------------------------------------------------------------------------------\\nIT855524    2024-04-21 12:53:22.103260  TR47794        0.381  Irregular       Market                 0.208      0.486        0.114     0.124        0.017  {'washsus': 'Low', 'layerind': 'Suspected', 'spoofprob': 0.32, 'frontscore': 85.62, 'momentignit': 'Weak', 'qstuffindex': 0.519, 'markclosepat': 'Occasional'}\\nIT110951    2025-01-05 18:39:26.103260  TR47821        1.854  Irregular       Mixed                  0.213      0.164        0.338     0.016        0.058  {'washsus': 'High', 'layerind': 'Confirmed', 'spoofprob': 0.95, 'frontscore': 15.82, 'momentignit': 'Weak', 'qstuffindex': 0.528, 'markclosepat': 'Occasional'}\\nIT589692    2024-06-12 16:39:52.103260  TR74663        1.119  Regular         Mixed                  0.127      0.114        0.153     0.089        0.015  {'washsus': 'High', 'layerind': 'Confirmed', 'spoofprob': 0.25, 'frontscore': 16.94, 'momentignit': 'Weak', 'qstuffindex': 0.894, 'markclosepat': 'Occasional'}\\n...\\n\\n\\nCREATE TABLE \\\"advancedbehavior\\\" (\\nabhvreg character varying NOT NULL,\\ntranslink character varying NOT NULL,\\npatsim numeric NULL,\\npeercorr numeric NULL,\\nmktcorr numeric NULL,\\nsecrotimp numeric NULL,\\n    PRIMARY KEY (abhvreg),\\n    FOREIGN KEY (translink) REFERENCES transactionrecord(transreg)\\n);\\n\\nFirst 3 rows:\\nabhvreg     translink      patsim    peercorr    mktcorr    secrotimp\\n----------  -----------  --------  ----------  ---------  -----------\\nABHV_0Z7PG  IT291460        0.823       0.525     -0.327       -0.793\\nABHV_XIYLR  IT931600        0.457      -0.353     -0.324        0.371\\nABHV_4WDLK  IT310545        0.06        0.382     -0.104       -0.183\\n...\\n\\n\\nCREATE TABLE \\\"sentimentandfundame...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_column_meanings",
+              "id": "get_all_column_meanings_savymksjdmmw",
+              "response": "{\"result\": \"{\\n  \\\"insider|trader|tradereg\\\": \\\"VARCHAR(50). Primary key uniquely identifying each trader account (e.g., 'TRD\\\\u2011987654').\\\",\\n  \\\"insider|trader|tradekind\\\": \\\"trader_type_enum (enum: 'Market Maker', 'Broker', 'Individual', 'Institution'). Broad category of the trader.\\\",\\n  \\\"insider|trader|acctdays\\\": \\\"INT. Age of the trading account in days since opening (e.g., 782).\\\",\\n  \\\"insider|trader|acctbal\\\": \\\"NUMERIC(20,2). Current cash equity in the trader\\\\u2019s account in USD (e.g., 2\\\\u00a0150\\\\u00a0345.75).\\\",\\n  \\\"insider|trader|freqscope\\\": \\\"trading_frequency_enum (enum: 'Low', 'Medium', 'High'). Average trading frequency classification.\\\",\\n  \\\"insider|trader|voldaily\\\": \\\"NUMERIC(20,4). Mean daily share volume traded across all symbols (e.g., 1\\\\u00a0250\\\\u00a0000.0000).\\\",\\n  \\\"insider|trader|posavg\\\": \\\"NUMERIC(20,4). Average position size in USD held per trade (e.g., 350\\\\u00a0000.0000).\\\",\\n  \\\"insider|trader|posspan\\\": \\\"position_holding_period_enum (enum: 'Intraday', 'Position', 'Long-term', 'Swing'). Typical holding\\\\u2011period style.\\\",\\n  \\\"insider|transactionrecord|transreg\\\": \\\"VARCHAR(50). Primary key for an individual trade\\\\u2011day record (e.g., 'REC\\\\u201120250117\\\\u20110001').\\\",\\n  \\\"insider|transactionrecord|transtime\\\": \\\"TIMESTAMP. Date\\\\u2011time the trade blotter snapshot was taken (e.g., '2025\\\\u201104\\\\u201117 13:42:05').\\\",\\n  \\\"insider|transactionrecord|trdref\\\": \\\"VARCHAR(50). Foreign\\\\u2011key linking this record to Trader.TradeReg.\\\",\\n  \\\"insider|transactionrecord|ordervar\\\": \\\"NUMERIC(20,4). Variance of order sizes submitted during the session.\\\",\\n  \\\"insider|transactionrecord|ordertimepat\\\": \\\"order_timing_pattern_enum (enum: 'Irregular', 'Regular', 'Suspicious'). Pattern of order entry times.\\\",\\n  \\\"insider|transactionrecord|ordertypedist\\\": \\\"order_type_distribution_enum (enum: 'Market', 'Mixed', 'Limit'). Distribution of order types used.\\\",\\n  \\\"insider|transactionrecord|cancelpct\\\": \\\"NUMERIC(7,4). Percentage of orders cancelled before execution (e.g., 35.8125).\\\",\\n  \\\"insider|transactionrecord|modfreq\\\": \\\"NUMERIC(7,4). Average number of order modifications per original order (e.g., 0.7430).\\\",\\n  \\\"insider|transactionrecord|darkusage\\\": \\\"VARCHAR(100). Qualitative or venue list describing dark\\\\u2011pool usage (e.g., 'ATS\\\\u2011X, ATS\\\\u2011Y').\\\",\\n  \\\"insider|transactionrecord|offmkt\\\": \\\"VARCHAR(100). Summary of off\\\\u2011exchange trade activity (e.g., 'Internal crosses').\\\",\\n  \\\"insider|transactionrecord|crossfreq\\\": \\\"NUMERIC(10,4). Frequency of cross trades relative to total trades (e.g., 0.1520).\\\",\\n  \\\"insider|advancedbehavior|abhvreg\\\": \\\"VARCHAR(50). Primary key for an advanced behavioural analysis record.\\\",\\n  \\\"insider|advancedbehavior|translink\\\": \\\"VARCHAR(50). Foreign\\\\u2011key to TransactionRecord.TransReg.\\\",\\n  \\\"insider|advancedbehavior|patsim\\\": \\\"NUMERIC(7,4). Similarity score to known illicit trading patterns (e.g., 0.8754).\\\",\\n  \\\"insider|advancedbehavior|peercorr\\\": \\\"NUMERIC(7,4). Correlation of the trader\\\\u2019s pattern with peers (e.g., 0.6432).\\\",\\n  \\\"insider|advancedbehavior|mktcorr\\\": \\\"NUMERIC(7,4). Correlation of trading activity with overall market moves (e.g., 0.5123).\\\",\\n  \\\"insider|advancedbehavior|secrotimp\\\": \\\"NUMERIC(7,4). Impact of sector rotation strategies used by the trader (e.g., 0.2198).\\\",\\n  \\\"insider|sentimentandfundamentals|sentreg\\\": \\\"VARCHAR(50). Primary key for combined sentiment/fundamental snapshot.\\\",\\n  \\\"insider|sentimentandfundamentals|transref\\\": \\\"VARCHAR(50). Foreign\\\\u2011key to TransactionRecord.TransReg.\\\",\\n  \\\"insider|sentimentandfundamentals|newsscore\\\": \\\"NUMERIC(5,2). Normalised sentiment score from news feeds (e.g., 68.25).\\\",\\n  \\\"insider|sentimentandfundamentals|socscore\\\": \\\"NUMERIC(5,2). Social\\\\u2011media sentiment score (e.g., 54.90).\\\",\\n  \\\"insider|sentimentandfundamentals|anlycount\\\": \\\"INT. Number of active analyst coverage reports (e.g., 12).\\\",\\n  \\\"insider|sentiment...<truncated>"
+            },
+            {
+              "type": "function_response",
+              "name": "get_all_external_knowledge_names",
+              "id": "get_all_external_knowledge_names_mkpej8xhep7q",
+              "response": "{\"result\": \"[\\\"Daily Turnover Rate (DTR)\\\", \\\"Order Modification Intensity (OMI)\\\", \\\"Trader Leverage Exposure (TLE)\\\", \\\"Suspicious Activity Index (SAI)\\\", \\\"Pattern Anomaly Score (PAS)\\\", \\\"Compliance Recidivism Score (CRS)\\\", \\\"Investigation Intensity Index (III)\\\", \\\"Sentiment Divergence Factor (SDF)\\\", \\\"Relative Short Interest (RSI)\\\", \\\"Enforcement Financial Impact Ratio (EFIR)\\\", \\\"High-Risk Trader Profile\\\", \\\"Potential Insider Trading Flag\\\", \\\"Market Manipulation Pattern: Layering/Spoofing\\\", \\\"Collusion Network Indicator\\\", \\\"Elevated Regulatory Scrutiny\\\", \\\"Problematic Compliance History\\\", \\\"Wash Trading Alert\\\", \\\"Event-Driven Trader\\\", \\\"High Cancellation/Modification Trader\\\", \\\"Significant Enforcement Action\\\", \\\"Trader Position Holding Style\\\", \\\"Dark Pool Usage Venues\\\", \\\"Off-Market Trading Activity\\\", \\\"Order Type Distribution\\\", \\\"Momentum Ignition Signals\\\", \\\"Marking the Close Patterns\\\", \\\"Unusual Option Activity Level\\\", \\\"Information Leakage Score Interpretation\\\", \\\"Pattern Similarity Score Context\\\", \\\"Trading Restriction Period Types\\\", \\\"Risk-Adjusted Turnover (RAT)\\\", \\\"Combined Manipulation Indicator (CMI)\\\", \\\"Compliance Health Score (CHS)\\\", \\\"Weighted Investigation Score (WIS)\\\", \\\"Sentiment-Weighted Option Volume (SWOV)\\\", \\\"Logarithmic Enforcement Fine Impact (LEFI)\\\", \\\"Aggressive Trading Intensity (ATI)\\\", \\\"Suspicion-Weighted Turnover (SWT)\\\", \\\"Boosted Insider Leakage Score (BILS)\\\", \\\"Market-Adjusted Pattern Anomaly (MAPA)\\\", \\\"High-Frequency High-Risk Trader\\\", \\\"Suspected Event-Driven Insider\\\", \\\"Confirmed Manipulator Under Scrutiny\\\", \\\"High-Risk Collusion Group Member\\\", \\\"Chronic Compliance Violator\\\", \\\"High-Volume Wash Trading Concern\\\", \\\"Aggressive Event Speculator\\\", \\\"Potentially Evasive Order Modifier\\\", \\\"Financially Impactful Enforcement Case\\\", \\\"Peer Mimicry Suspicion\\\", \\\"Investigation Compliance Risk Index (ICRI)\\\", \\\"Sentiment-Driven Leakage Risk (SDLR)\\\", \\\"Unique Pattern Deviation Ratio (UPDR)\\\", \\\"Recidivism Enforcement Severity (RES)\\\", \\\"Aggressive Suspicion Score (ASS)\\\", \\\"Capital-Adjusted Investigation Intensity (CAII)\\\", \\\"Market-Agnostic Suspicion Index (MASI)\\\", \\\"Cross-Modification Ratio (CMR)\\\", \\\"Insider Sentiment Short Ratio (ISSR)\\\", \\\"Risk-Adjusted Win Rate (RAWR)\\\", \\\"High-Risk Manipulator Candidate\\\", \\\"Escalated Compliance Failure\\\", \\\"Networked Mimicry Risk\\\", \\\"High-Scrutiny Wash Trading Case\\\", \\\"Volatile Event Speculator\\\", \\\"Confirmed Evasive Layering/Spoofing\\\", \\\"High Velocity Suspicion Trader\\\", \\\"High-Intensity Insider Investigation\\\", \\\"Severe Chronic Violator Case\\\", \\\"Costly High-Frequency Risk Enforcement\\\", \\\"High SDLR Transaction\\\", \\\"Compliance Rating Grade\\\", \\\"Premature Resolution Block\\\", \\\"Peer Correlation Z-Score\\\"]\\n\\n[SYSTEM NOTE: Remaining budget: 15.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_54vgsk8b9te0",
+              "args": {
+                "question": "Does 'high-risk trading group' refer to traders with a 'High' risk level in the trading_performance column?"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_j0mxhze12cps",
+              "args": {
+                "question": "Does 'Significant Enforcement Action' refer to an enforcement action with an escalation level of 'Significant' in the esclvl column?"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_aet44rvtjes6",
+              "args": {
+                "question": "What does 'recently' mean in terms of the last review date in the lastrevdt column?"
+              }
+            },
+            {
+              "type": "function_call",
+              "name": "ask_user",
+              "id": "ask_user_qhvdsshqx1yd",
+              "args": {
+                "question": "Does 'related compliance case' refer to the compliance case linked to the enforcement action?"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_54vgsk8b9te0",
+              "response": "{\"result\": \"No, 'high-risk trading group' refers to traders who meet specific criteria: either their Trader Leverage Exposure (TLE) is greater than 5.0 and their risk level is 'Aggressive', or their Daily Turnover Rate (DTR) is greater than 0.5.\\n\\n[SYSTEM NOTE: Remaining budget: 13.5/18.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_j0mxhze12cps",
+              "response": "{\"result\": \"Sorry, this question is out of scope, so I can not answer your question.\\n\\n[SYSTEM NOTE: Remaining budget: 11.5/18.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_aet44rvtjes6",
+              "response": "{\"result\": \"In this context, 'recently' refers to any compliance case where the last review date in the lastrevdt column is within the past 12 months from the current date.\\n\\n[SYSTEM NOTE: Remaining budget: 9.5/18.0]\"}"
+            },
+            {
+              "type": "function_response",
+              "name": "ask_user",
+              "id": "ask_user_qhvdsshqx1yd",
+              "response": "{\"result\": \"Sorry, this question is out of scope, so I can not answer your question.\\n\\n[SYSTEM NOTE: Remaining budget: 7.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_0444a7v3p89p",
+              "args": {
+                "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT trdref\n    FROM (\n        SELECT trdref, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.trdref\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_0444a7v3p89p",
+              "response": "{\"result\": \"SQL Error: SQL error: column \\\"trdref\\\" does not exist\\nLINE 6:         SELECT trdref, trading_performance->'risklevel'->>'r...\\n                       ^\\nHINT:  Perhaps you meant to reference the column \\\"trader.tradereg\\\" or the column \\\"t.tradereg\\\".\\n\\n\\n[SYSTEM NOTE: Remaining budget: 6.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_mghe25eymqt4",
+              "args": {
+                "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_mghe25eymqt4",
+              "response": "{\"result\": \"SQL Error: SQL error: operator does not exist: escalation_level_enum ~~* unknown\\nLINE 17: WHERE (ea.esclvl ILIKE '%significant%'\\n                          ^\\nHINT:  No operator matches the given name and argument types. You might need to add explicit type casts.\\n\\n\\n[SYSTEM NOTE: Remaining budget: 5.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "function_call",
+              "name": "execute_sql",
+              "id": "execute_sql_k6s670yqd0yv",
+              "args": {
+                "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl::TEXT ILIKE '%significant%'\n    OR ea.acttake::TEXT ILIKE '%significant%'\n    OR ea.resstat::TEXT ILIKE '%significant%'\n    OR ea.penimp::TEXT ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": false,
+        "content": {
+          "role": "user",
+          "parts": [
+            {
+              "type": "function_response",
+              "name": "execute_sql",
+              "id": "execute_sql_k6s670yqd0yv",
+              "response": "{\"result\": \"Query executed, empty result set.\\n\\n[SYSTEM NOTE: Remaining budget: 4.5/18.0]\"}"
+            }
+          ]
+        }
+      },
+      {
+        "type": "adk_event",
+        "author": "bird_interact_agent",
+        "invocation_id": "e-18111a40-245a-423d-afe5-3377089e117a",
+        "branch": null,
+        "final": true,
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "type": "text",
+              "text": "Apologies, I could not find any traders that match your criteria."
+            }
+          ]
+        }
+      }
+    ],
+    "final_response": "Apologies, I could not find any traders that match your criteria."
+  },
+  "events": [
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "fafb8cadc66b4ae4a8a7ff35009703fa",
+      "client": "insider_1",
+      "database": "insider",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/61c3a70d6208414f80e4eb796e872579/0",
+      "at": 1793849474.5435567,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 2.940800004580524,
+      "response_bytes": 12067,
+      "response_digest": "ac4b0f34563054f1f25eae5358e774807afe0932bd49c07d205eca8d7109e80f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "schema",
+      "id": "e4ab8508b607439a9bc9cdef33845c62",
+      "client": "insider_1",
+      "database": "insider",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/61c3a70d6208414f80e4eb796e872579/0",
+      "at": 1793849512.7243037,
+      "sql": null,
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 1.24379999761004,
+      "response_bytes": 12067,
+      "response_digest": "ac4b0f34563054f1f25eae5358e774807afe0932bd49c07d205eca8d7109e80f"
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "99e64e62cb3942408efd8260e08b5120",
+      "client": "insider_1",
+      "database": "insider",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/61c3a70d6208414f80e4eb796e872579/0",
+      "at": 1793849748.3894014,
+      "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT trdref\n    FROM (\n        SELECT trdref, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.trdref\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 34.374499999103136,
+      "response_bytes": 284,
+      "response_digest": "eae7179c2865b31aed263e3a0e0207879bf10264516aa51775516acbcd841fbd",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "336706e32c184c4598e72e05899bf463",
+      "client": "insider_1",
+      "database": "insider",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/61c3a70d6208414f80e4eb796e872579/0",
+      "at": 1793849776.748715,
+      "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl ILIKE '%significant%'\n    OR ea.acttake ILIKE '%significant%'\n    OR ea.resstat ILIKE '%significant%'\n    OR ea.penimp ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 8.147599997755606,
+      "response_bytes": 295,
+      "response_digest": "891e095829586031c88d407809def9ea19d5ee1b37baff69ee90f545fa0c890f",
+      "successful": false
+    },
+    {
+      "source": "bird-capture",
+      "kind": "read",
+      "id": "70c2573a725f439ca25c3fadc7568d36",
+      "client": "insider_1",
+      "database": "insider",
+      "scope": "0f03acafe8b34339863bf57a4bf87fb0/61c3a70d6208414f80e4eb796e872579/0",
+      "at": 1793849810.4677782,
+      "sql": "SELECT DISTINCT t.tradereg\nFROM trader t\nJOIN (\n    SELECT tradereg\n    FROM (\n        SELECT tradereg, trading_performance->'risklevel'->>'risklevel' AS risk_level,\n               trading_performance->'risklevel'->>'levratio' AS levratio,\n               (voldaily / acctbal) AS dtr\n        FROM trader\n    ) AS trader_risk\n    WHERE (levratio::FLOAT > 5.0 AND risk_level = 'Aggressive')\n       OR dtr > 0.5\n) AS high_risk_traders ON t.tradereg = high_risk_traders.tradereg\nJOIN transactionrecord tr ON t.tradereg = tr.trdref\nJOIN compliancecase cc ON tr.transreg = cc.transref\nJOIN enforcementactions ea ON cc.compreg = ea.compref2\nWHERE (ea.esclvl::TEXT ILIKE '%significant%'\n    OR ea.acttake::TEXT ILIKE '%significant%'\n    OR ea.resstat::TEXT ILIKE '%significant%'\n    OR ea.penimp::TEXT ILIKE '%significant%')\n    AND cc.lastrevdt >= DATE '2023-05-25';",
+      "params": [],
+      "http_status": 200,
+      "endpoint_ms": 19.107100000837818,
+      "response_bytes": 74,
+      "response_digest": "3a85c143a286e7fb851c6d05424615923dbf278df3140938e651873a2019d4d0",
+      "successful": true
+    }
+  ]
+}

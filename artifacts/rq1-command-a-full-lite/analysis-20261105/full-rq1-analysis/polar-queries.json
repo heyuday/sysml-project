@@ -1,0 +1,2142 @@
+{
+  "version": 2,
+  "database": "polar",
+  "queries": {
+    "2b5774cf663ff81315df052fd9950f3ede6e2162abb2a5b73cc145cffff26181": {
+      "sql": "SELECT\n    e.equipmentcode AS Equipment,\n    ce.heaterstatus AS \"Heater Status\",\n    tswg.insulationstatus AS \"Insulation Status\",\n    las.emergencylightstatus AS \"Emergency Light Status\",\n    ws.structuralloadpercent AS \"Structure Load\",\n    om.operationalstatus AS \"Readiness Label\"\nFROM\n    equipment e\nJOIN\n    cabinenvironment ce ON e.equipmentcode = ce.cabineqref\nJOIN\n    thermalsolarwindandgrid tswg ON e.equipmentcode = tswg.thermaleqref\nJOIN\n    lightingandsafety las ON e.equipmentcode = las.lighteqref\nJOIN\n    location l ON e.equipmentcode = l.loceqref\nJOIN\n    weatherandstructure ws ON l.locationregistry = ws.weatherlocref\nJOIN\n    operationmaintenance om ON e.equipmentcode = om.opmainteqref\nWHERE\n    ws.structuralintegritystatus = 'Normal';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5af892d49f089bdb7e45a410687680b5dfacbff848f6902c1d763b8b8e689b7c",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment",
+          1043,
+          54
+        ],
+        [
+          "Heater Status",
+          19978,
+          -1
+        ],
+        [
+          "Insulation Status",
+          19994,
+          -1
+        ],
+        [
+          "Emergency Light Status",
+          19898,
+          -1
+        ],
+        [
+          "Structure Load",
+          700,
+          -1
+        ],
+        [
+          "Readiness Label",
+          20032,
+          -1
+        ]
+      ],
+      "rows": 342,
+      "bag_digest": "fc2696472a9002469790198481b3125d8eaebc239df0364cbc146eedb1d027a5",
+      "values_digest": "5744875df2acea62352d8a81eb97d59e7de4705502e941f64fb8f441b67d6589",
+      "ordered_digest": "ac144b526d73c87e8cc32584ced85c5c5c5105ffee682aba2e6275610cccf590"
+    },
+    "f2b7ac8880dc19227985d10996a3c48908765d1184b52621986968fa143d1c1d": {
+      "sql": "SELECT\n    e.equipmentcode AS equipment,\n    ce.heaterstatus AS heater_status,\n    tswg.insulationstatus AS insulation_status,\n    las.emergencylightstatus AS emergency_light_status,\n    ws.structuralloadpercent AS structure_margin,\n    om.operationalstatus AS readiness_label\nFROM\n    equipment e\nJOIN\n    cabinenvironment ce ON e.equipmentcode = ce.cabineqref\nJOIN\n    thermalsolarwindandgrid tswg ON e.equipmentcode = tswg.thermaleqref\nJOIN\n    lightingandsafety las ON e.equipmentcode = las.lighteqref\nJOIN\n    location l ON e.equipmentcode = l.loceqref\nJOIN\n    weatherandstructure ws ON l.locationregistry = ws.weatherlocref\nJOIN\n    operationmaintenance om ON e.equipmentcode = om.opmainteqref\nWHERE\n    ce.heaterstatus = 'On'\n    AND tswg.insulationstatus = 'Good'\n    AND las.emergencylightstatus = 'On'\n    AND ws.structuralintegritystatus = 'Normal'\n    AND om.operationalstatus = 'Active';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ab8f5bb1c692cdf0719ab0686bd570f773008ed69f3ba5348fb3de12b5caa0be",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment",
+          1043,
+          54
+        ],
+        [
+          "heater_status",
+          19978,
+          -1
+        ],
+        [
+          "insulation_status",
+          19994,
+          -1
+        ],
+        [
+          "emergency_light_status",
+          19898,
+          -1
+        ],
+        [
+          "structure_margin",
+          700,
+          -1
+        ],
+        [
+          "readiness_label",
+          20032,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "914722736a71b297dc3a5c3d4438e16be22761525445d9ac4ec375c0e6fa020b",
+      "values_digest": "c31d7a1aad278081b1a16d35d9cc5be68a213093999abaa9797d83a193d8b156",
+      "ordered_digest": "914722736a71b297dc3a5c3d4438e16be22761525445d9ac4ec375c0e6fa020b"
+    },
+    "536039542e5487eec3c97054578eb926e85f2d86e47f4222508bdd5e9f436352": {
+      "sql": "SELECT\n    e.equipmentcode,\n    e.equipmenttype,\n    om.operationalstatus AS status_category,\n    (\n        (ww.waterlevelpercent / 100.0) * 0.2\n        + (ww.waterpressurekpa / 1000.0) * 0.2\n        + (ww.watertemperaturec / 100.0) * 0.2\n        + (ww.waterflowlpm / 1000.0) * 0.2\n        + (ww.waterqualityindex / 100.0) * 0.2\n    ) AS water_management_score\nFROM\n    equipment e\nJOIN\n    waterandwaste ww ON e.equipmentcode = ww.watereqref\nJOIN\n    operationmaintenance om ON e.equipmentcode = om.opmainteqref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ef03e6fde424825f9116f60ec3f4412bd86539846c6aaa47dc96320b12ca05bb",
+      "ordered": false,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "status_category",
+          20032,
+          -1
+        ],
+        [
+          "water_management_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "2d72de3e6258c66d2aa5b1ded9e78760f5bcb874f5b7c521b98ba1278cee614c",
+      "values_digest": "b1e87e1ab59833fb8d69addb8c26d5a3e605f7f8190d68840f43c4ddf7d46d75",
+      "ordered_digest": "08ad5a40b328bfc98e761af40e92bb10ea76b64939d844ee1ad2ac7e49b95803"
+    },
+    "57ea1d56555e7bccb3988de70a345ab496acfa8e4834059fd5939e4cc0c6201a": {
+      "sql": "SELECT\n    l.stationname AS station_name,\n    l.locationtype AS location_type,\n    AVG(ww.waterqualityindex) AS avg_water_quality_index,\n    AVG(tswg.powerqualityindex) AS avg_power_quality_index\nFROM\n    location AS l\nJOIN\n    waterandwaste AS ww ON l.loceqref = ww.watereqref\nJOIN\n    thermalsolarwindandgrid AS tswg ON l.loceqref = tswg.thermaleqref\nGROUP BY\n    l.stationname,\n    l.locationtype\nORDER BY\n    l.stationname,\n    l.locationtype;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "61d155511470b1910a7e3e58c6e9aa10ba64982c58dcbdaf4e82eb5ef0d85731",
+      "ordered": true,
+      "columns": [
+        [
+          "station_name",
+          25,
+          -1
+        ],
+        [
+          "location_type",
+          20018,
+          -1
+        ],
+        [
+          "avg_water_quality_index",
+          1700,
+          -1
+        ],
+        [
+          "avg_power_quality_index",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 40,
+      "bag_digest": "435eacd26f9f2b04b345b057ab4bea9042a5aaff5d391baa83c582576f0c0557",
+      "values_digest": "e8eac54d17c9a367afc7a0a987ae3d6a9f70d883178653b2a4e5b27d0a8d81e8",
+      "ordered_digest": "2d86eef5083655284ca8a4e7f3852c371fc3c76d170faf8d992a3b843d74d7a5"
+    },
+    "1d318b98cc94aac9b4172c1daa5ece339db97524383326c1bbbbbd740e0ad920": {
+      "sql": "SELECT \n    e.equipmentcode, \n    e.equipmenttype, \n    e.equipmentmodel, \n    e.manufacturer, \n    e.reliabilityindex, \n    e.efficiencyindex, \n    e.safetyindex, \n    e.environmentalimpactindex, \n    ce.cabineqref, \n    ce.cabinclimate \nFROM \n    equipment e \nJOIN \n    cabinenvironment ce ON e.equipmentcode = ce.cabineqref \nWHERE \n    ce.cabinclimate->>'temperature_c' BETWEEN '18' AND '24' \n    AND ce.cabinclimate->>'o2_percent' > '19.5' \n    AND ce.cabinclimate->>'co2_ppm' < '1000' \n    AND ce.ventilationstatus = 'On' \n    AND ce.heaterstatus = 'On';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "545bcd045453110ecd275f48e35f9b754a3f632a3f67438edf7b37b9fa55b457",
+      "ordered": false,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentmodel",
+          1043,
+          84
+        ],
+        [
+          "manufacturer",
+          1043,
+          124
+        ],
+        [
+          "reliabilityindex",
+          1700,
+          393223
+        ],
+        [
+          "efficiencyindex",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "environmentalimpactindex",
+          701,
+          -1
+        ],
+        [
+          "cabineqref",
+          1043,
+          74
+        ],
+        [
+          "cabinclimate",
+          3802,
+          -1
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "403e7e7423ccf14a34933f8792e02bd7ba03c135032fd9d69c327719e800ee68",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "403e7e7423ccf14a34933f8792e02bd7ba03c135032fd9d69c327719e800ee68"
+    },
+    "c1e2e2b2058a9af18e40bc31eb711094d50953659ac6b5a9453780a0278fb1dd": {
+      "sql": "SELECT \n    e.equipmentcode, \n    e.equipmenttype, \n    l.lifesupportstatus, \n    e.reliabilityindex AS reliability_score, \n    l.safetysystemstatus AS reliability_classification, \n    json_build_object(\n        'oxygen_status', l.oxygensupplystatus,\n        'medical_status', l.medicalequipmentstatus,\n        'safety_system_status', l.safetysystemstatus\n    ) AS support_systems_status\nFROM \n    equipment AS e\nJOIN \n    lightingandsafety AS l ON e.equipmentcode = l.lighteqref\nWHERE \n    e.equipmenttype = 'Safety'\nORDER BY \n    e.equipmentcode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "abbc6ba808a65ca9ee63cccba8af7d933ad10a6837f549d09f40491b1cb51d7f",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "lifesupportstatus",
+          20002,
+          -1
+        ],
+        [
+          "reliability_score",
+          1700,
+          393223
+        ],
+        [
+          "reliability_classification",
+          20092,
+          -1
+        ],
+        [
+          "support_systems_status",
+          114,
+          -1
+        ]
+      ],
+      "rows": 163,
+      "bag_digest": "d37ff7cd21c1e7f3ec90fbaa711a22a8d832e50ea7c77344e13f90068876b81b",
+      "values_digest": "16f37d204c95f2cff605b8d482789d96c61180235425ae70a537f817c7904047",
+      "ordered_digest": "39cf6f70f8c43414c3159cdd242c98c37a2f0495153794b59379d0fce37f5660"
+    },
+    "fd222ed9bf3d6af610e106beb390f0f407df2835f5e44ec6b7e26a358902e6a5": {
+      "sql": "SELECT \n    pwrbatteqref AS equipment_reference_code,\n    powersource AS power_source,\n    energyefficiencypercent AS efficiency_level\nFROM \n    powerbattery;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8f4452e0074bdbf6d4d64b3bb03189f3b5a32eec23d790b496bed1546f4da957",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment_reference_code",
+          1043,
+          74
+        ],
+        [
+          "power_source",
+          20060,
+          -1
+        ],
+        [
+          "efficiency_level",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4fb49ecc5932220331eaff87d9f7ddd6d2e7f5693c272f669ddf236cf0a15eac",
+      "values_digest": "eeb3b63dde4a79ffbfca96c1ca24343eacb88172b8766f4cbf08ae04e40ec9eb",
+      "ordered_digest": "1d8126f63d16d8e45254deda7f7b9afc3311802ebac6ce8120f08299e8940efd"
+    },
+    "eddd7d1b0caf69d2677522b2acca135d5d3685584a5b51f49b5cc632581ff4d1": {
+      "sql": "SELECT \n    s.sciregistry AS registry,\n    s.scieqref AS equipment_reference,\n    s.measurementaccuracypercent AS measurement_accuracy,\n    s.calibrationstatus AS calibration_status,\n    e.reliabilityindex AS calculated_SER\nFROM \n    scientific s\nJOIN \n    equipment e ON s.scieqref = e.equipmentcode\nWHERE \n    e.reliabilityindex > 0.85\nORDER BY \n    calculated_SER DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "526c45213738942589c120a2d3c5758a08b786bcd85ec8287a8ebcee7fc76f58",
+      "ordered": true,
+      "columns": [
+        [
+          "registry",
+          23,
+          -1
+        ],
+        [
+          "equipment_reference",
+          1043,
+          74
+        ],
+        [
+          "measurement_accuracy",
+          700,
+          -1
+        ],
+        [
+          "calibration_status",
+          19816,
+          -1
+        ],
+        [
+          "calculated_ser",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 992,
+      "bag_digest": "fa09f3f4dce537012c3660f2132c8082a82cae70b9164130fe9205cb05d368a1",
+      "values_digest": "0e451ece6bbf26ffa67c5414f7a10f0a1f55d58d4b77f748028d29765a7546b6",
+      "ordered_digest": "a8ed4f0bd78dd322c82b30dd87b68b6a97c316b3f00b6f5d63a65472075c768b"
+    },
+    "4cf1577c3f81464b7ddb631a264def517c1d4db302d1d60a9c6b4520769d52b1": {
+      "sql": "SELECT \n    s.sciregistry AS registry,\n    s.scieqref AS equipment_reference,\n    s.measurementaccuracypercent AS measurement_accuracy,\n    s.calibrationstatus AS calibration_status,\n    e.reliabilityindex AS calculated_SER\nFROM \n    scientific s\nJOIN \n    equipment e ON s.scieqref = e.equipmentcode\nWHERE \n    e.reliabilityindex > 0.85\nORDER BY \n    e.reliabilityindex DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f37c2e106a16989a4c5000bcd0e305278182fb12561df6aab8f399387ac97794",
+      "ordered": true,
+      "columns": [
+        [
+          "registry",
+          23,
+          -1
+        ],
+        [
+          "equipment_reference",
+          1043,
+          74
+        ],
+        [
+          "measurement_accuracy",
+          700,
+          -1
+        ],
+        [
+          "calibration_status",
+          19816,
+          -1
+        ],
+        [
+          "calculated_ser",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 992,
+      "bag_digest": "fa09f3f4dce537012c3660f2132c8082a82cae70b9164130fe9205cb05d368a1",
+      "values_digest": "0e451ece6bbf26ffa67c5414f7a10f0a1f55d58d4b77f748028d29765a7546b6",
+      "ordered_digest": "a8ed4f0bd78dd322c82b30dd87b68b6a97c316b3f00b6f5d63a65472075c768b"
+    },
+    "d6deb2a599ba4a7bf1ccc2d962c06de29c37bdccc7c3d0ee36de42d0ad96a673": {
+      "sql": "SELECT \n    s.sciregistry AS registry,\n    s.scieqref AS equipment_reference,\n    s.measurementaccuracypercent AS measurement_accuracy,\n    s.calibrationstatus AS calibration_status,\n    e.reliabilityindex AS calculated_ser\nFROM \n    scientific AS s\nJOIN \n    equipment AS e ON s.scieqref = e.equipmentcode\nWHERE \n    e.reliabilityindex > 0.85\nORDER BY \n    calculated_ser DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "526c45213738942589c120a2d3c5758a08b786bcd85ec8287a8ebcee7fc76f58",
+      "ordered": true,
+      "columns": [
+        [
+          "registry",
+          23,
+          -1
+        ],
+        [
+          "equipment_reference",
+          1043,
+          74
+        ],
+        [
+          "measurement_accuracy",
+          700,
+          -1
+        ],
+        [
+          "calibration_status",
+          19816,
+          -1
+        ],
+        [
+          "calculated_ser",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 992,
+      "bag_digest": "fa09f3f4dce537012c3660f2132c8082a82cae70b9164130fe9205cb05d368a1",
+      "values_digest": "0e451ece6bbf26ffa67c5414f7a10f0a1f55d58d4b77f748028d29765a7546b6",
+      "ordered_digest": "a8ed4f0bd78dd322c82b30dd87b68b6a97c316b3f00b6f5d63a65472075c768b"
+    },
+    "e14ae896a8756eb01d844c3165faf9c44a37ed4aa9c8970ce1f50dd2ac00e57f": {
+      "sql": "SELECT \n    s.sciregistry AS registry,\n    s.scieqref AS equipment_reference,\n    s.measurementaccuracypercent AS measurement_accuracy,\n    s.calibrationstatus AS calibration_status,\n    e.reliabilityindex AS ser\nFROM \n    scientific s\nJOIN \n    equipment e ON s.scieqref = e.equipmentcode\nWHERE \n    e.reliabilityindex > 0.85\nORDER BY \n    e.reliabilityindex DESC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "743c4157eac926e1e0c73f330ea6e4879bd2e0ba90294d4ffeb95954d5898f1b",
+      "ordered": true,
+      "columns": [
+        [
+          "registry",
+          23,
+          -1
+        ],
+        [
+          "equipment_reference",
+          1043,
+          74
+        ],
+        [
+          "measurement_accuracy",
+          700,
+          -1
+        ],
+        [
+          "calibration_status",
+          19816,
+          -1
+        ],
+        [
+          "ser",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 992,
+      "bag_digest": "c13dc38548be84bc42d4aa0ccf4f74cb7c61f5383c4301baf168c43e26cf0842",
+      "values_digest": "0e451ece6bbf26ffa67c5414f7a10f0a1f55d58d4b77f748028d29765a7546b6",
+      "ordered_digest": "c7fc1d087b7190ba1eec68696f42e2497cd7ebb7aefdf82e1ab8cef4dd7e0d38"
+    },
+    "414513fcf9096837c43698c1715b19ffe90a820a7e5f045fc97af07b627d9b88": {
+      "sql": "SELECT \n  (\n    AVG(\n      brakepadwearpercent + trackwearpercent + vehiclespeedkmh + engineloadpercent + CAST(\n        tiremetrics ->> 'temperature_c' AS NUMERIC\n      )\n    )\n  ) AS vehicle_performance_score \nFROM \n  chassisandvehicle AS cv \nJOIN \n  engineandfluids AS ef \nON \n  cv.chassisengref = ef.engineregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a73a93172582a493f65042dae0da71760f7682b19f085923aaf067bd901fce23",
+      "ordered": false,
+      "columns": [
+        [
+          "vehicle_performance_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "c3f81348fa8245be3bf18532baa9f987767aa28f059b4c6fa5e50ed648ed6e23",
+      "values_digest": "df53060fce4421f4c86550328b0b13fc65ba3615ad9b4de9b742fc487fd22997",
+      "ordered_digest": "c3f81348fa8245be3bf18532baa9f987767aa28f059b4c6fa5e50ed648ed6e23"
+    },
+    "3ba822aec6de7c57cdb0dde307bd85b6d931a8058623e90d29090979042e531a": {
+      "sql": "SELECT \n  (\n    cv.brakepadwearpercent + \n    cv.trackwearpercent + \n    cv.vehiclespeedkmh + \n    (ef.fluidmetrics->>'pressure_kpa')::numeric + \n    (ef.fluidmetrics->>'temperature_c')::numeric + \n    ef.engineloadpercent\n  ) / 6 AS vehicle_performance_score\nFROM \n  chassisandvehicle AS cv\nJOIN \n  engineandfluids AS ef ON cv.chassisengref = ef.engineregistry;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "434b7724f6931da7e53444f1e9e587c546764382066a991ef62a53a25769e661",
+      "ordered": false,
+      "columns": [
+        [
+          "vehicle_performance_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4a66ef1f2491e2c6d1af6cb6683a74c6506dc738ff428c2714d3523d8b5cd64b",
+      "values_digest": "b73b0abafb26a101db7dd73d017d44b2734eb343800a1b865bedec8e39d6df72",
+      "ordered_digest": "4a66ef1f2491e2c6d1af6cb6683a74c6506dc738ff428c2714d3523d8b5cd64b"
+    },
+    "c783b3c1da42fa32928e8fc7255f909aa62b5c5349215dc15d2a18df1588864d": {
+      "sql": "SELECT \n  e.equipmentcode AS equipment_code,\n  e.equipmenttype AS equipment_type,\n  l.lifesupportstatus AS life_support_status,\n  e.reliabilityindex AS reliability_score,\n  CASE \n    WHEN e.reliabilityindex >= 0.8 THEN 'High Reliability'\n    WHEN e.reliabilityindex >= 0.6 THEN 'Moderate Reliability'\n    ELSE 'Low Reliability'\n  END AS reliability_classification,\n  json_build_object(\n    'oxygen_status', l.oxygensupplystatus,\n    'medical_status', l.medicalequipmentstatus,\n    'safety_system_status', l.safetysystemstatus\n  ) AS support_systems_status\nFROM \n  equipment AS e\n  JOIN lightingandsafety AS l ON e.equipmentcode = l.lighteqref\nWHERE \n  e.equipmenttype = 'Safety'\nORDER BY \n  equipment_code;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "bbf548f0fb633cc9ffe5c2e8dcdb3b74b20621e054269265184672f5217ce162",
+      "ordered": true,
+      "columns": [
+        [
+          "equipment_code",
+          1043,
+          54
+        ],
+        [
+          "equipment_type",
+          19914,
+          -1
+        ],
+        [
+          "life_support_status",
+          20002,
+          -1
+        ],
+        [
+          "reliability_score",
+          1700,
+          393223
+        ],
+        [
+          "reliability_classification",
+          25,
+          -1
+        ],
+        [
+          "support_systems_status",
+          114,
+          -1
+        ]
+      ],
+      "rows": 163,
+      "bag_digest": "17e4156e1bf53c07d24240ac4380af5cf6c64cc7089d8fd422b346721c60cae7",
+      "values_digest": "37a17d694492b036b22f1bb7a7def2df2f3a23614910b819185f28faa179b216",
+      "ordered_digest": "edb25447d94778731dea1bd155613df23ca4f3b153423820111429c3a269af66"
+    },
+    "ab593103ac631848b6b640528a10b662cb4041742087f5018d0e05be3b43ff6c": {
+      "sql": "SELECT \n  e.equipmentcode AS equipment_code, \n  e.equipmenttype AS equipment_type, \n  l.lifesupportstatus AS life_support_status, \n  e.reliabilityindex AS reliability_score, \n  NULL AS reliability_classification, \n  json_build_object(\n    'oxygen_status', l.oxygensupplystatus,\n    'medical_status', l.medicalequipmentstatus,\n    'safety_system_status', l.safetysystemstatus\n  ) AS support_systems_status \nFROM \n  equipment AS e \n  JOIN lightingandsafety AS l ON e.equipmentcode = l.lighteqref \nWHERE \n  e.equipmenttype = 'Safety' \nORDER BY \n  e.equipmentcode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "15eb2a6deac85562c26ecd83fd27bfaf66ee0bd7b0db794fd4d9813044a513b4",
+      "ordered": true,
+      "columns": [
+        [
+          "equipment_code",
+          1043,
+          54
+        ],
+        [
+          "equipment_type",
+          19914,
+          -1
+        ],
+        [
+          "life_support_status",
+          20002,
+          -1
+        ],
+        [
+          "reliability_score",
+          1700,
+          393223
+        ],
+        [
+          "reliability_classification",
+          25,
+          -1
+        ],
+        [
+          "support_systems_status",
+          114,
+          -1
+        ]
+      ],
+      "rows": 163,
+      "bag_digest": "93957c33570fcaf294a8b7d1a8399c6e6c696bfa1529f04e303cd5aad3c73dbe",
+      "values_digest": "5eefca086129e1e22d0321c8523d3ee52f9cb3c62c9c4a6f147a1cd95fb7b191",
+      "ordered_digest": "bbfa8d7fe900fcfef86b90a72f643756cf03244b7f42e540575592b08293dc58"
+    },
+    "33af72c74bce3bc50ef2eced5d1c9da3edc43ac8672431525aa9dd2da37b0c9f": {
+      "sql": "SELECT \n  e.equipmentcode, \n  e.equipmenttype, \n  l.lifesupportstatus, \n  e.reliabilityindex AS reliability_score, \n  -- Add classification logic here based on user input\n  json_build_object(\n    'oxygen_status', l.safetysensors->>'oxygen_status',\n    'medical_status', l.safetysensors->>'medical_status',\n    'safety_system_status', l.safetysensors->>'safety_system_status'\n  ) AS support_systems_status\nFROM \n  equipment e\nJOIN \n  lightingandsafety l ON e.equipmentcode = l.lighteqref\nWHERE \n  e.equipmenttype = 'Safety'\nORDER BY \n  e.equipmentcode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported function",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b432da486d4cd80b011a7896811b5c0fdfc604239cb8552a06acbd6f5d6670ae",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "lifesupportstatus",
+          20002,
+          -1
+        ],
+        [
+          "reliability_score",
+          1700,
+          393223
+        ],
+        [
+          "support_systems_status",
+          114,
+          -1
+        ]
+      ],
+      "rows": 163,
+      "bag_digest": "74d3c0fff96c4ebb007592e325ea6c7e8ed06af471fd8b9fe44d506b69855f3a",
+      "values_digest": "618b90545ddb7190ab17d288cc7f88b6ac1fe3a098d4d175ff05381c45f7f345",
+      "ordered_digest": "b98ec8c410370012306580eaec0c2f0fe34d1a5525166b0fbb0638bcfa905d16"
+    },
+    "62b47b7971fd9ff1da9f1a436d78c929a8a8242f02a2a8cf20ede4deb00e0ddc": {
+      "sql": "SELECT \n  pwrbatteqref AS equipment_reference_code, \n  powersource AS power_source, \n  energyefficiencypercent AS efficiency_level \nFROM \n  powerbattery;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "8f4452e0074bdbf6d4d64b3bb03189f3b5a32eec23d790b496bed1546f4da957",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment_reference_code",
+          1043,
+          74
+        ],
+        [
+          "power_source",
+          20060,
+          -1
+        ],
+        [
+          "efficiency_level",
+          1700,
+          393223
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "4fb49ecc5932220331eaff87d9f7ddd6d2e7f5693c272f669ddf236cf0a15eac",
+      "values_digest": "eeb3b63dde4a79ffbfca96c1ca24343eacb88172b8766f4cbf08ae04e40ec9eb",
+      "ordered_digest": "1d8126f63d16d8e45254deda7f7b9afc3311802ebac6ce8120f08299e8940efd"
+    },
+    "e63f8cf5a5350996bf4b1dbb2e47c9547214130325125acd8be8419f3836fe95": {
+      "sql": "SELECT \r\n    chassisregistry AS chassis_registry_id,\r\n    (1 - ((brakepadwearpercent + trackwearpercent)/200.0)) * (vehiclespeedkmh/50.0) * (engineloadpercent/100.0) AS vehicle_performance_score\r\nFROM \r\n    chassisandvehicle\r\nJOIN \r\n    engineandfluids ON chassisandvehicle.chassisengref = engineandfluids.engineregistry;",
+      "decisions": {
+        "N0": {
+          "key": "b6165672543796252adc027c6ace3f947791176a821867880ef8099949975383",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "5524de67eae85bb8248d5827b263defb102311c3da55525d6f3c74b2a1a772c4",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "510daa9513c66529065728ba2252ae912ae68a3a6c17e69b6f3f397f72c3794f",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "fbf3b7c7ea4a85543b0ccd707ed7de7278e1acb691066c51cf4e33695f6cf2d7",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "1a5bc9af951501a62e1513472a3f3805347f96a9a854b53b14bdead6f5e499f8",
+      "ordered": false,
+      "columns": [
+        [
+          "chassis_registry_id",
+          23,
+          -1
+        ],
+        [
+          "vehicle_performance_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ffeaaee2fc66d5033c9ad709d68f5b2f6cf2f56c2ea8cc02e1ed459a4c4275ba",
+      "values_digest": "0c7bd74cf7da6c2c6ec0f6e35ebbebe458a0ba34d05d18fbf40d868af83a31c7",
+      "ordered_digest": "5886c9a4408800d4f637f2edb1a6f731da2f119abdffa6076de79579bc72b904"
+    },
+    "62abdd5d67d3a926b0eaf0cb24761ef5e011eaa99207ee9f7e583467e3028ec9": {
+      "sql": "SELECT \r\n    e.equipmenttype AS Equipment, \r\n    ww.waterqualityindex AS \"Water Quality Index\", \r\n    ww.waterlevelpercent AS \"Water Level Percentage\", \r\n    om.operationalstatus AS \"Status Category\",\r\n    (ww.waterqualityindex * ww.waterlevelpercent) AS \"Water Management Score\"\r\nFROM \r\n    waterandwaste ww\r\nJOIN \r\n    equipment e ON ww.watereqref = e.equipmentcode\r\nJOIN \r\n    operationmaintenance om ON e.equipmentcode = om.opmainteqref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "62e4e27798c9c460d61e3cb383966f78a99f9aedc02f1413b692ff9dc1738837",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment",
+          19914,
+          -1
+        ],
+        [
+          "Water Quality Index",
+          23,
+          -1
+        ],
+        [
+          "Water Level Percentage",
+          700,
+          -1
+        ],
+        [
+          "Status Category",
+          20032,
+          -1
+        ],
+        [
+          "Water Management Score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "8359f64509100208ddf6e73d6ad5bcff52c507ae80573a4061fad18c5e8d12c2",
+      "values_digest": "af71892954d5269bc0d0bc8a628c642a581fd8a16db466981146397b1c3d9bb8",
+      "ordered_digest": "54c97546948c2667c9d182a0d8967b6441253de84120eab87305231179df5077"
+    },
+    "69441f81c4fbe1e5394a25ef1a00b298d37ce18c2860a211f9bf82e347c4023d": {
+      "sql": "SELECT \r\n    equipmentcode AS \"Equipment Code\", \r\n    ((performanceindex + reliabilityindex)/2) * (1 - environmentalimpactindex/10) AS \"Energy-Efficiency Metric (EER)\", \r\n    safetyindex AS \"OSPI Value\" \r\nFROM \r\n    equipment \r\nWHERE \r\n    safetyindex > 0.75;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "679693778182a61ce3ce86280883b8bdc14245a7e7b048a48cee3ac511f4fec4",
+      "ordered": false,
+      "columns": [
+        [
+          "Equipment Code",
+          1043,
+          54
+        ],
+        [
+          "Energy-Efficiency Metric (EER)",
+          701,
+          -1
+        ],
+        [
+          "OSPI Value",
+          1700,
+          327687
+        ]
+      ],
+      "rows": 987,
+      "bag_digest": "614cb63847a9ff2daf1ccd52e491398fa2b755586c6a3a6085f01b6d78d94e16",
+      "values_digest": "65884b7720fc0ac264a3e42c2142e9a4dce8f4c30ecf9fab8e62febcf71c67cc",
+      "ordered_digest": "b4ebe6a353d380d047c16f8c61925651e0ce2237f6c21a0f610c1c04d4f7235f"
+    },
+    "cfa87d1ebcb891ad2ce935367a2dfcefb73950e54bfa139e80391ec5bfc2daba": {
+      "sql": "SELECT \r\n    l.locationtype AS location_type,\r\n    l.stationname AS station_name,\r\n    COUNT(e.equipmentcode) AS number_of_equipment\r\nFROM \r\n    location AS l\r\nJOIN \r\n    equipment AS e ON l.loceqref = e.equipmentcode\r\nGROUP BY \r\n    l.stationname, l.locationtype\r\nORDER BY \r\n    l.stationname;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6b342541f7c9e7684d702a6dd6848e6b0c6580812722ceec0b02d8a4ed8db89b",
+      "ordered": true,
+      "columns": [
+        [
+          "location_type",
+          20018,
+          -1
+        ],
+        [
+          "station_name",
+          25,
+          -1
+        ],
+        [
+          "number_of_equipment",
+          20,
+          -1
+        ]
+      ],
+      "rows": 40,
+      "bag_digest": "07c49e9fd60e499d21ee1dd598a6d2578bda97cace509d60b703f9af972ca114",
+      "values_digest": "53c833ad03f82f3675f43ec68f9967f227e7f028623acdffc7f3dff641caf6c7",
+      "ordered_digest": "e93e72bc67d4344f7d5bda137adb3d0e803b287b7422aac14f3d65dfa6d56050"
+    },
+    "288d914101157ef29afafa3fee7b34f81699865ca13f313b99ddac65adbcecc7": {
+      "sql": "SELECT \r\n    l.locationtype AS location_type, \r\n    l.stationname AS station_name, \r\n    COUNT(DISTINCT e.equipmentcode) AS num_equipment, \r\n    CAST(COUNT(DISTINCT CASE WHEN tswg.renewablemetrics IS NOT NULL THEN e.equipmentcode END) AS FLOAT) / COUNT(DISTINCT e.equipmentcode) AS reliance_on_renewables, \r\n    SUM(\r\n        (\r\n            (tswg.renewablemetrics->'solar'->>'output_w')::NUMERIC + \r\n            (tswg.renewablemetrics->'wind'->>'output_w')::NUMERIC\r\n        )\r\n    ) AS total_renewable_power, \r\n    e.equipmenttype AS classification \r\nFROM \r\n    location l \r\nJOIN \r\n    equipment e ON l.loceqref = e.equipmentcode \r\nLEFT JOIN \r\n    thermalsolarwindandgrid tswg ON e.equipmentcode = tswg.thermaleqref \r\nLEFT JOIN \r\n    powerbattery pb ON e.equipmentcode = pb.pwrbatteqref \r\nWHERE \r\n    tswg.renewablemetrics IS NOT NULL \r\nGROUP BY \r\n    l.locationtype, l.stationname, e.equipmenttype \r\nORDER BY \r\n    l.locationtype, l.stationname;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unmodeled cast target",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unmodeled cast target",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unmodeled cast target",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unmodeled cast target",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "edb1175a54bd34373ba1c937cd359187ed3cbe8682256f6c08e697da4fc3e20c",
+      "ordered": true,
+      "columns": [
+        [
+          "location_type",
+          20018,
+          -1
+        ],
+        [
+          "station_name",
+          25,
+          -1
+        ],
+        [
+          "num_equipment",
+          20,
+          -1
+        ],
+        [
+          "reliance_on_renewables",
+          701,
+          -1
+        ],
+        [
+          "total_renewable_power",
+          1700,
+          -1
+        ],
+        [
+          "classification",
+          19914,
+          -1
+        ]
+      ],
+      "rows": 235,
+      "bag_digest": "ed1a91f2b19dce5013f37919d6876ea9ca66585494ee0c8473c1472f3cc6f604",
+      "values_digest": "b5cb2f02b23a7c53c3bd1392595a49195704cbb4507f1dad4a64ef468510cf21",
+      "ordered_digest": "0344f91fffa31d012b7921d66e4c600557d020ae3cf3bf59bcf7fbfd391a161b"
+    },
+    "62f4735e3d4895254dbff64d4572597cca2e30966a131e501f6b0e5e0cbbf600": {
+      "sql": "SELECT \r\n    l.stationname, \r\n    COUNT(e.equipmentcode) AS equipment_count\r\nFROM \r\n    location l\r\nJOIN \r\n    equipment e ON l.loceqref = e.equipmentcode\r\nGROUP BY \r\n    l.stationname;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "79fa5425d9711dfc4e3d543d7dfa62f556e0fed85f8187386741a977cef7102e",
+      "ordered": false,
+      "columns": [
+        [
+          "stationname",
+          25,
+          -1
+        ],
+        [
+          "equipment_count",
+          20,
+          -1
+        ]
+      ],
+      "rows": 20,
+      "bag_digest": "7e5038f24c17a930f4b62cf840ba5ea7cf6feb152a421d67893b5e7db1bac555",
+      "values_digest": "872b91350b908724904b6da4fc9df8d20bb6ec4a20f3cb10ea5d6e9e7166b54d",
+      "ordered_digest": "2b895d2da28eeebf33c277bb391aed59ad87a7b89c12a912ac0c3ab2d46fe4ad"
+    },
+    "0152bcc469a79ac7045f2282ec653921c14cbe111c4e5029734b0ac1487cd38b": {
+      "sql": "SELECT \r\n    t1.chassisregistry, \r\n    (1 - ((t1.brakepadwearpercent + t1.trackwearpercent)/200.0)) * (t1.vehiclespeedkmh/50.0) * (t2.engineloadpercent/100.0) AS vehicle_performance_score\r\nFROM \r\n    chassisandvehicle AS t1\r\nJOIN \r\n    engineandfluids AS t2 ON t1.chassisengref = t2.engineregistry;",
+      "decisions": {
+        "N0": {
+          "key": "0ddc7f671ac56d2b9d19c187b09855b347a8a4e69e4de24b4c8d3b7f387b70fc",
+          "reason": "",
+          "proposal": ""
+        },
+        "N1": {
+          "key": "9f4329bfef4287967d4948eb23a07cb238ec518b9f3cdcb1c8ed94895b4809fc",
+          "reason": "",
+          "proposal": ""
+        },
+        "N2": {
+          "key": "eb9d59379bcb5e72bc7b766232a11f7cf4aa1277af4bc5c65353850f90f63d11",
+          "reason": "",
+          "proposal": ""
+        },
+        "N3": {
+          "key": "24975639728b14a2609b06591f37eb78809af733dd249977c78734635f7961e1",
+          "reason": "",
+          "proposal": "rejected"
+        }
+      },
+      "tree_digest": "feee56e647525e8971a94861ab0cdfc558988b33eeab224e593f3b31b5983e7e",
+      "ordered": false,
+      "columns": [
+        [
+          "chassisregistry",
+          23,
+          -1
+        ],
+        [
+          "vehicle_performance_score",
+          701,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "b6f006f9bcb277153c31ade6e4fad34981176bce66175688a86ccb7e4239f456",
+      "values_digest": "0c7bd74cf7da6c2c6ec0f6e35ebbebe458a0ba34d05d18fbf40d868af83a31c7",
+      "ordered_digest": "f6146c0f6b87b695f62f816e60262672acdcecd28362f78d37953fec29dc3d17"
+    },
+    "e8e9e4e2aa3152631c7bacb8269311bdb6ff62b0a7d9e9f918dd344727b7113d": {
+      "sql": "SELECT \r\n    t1.equipmentcode,\r\n    ((t2.waterlevelpercent * t2.waterqualityindex) / 100) * (1 - (t2.wastetanklevelpercent / 100)) AS water_management_score,\r\n    CASE \r\n        WHEN ((t2.waterlevelpercent * t2.waterqualityindex) / 100) * (1 - (t2.wastetanklevelpercent / 100)) < 50 THEN 'Conservation needs immediate attention'\r\n        WHEN ((t2.waterlevelpercent * t2.waterqualityindex) / 100) * (1 - (t2.wastetanklevelpercent / 100)) BETWEEN 50 AND 70 THEN 'Monitoring advisability'\r\n        ELSE 'Sustainable management'\r\n    END AS status_category\r\nFROM \r\n    equipment AS t1\r\nJOIN \r\n    waterandwaste AS t2 ON t1.equipmentcode = t2.watereqref;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "unsupported operator",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "b13a9c12802da820c90c98f8b7596379c783b1ca45effa0c744f306992a17574",
+      "ordered": false,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "water_management_score",
+          701,
+          -1
+        ],
+        [
+          "status_category",
+          25,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "780509d20001dbce5424cbab7040fd064a3325646684f331a42bd46d7f22de7d",
+      "values_digest": "951efc9d574f70de768c4d9054ac3712c4a61836cab08ceead9cdcb8582585e6",
+      "ordered_digest": "800f5d57d3dbb204cb9bb23d372ea7bb46278030392955fe2265552205ae12ec"
+    },
+    "5fbc427119a3a483c0ff0cda8daebb6b75a3688300a8044dd4bc35a625bcb8ba": {
+      "sql": "SELECT \r\n    tswg.thermaleqref\r\nFROM \r\n    thermalsolarwindandgrid AS tswg\r\nWHERE \r\n    tswg.renewablemetrics IS NOT NULL\r\n    AND (\r\n        (tswg.renewablemetrics->>'solar_output_w' IS NOT NULL AND tswg.renewablemetrics->>'solar_output_w' != '0')\r\n        OR \r\n        (tswg.renewablemetrics->>'wind_output_w' IS NOT NULL AND tswg.renewablemetrics->>'wind_output_w' != '0')\r\n    );",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a9fd7fcd77c9e807c876d568d012afe17b01150fcc3a912c3e6693cd062dd4c3",
+      "ordered": false,
+      "columns": [
+        [
+          "thermaleqref",
+          1043,
+          74
+        ]
+      ],
+      "rows": 0,
+      "bag_digest": "f553cafb15a0fb6bba0e282600960c9d22378f8f132e8a077e269010e87120a4",
+      "values_digest": "643d5437104296e21d906ecb15b2c96ad278f20cfc4af53b12bb6069bd853726",
+      "ordered_digest": "f553cafb15a0fb6bba0e282600960c9d22378f8f132e8a077e269010e87120a4"
+    },
+    "32434ac411d1bfd9e129da969add248544ad5f570e120ef9021c7a02022b9bd7": {
+      "sql": "SELECT AVG(T1.reliabilityindex) AS avg_reliability\nFROM equipment AS T1\nJOIN cabinenvironment AS T2 ON T1.equipmentcode = T2.cabineqref\nWHERE T2.cabinclimate->>'temperature_c' BETWEEN '20' AND '25'\nAND T2.cabinclimate->>'humidity_percent' BETWEEN '30' AND '50'\nAND T2.cabinclimate->>'air_quality_index' < '200'\nAND T2.cabinclimate->>'pressure_kpa' BETWEEN '950' AND '1050'\nAND T2.cabinclimate->>'o2_percent' > '15'\nAND T2.cabinclimate->>'co2_ppm' < '1000';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "afab693ff5897a41184d350b213a25093a46298a0c8b1b8ae95bdce4c43174c4",
+      "ordered": false,
+      "columns": [
+        [
+          "avg_reliability",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "df66e88b01c25f94b4271f268a1a3b14eb274dc131361ae1ac21e0707bf219ff",
+      "values_digest": "7043d284d247c881dc10ed4304327a9fb9659067dda1ecec7c07ef6bac20318c",
+      "ordered_digest": "df66e88b01c25f94b4271f268a1a3b14eb274dc131361ae1ac21e0707bf219ff"
+    },
+    "08e785b6739af01f91b65f83f0e5772b4014f0230e2bb154e0468461bd5aa670": {
+      "sql": "SELECT AVG(T1.reliabilityindex) AS avg_reliability\nFROM equipment AS T1\nJOIN thermalsolarwindandgrid AS T2 ON T1.equipmentcode = T2.thermaleqref\nWHERE T2.renewablemetrics->>'temperature_c' BETWEEN '20' AND '25'\nAND T2.renewablemetrics->>'humidity_percent' BETWEEN '30' AND '50'\nAND T2.renewablemetrics->>'air_quality_index' < '200'\nAND T2.renewablemetrics->>'pressure_kpa' BETWEEN '950' AND '1050'\nAND T2.renewablemetrics->>'o2_percent' > '15'\nAND T2.renewablemetrics->>'co2_ppm' < '1000';",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f7914b91cdcfd436f5afd16b7752ba98decd93ae88f4c22bffaf029f18d7bab7",
+      "ordered": false,
+      "columns": [
+        [
+          "avg_reliability",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1,
+      "bag_digest": "df66e88b01c25f94b4271f268a1a3b14eb274dc131361ae1ac21e0707bf219ff",
+      "values_digest": "7043d284d247c881dc10ed4304327a9fb9659067dda1ecec7c07ef6bac20318c",
+      "ordered_digest": "df66e88b01c25f94b4271f268a1a3b14eb274dc131361ae1ac21e0707bf219ff"
+    },
+    "b5e754e993922abe87be8271853ddb812ae668e08e2fb23f20ce480111097fd2": {
+      "sql": "SELECT equipmentcode AS equipment_code,\n    efficiencyindex AS energy_efficiency_metric,\n    safetyindex AS OSPI\nFROM equipment\nWHERE safetyindex > (\n    SELECT AVG(safetyindex)\n    FROM equipment\n);\n",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "4852b7bca43f4111a4f081d9752042e410b5a0cf05ee2385bc44a4d0feb29ab2",
+      "ordered": false,
+      "columns": [
+        [
+          "equipment_code",
+          1043,
+          54
+        ],
+        [
+          "energy_efficiency_metric",
+          700,
+          -1
+        ],
+        [
+          "ospi",
+          1700,
+          327687
+        ]
+      ],
+      "rows": 504,
+      "bag_digest": "9506ac9d77d7a547380e5d53d627f7bf56a8d997c4250b8b151630946fc86837",
+      "values_digest": "11f3350b68df11a016472385ca1185cf840046a4801a6b459e3a1c92680f10d0",
+      "ordered_digest": "2ddb82eb6f660033b7981f4b54aa29c723c188c5d1bb093c3afabaa39f8cc4f9"
+    },
+    "8d1539c46a7be158163544fcb6a5894d616738113072a1fcc1381f50c7764b29": {
+      "sql": "SELECT equipmentcode, efficiencyindex AS \"energy-efficiency metric\", safetyindex AS OSPI\nFROM equipment\nWHERE safetyindex > (SELECT AVG(safetyindex) FROM equipment);",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "5d8e09e48f0903cf308e055777f324202ca7f6e0c86051964e53a03b79f10d65",
+      "ordered": false,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "energy-efficiency metric",
+          700,
+          -1
+        ],
+        [
+          "ospi",
+          1700,
+          327687
+        ]
+      ],
+      "rows": 504,
+      "bag_digest": "bbf88e867c281467c6c3f3db608cef5597ba937a61a62a6a01a33c3afcfeb964",
+      "values_digest": "11f3350b68df11a016472385ca1185cf840046a4801a6b459e3a1c92680f10d0",
+      "ordered_digest": "515d564c924965a0a36a842728c98a82f52293749a4e4a6ef57dbff83b5ac540"
+    },
+    "065842a43cf90a430c8dbcc8bf12baa359025b3622b827933154822ed4831cff": {
+      "sql": "WITH EnergyEfficiency AS (\r\n    SELECT \r\n        equipmentcode, \r\n        ((performanceindex + reliabilityindex)/2) * (1 - environmentalimpactindex/10) AS eer\r\n    FROM \r\n        equipment\r\n),\r\nHighOSPI AS (\r\n    SELECT \r\n        equipmentcode, \r\n        safetyindex * efficiencyindex AS osapi\r\n    FROM \r\n        equipment\r\n    WHERE \r\n        safetyindex * efficiencyindex > 0.75\r\n)\r\nSELECT \r\n    h.equipmentcode, \r\n    e.eer AS energy_efficiency_metric, \r\n    h.osapi AS OSPI_value\r\nFROM \r\n    HighOSPI h\r\nJOIN \r\n    EnergyEfficiency e ON h.equipmentcode = e.equipmentcode;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "a99a5e682ac8208a20086e300c564a800f30506a723f62188de84bbed45ac351",
+      "ordered": false,
+      "columns": [
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "energy_efficiency_metric",
+          701,
+          -1
+        ],
+        [
+          "ospi_value",
+          701,
+          -1
+        ]
+      ],
+      "rows": 999,
+      "bag_digest": "6df31e4360337d6db416f7d671a3515360a3fdd3bb8a61b526648dfcc99c13fe",
+      "values_digest": "78e55cbc5b0ba9159115ff32ff673885bffab1e21b4e5300d7c194fe423a61fd",
+      "ordered_digest": "69d6ab6bce761208018583345ba146a26a8cd52674516e1addb8f5926b97f8a5"
+    },
+    "9f9a09c85b96f49f9821cc78c9dd5904355ec22f3061ad85d79426cff43a59ba": {
+      "sql": "WITH EquipmentRanks AS (\r\n    SELECT \r\n        equipmenttype,\r\n        equipmentcode,\r\n        efficiencyindex,\r\n        safetyindex,\r\n        RANK() OVER (ORDER BY efficiencyindex) AS efficiency_rank,\r\n        RANK() OVER (ORDER BY safetyindex) AS safety_rank\r\n    FROM \r\n        equipment\r\n)\r\nSELECT \r\n    equipmenttype,\r\n    equipmentcode,\r\n    efficiencyindex,\r\n    safetyindex,\r\n    efficiency_rank,\r\n    safety_rank,\r\n    (efficiency_rank - safety_rank) AS rank_difference\r\nFROM \r\n    EquipmentRanks\r\nORDER BY \r\n    rank_difference;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "ef733849adb89359759b8b460b2b26ec9c33f92bd31d6e867652088caf39622b",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "efficiencyindex",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "efficiency_rank",
+          20,
+          -1
+        ],
+        [
+          "safety_rank",
+          20,
+          -1
+        ],
+        [
+          "rank_difference",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "83ec995e34e9dd4379bc0d57c89f67aece22a632d136babd508af2340ca3965e",
+      "values_digest": "84590c369650e6c44a4aa0556843d1c853deefe67efb5c3b5b99d590d3098420",
+      "ordered_digest": "95590a91784c70039a448470e55cf0806cb3bfa24b740940749377d834c9fad6"
+    },
+    "e4d06e166abce35820f6f7d63d99c6bb2b3c1af1c70635633d35c40aabc42e52": {
+      "sql": "WITH RankedEquipment AS (\r\n    SELECT \r\n        equipmenttype, \r\n        equipmentcode, \r\n        efficiencyindex AS overall_efficiency, \r\n        safetyindex, \r\n        DENSE_RANK() OVER (ORDER BY efficiencyindex DESC) AS efficiency_rank, \r\n        DENSE_RANK() OVER (ORDER BY safetyindex DESC) AS safety_rank, \r\n        (DENSE_RANK() OVER (ORDER BY efficiencyindex DESC) - DENSE_RANK() OVER (ORDER BY safetyindex DESC)) AS rank_difference\r\n    FROM \r\n        equipment\r\n)\r\nSELECT \r\n    equipmenttype, \r\n    equipmentcode, \r\n    overall_efficiency, \r\n    safetyindex, \r\n    efficiency_rank, \r\n    safety_rank, \r\n    rank_difference\r\nFROM \r\n    RankedEquipment\r\nORDER BY \r\n    rank_difference ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "89fd7a73c1ddff468edc401c4813d68868e8b0d66f24673b598da832e5ce90ba",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "overall_efficiency",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "efficiency_rank",
+          20,
+          -1
+        ],
+        [
+          "safety_rank",
+          20,
+          -1
+        ],
+        [
+          "rank_difference",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "e4edbfba6fca1f2ddd0ad99b4b2f4de3c9b9d02adaf93a521aeebb54ca42f389",
+      "values_digest": "9790e8ecbb36d4fb92c3ec7ef1a87c93867876a6b3e4797cade3bb513f1fe73a",
+      "ordered_digest": "66851007bb0ebf352feb4e2de2efdc6df0d0ce906ca780ce987e8f83b3ea7fb8"
+    },
+    "288b6d556e23e12a2b26d076f283ba033d24517bd80a40b3948f825c88bfb971": {
+      "sql": "WITH RankedEquipment AS (\r\n    SELECT \r\n        equipmenttype, \r\n        equipmentcode, \r\n        efficiencyindex AS overall_efficiency, \r\n        safetyindex, \r\n        RANK() OVER (ORDER BY efficiencyindex DESC) AS efficiency_rank, \r\n        RANK() OVER (ORDER BY safetyindex DESC) AS safety_rank, \r\n        (RANK() OVER (ORDER BY efficiencyindex DESC) - RANK() OVER (ORDER BY safetyindex DESC)) AS rank_difference\r\n    FROM \r\n        equipment\r\n)\r\nSELECT \r\n    equipmenttype, \r\n    equipmentcode, \r\n    overall_efficiency, \r\n    safetyindex, \r\n    efficiency_rank, \r\n    safety_rank, \r\n    rank_difference\r\nFROM \r\n    RankedEquipment\r\nORDER BY \r\n    rank_difference ASC;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "288462627ed4deed165403a141fe64c2434d390e3d929958dbbd147fb1202848",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "overall_efficiency",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "efficiency_rank",
+          20,
+          -1
+        ],
+        [
+          "safety_rank",
+          20,
+          -1
+        ],
+        [
+          "rank_difference",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "9b6d0da32746cbefd726ba522542a706254b70359c726ff20cb1ea2f44d3d77f",
+      "values_digest": "e3d0c1ae1138b4c23851c692f7800649b71db05de3610448bdb3ede73a4a45ad",
+      "ordered_digest": "7eea9fe911f6ca9b3495c13dcc62e42dbf13c8539f0ad9a005359ad26956cf09"
+    },
+    "2e043a9e8f34af20c696c480693b9028bd818d671624f6182d8050a78c1544d6": {
+      "sql": "WITH RankedEquipment AS (\r\n    SELECT \r\n        equipmenttype, \r\n        equipmentcode, \r\n        efficiencyindex AS overall_efficiency, \r\n        safetyindex, \r\n        RANK() OVER (ORDER BY efficiencyindex) AS efficiency_rank, \r\n        RANK() OVER (ORDER BY safetyindex) AS safety_rank, \r\n        (RANK() OVER (ORDER BY efficiencyindex)) - (RANK() OVER (ORDER BY safetyindex)) AS rank_difference\r\n    FROM \r\n        equipment\r\n)\r\nSELECT \r\n    equipmenttype, \r\n    equipmentcode, \r\n    overall_efficiency, \r\n    safetyindex, \r\n    efficiency_rank, \r\n    safety_rank, \r\n    rank_difference\r\nFROM \r\n    RankedEquipment\r\nORDER BY \r\n    rank_difference;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "efdf0cf96d74b35f4e43a70cfed62b00de5607ceee6ee511add8cc5823649ad4",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "overall_efficiency",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "efficiency_rank",
+          20,
+          -1
+        ],
+        [
+          "safety_rank",
+          20,
+          -1
+        ],
+        [
+          "rank_difference",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "ecf4a71415c97ec5ce3f9c9b50ee0adff845e55ffc726692070ccb1ac678a3b7",
+      "values_digest": "84590c369650e6c44a4aa0556843d1c853deefe67efb5c3b5b99d590d3098420",
+      "ordered_digest": "24103c22983435d88fda31365dba8266d6e0c85366101701ad27372624d6d9c7"
+    },
+    "3b7f2523c5a064926093077c75d7e483bbefbf9905c030991cd5e068e6f30ac2": {
+      "sql": "WITH calc_scores AS (\r\n    SELECT \r\n        T1.equipmenttype,\r\n        T1.equipmentcode,\r\n        T1.efficiencyindex AS overall_efficiency,\r\n        T1.safetyindex,\r\n        (T1.safetyindex * T1.efficiencyindex * 0.8) AS overall_safety_performance_index,\r\n        CASE \r\n            WHEN T2.operationalstatus = 'Active' THEN 10 * (1 - (T2.operationhours / T2.maintenancecyclehours))\r\n            WHEN T2.operationalstatus = 'Standby' THEN 5 * (1 - (T2.operationhours / T2.maintenancecyclehours))\r\n            ELSE 0\r\n        END AS operational_readiness_score\r\n    FROM equipment AS T1\r\n    JOIN operationmaintenance AS T2 ON T1.equipmentcode = T2.opmainteqref\r\n),\r\nrank_scores AS (\r\n    SELECT \r\n        *,\r\n        RANK() OVER (ORDER BY overall_safety_performance_index) AS ospi_rank,\r\n        RANK() OVER (ORDER BY operational_readiness_score) AS ors_rank\r\n    FROM calc_scores\r\n)\r\nSELECT \r\n    equipmenttype,\r\n    equipmentcode,\r\n    overall_efficiency,\r\n    safetyindex,\r\n    ospi_rank,\r\n    ors_rank,\r\n    (ospi_rank - ors_rank) AS rank_difference\r\nFROM rank_scores\r\nORDER BY rank_difference;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "6d2d2c760e7f86fdddf612687489df6469e03e524f86ea5dda94c9b0c341dbd4",
+      "ordered": true,
+      "columns": [
+        [
+          "equipmenttype",
+          19914,
+          -1
+        ],
+        [
+          "equipmentcode",
+          1043,
+          54
+        ],
+        [
+          "overall_efficiency",
+          700,
+          -1
+        ],
+        [
+          "safetyindex",
+          1700,
+          327687
+        ],
+        [
+          "ospi_rank",
+          20,
+          -1
+        ],
+        [
+          "ors_rank",
+          20,
+          -1
+        ],
+        [
+          "rank_difference",
+          20,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "88d1a3618c7450ae1a8f8238dc247a62de1d0f10e6c837792c8c12789a106cc7",
+      "values_digest": "930fc2dc00c4481615c3851cc78b30328648abb164ee83cf525847f4dc327d2e",
+      "ordered_digest": "3b4b73f97ea5ce43f7b7328f966c50da61165fadd0c694a2b505ec3b49c5b61a"
+    },
+    "ca506a36aeef7cdb202bb5a50e932cc031d9a46edcd26e9f9548ef856bc8f487": {
+      "sql": "WITH readiness_metric AS (\r\n    SELECT \r\n        opmaintregistry AS registry_id,\r\n        operationhours AS usage_hours,\r\n        maintenancecyclehours AS service_interval,\r\n        operationalstatus,\r\n        CASE \r\n            WHEN operationalstatus = 'Active' THEN 10 * (operationhours / maintenancecyclehours)\r\n            WHEN operationalstatus = 'Standby' THEN 5 * (operationhours / maintenancecyclehours)\r\n            ELSE 0\r\n        END AS readiness_metric\r\n    FROM \r\n        operationmaintenance\r\n)\r\nSELECT \r\n    registry_id,\r\n    usage_hours,\r\n    service_interval,\r\n    operationalstatus,\r\n    readiness_metric\r\nFROM \r\n    readiness_metric;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "f2868685a3aa825e9440903ad12d3e1b0ab80d65c4cf739b9a9da60707c422da",
+      "ordered": false,
+      "columns": [
+        [
+          "registry_id",
+          23,
+          -1
+        ],
+        [
+          "usage_hours",
+          1700,
+          524295
+        ],
+        [
+          "service_interval",
+          1700,
+          458758
+        ],
+        [
+          "operationalstatus",
+          20032,
+          -1
+        ],
+        [
+          "readiness_metric",
+          1700,
+          -1
+        ]
+      ],
+      "rows": 1000,
+      "bag_digest": "d2adc7b56fd5c974350d26eef26d16571e7204ac1a8f8d4f842641f976b50a72",
+      "values_digest": "0e21ca1386401c276ec029aab8dc41018f5d564b290608b31bf4b1e47f320da5",
+      "ordered_digest": "eb0b1623414231b32a73de8283fc58ccc8617c9c0f54c567362b0f2a82af7246"
+    },
+    "1b1bf75685ea32659f38d4a6b3d4680e1eb223f0162e29fa9d7babbd880b694e": {
+      "sql": "WITH station_info AS (\n    SELECT \n        l.stationname, \n        l.locationtype, \n        AVG(ww.waterqualityindex) AS avg_water_quality_index, \n        AVG(tswg.powerqualityindex) AS avg_wrmi_score, \n        COUNT(CASE WHEN tswg.powerqualityindex < 0.5 THEN 1 END) AS water_saving_systems_count, \n        'Water Quality Classification' AS water_quality_classification, \n        CASE \n            WHEN AVG(tswg.powerqualityindex) < 0.5 THEN 'Conservation Needed' \n            WHEN AVG(tswg.powerqualityindex) < 0.7 THEN 'Monitoring Advised' \n            ELSE 'Sustainable Management' \n        END AS management_situation \n    FROM \n        location l \n    JOIN \n        waterandwaste ww ON l.loceqref = ww.watereqref \n    JOIN \n        thermalsolarwindandgrid tswg ON l.loceqref = tswg.thermaleqref \n    GROUP BY \n        l.stationname, l.locationtype\n)\nSELECT \n    stationname, \n    locationtype, \n    avg_water_quality_index, \n    avg_wrmi_score, \n    water_saving_systems_count, \n    water_quality_classification, \n    management_situation \nFROM \n    station_info \nORDER BY \n    stationname, locationtype;",
+      "decisions": {
+        "N0": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N1": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N2": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        },
+        "N3": {
+          "key": null,
+          "reason": "untracked relation",
+          "proposal": ""
+        }
+      },
+      "tree_digest": "865a4d299805692e6ce40e9fc70066e7a105fbcf02273485ea143152fb7f7a78",
+      "ordered": true,
+      "columns": [
+        [
+          "stationname",
+          25,
+          -1
+        ],
+        [
+          "locationtype",
+          20018,
+          -1
+        ],
+        [
+          "avg_water_quality_index",
+          1700,
+          -1
+        ],
+        [
+          "avg_wrmi_score",
+          1700,
+          -1
+        ],
+        [
+          "water_saving_systems_count",
+          20,
+          -1
+        ],
+        [
+          "water_quality_classification",
+          25,
+          -1
+        ],
+        [
+          "management_situation",
+          25,
+          -1
+        ]
+      ],
+      "rows": 40,
+      "bag_digest": "0667be04b223e6783b2f05daa28880bceb113d6f6ec72b49436ddf295c71b90c",
+      "values_digest": "2e425d297ffea065b66c6d7ee6965fe69063b6d1bc22eb13b3738d273c6f4264",
+      "ordered_digest": "07e80be76b3ff957a0dabcc7c88535977dc768343ec175aab6eff6fc17c89fed"
+    }
+  },
+  "snapshot_date": "2026-11-05",
+  "catalog": {
+    "waterandwaste": {
+      "waterregistry": "int4",
+      "watereqref": "varchar",
+      "waterlevelpercent": "float4",
+      "waterpressurekpa": "numeric",
+      "watertemperaturec": "float8",
+      "waterflowlpm": "numeric",
+      "waterqualityindex": "int4",
+      "wastetanklevelpercent": "numeric"
+    },
+    "engineandfluids": {
+      "engineregistry": "int4",
+      "engfluidseqref": "varchar",
+      "engfluidspbref": "int4",
+      "enginespeedrpm": "int4",
+      "engineloadpercent": "float4",
+      "enginetemperaturec": "float8",
+      "enginehours": "numeric",
+      "engfluidsopmaintref": "int4",
+      "fluidmetrics": "jsonb"
+    },
+    "transmission": {
+      "transregistry": "int4",
+      "transeqref": "varchar",
+      "transengfluidsref": "int4",
+      "transmissiontemperaturec": "float4",
+      "transmissionpressurekpa": "numeric",
+      "transmissiongear": "int2",
+      "differentialtemperaturec": "float8",
+      "axletemperaturec": "float8",
+      "transopmaintref": "int4"
+    },
+    "chassisandvehicle": {
+      "chassisregistry": "int4",
+      "chassiseqref": "varchar",
+      "chassistransref": "int4",
+      "brakepadwearpercent": "float4",
+      "brakefluidlevelpercent": "numeric",
+      "brakepressurekpa": "int4",
+      "tracktensionkn": "numeric",
+      "trackwearpercent": "float8",
+      "suspensionheightmm": "numeric",
+      "vehiclespeedkmh": "float4",
+      "vehicleloadkg": "numeric",
+      "vehicleangledegrees": "numeric",
+      "vehicleheadingdegrees": "numeric",
+      "chassisengref": "int4",
+      "tiremetrics": "jsonb"
+    }
+  }
+}
