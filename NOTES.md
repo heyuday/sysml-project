@@ -150,3 +150,32 @@ This project now lives at the repo root. MadBonzz's original files moved, unchan
 - The whole cloud flow passes in a fresh Ubuntu 24.04 container at SF 0.1 with the mock backend: setup, tests, load, missing-key refusal, mock sweep, idempotent re-setup.
 
 **Planned cloud run:** SF 10, sequential, 4 Haiku agents, `direct` vs `aware`, 3 reps per task. Results go to `results/tpch-sf10/`.
+
+## TPC-H SF 10 heavy-query run, cloud (2026-11-06)
+
+**Where:** Claude Code cloud VM, 4 vCPU, 15 GB RAM. Load took about 3.5 min.
+**Query times (warm):** Q5 about 5.3 s (answer INDIA, runner-up CHINA); Q10 about 4.3 s (answer Customer#001237537).
+**Setup:** Haiku 5.5, 4 agents, sequential, `paraphrase`, no simulated delay, 3 reps per arm. Results are in `results/tpch-sf10/`.
+**Key problem:** the cloud reserves `ANTHROPIC_API_KEY` for Claude Code's own login and doesn't pass it to commands. Fixed with the alias `AGENTSQL_ANTHROPIC_API_KEY`.
+
+| task | arm | correct | follower wall s | follower LLM calls | follower LLM s | follower SQL s | reused/follower | DB s per run | makespan s |
+|---|---|---|---|---|---|---|---|---|---|
+| Q5 | direct | 12/12 | 10.9 ± 0.2 | 3.7 | 5.8 | 5.1 | 0 | 20.5 | 41.7 |
+| Q5 | aware | 12/12 | **4.7 ± 0.1** | 3.0 | 4.7 | **0.0** | 1.00 | **5.1** | 23.0 |
+| Q10 | direct | 12/12 | 9.1 ± 1.3 | 3.0 | 3.9 | 5.2 | 0 | 19.8 | 34.9 |
+| Q10 | aware | 12/12 | **4.4 ± 0.1** | 3.0 | 4.4 | **0.0** | 1.00 | **4.3** | 23.3 |
+
+**Findings:**
+1. **Real queries, real savings.** Aware followers finished 57% (Q5) and 52% (Q10) faster. DB work per run fell 75–78%: only the leader's query executes. Every aware follower reused the cached query (9/9 per task), and all 48 answers were correct.
+2. **The confound is resolved for Q10.** Direct and aware followers made the same number of LLM calls (3.0 vs 3.0), because direct followers ran their schema lookups alongside other calls in the same turns. Aware LLM time was even slightly higher (4.4 vs 3.9 s). So the whole 4.7 s per-follower saving is the cache hit (SQL 5.2 → 0 s). In Q5 about 1.1 s came from fewer turns and about 5.1 s from the hit.
+3. **With heavy queries, SQL is about half of a follower's time** without the cache (5.1 of 10.9 s). Compare Aryan's BIRD measurement of about 3.6%. Whether caching matters is set by query cost.
+4. **Overhead:** in Q10 the aware leader was 2.5 s slower (10.1 vs 7.6 s), from checking an empty cache. In Q5 there was no difference.
+
+**Caveats:**
+- Sequential is the best case: the leader finishes before followers start.
+- n = 3 per arm, one model, two tasks with explicit wordings, one 4-vCPU VM.
+- Tokens: Q5 aware used 16% fewer; Q10 aware used 7% more.
+
+**Next:**
+- Overlapping agents: staggered or parallel starts with heavy queries. Reuse will drop, so this is where single-flight (waiting on an in-flight query) matters.
+- Shourya's two items: a retrieval-based catalog and the near-miss wrong-reuse test.

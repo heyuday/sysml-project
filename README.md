@@ -8,7 +8,7 @@ CS 5470, Team 19.
 
 ## Findings so far
 
-Setup: Claude Haiku 5.5 agents, 4 at a time, on a small `shop` database (4 tables, about 20k rows). Agent 0 runs first. Agents 1–3 ("followers") can reuse its work. Raw logs are in [`results/`](results/).
+Setup for findings 1–2: Claude Haiku 5.5 agents, 4 at a time, on a small `shop` database (4 tables, about 20k rows). Finding 3 uses TPC-H. Agent 0 runs first. Agents 1–3 ("followers") can reuse its work. Raw logs are in [`results/`](results/).
 
 **1. A plain exact-text cache gets no hits on real analytical SQL.** Four agents answering the same question, reworded, wrote seven different SQL statements. They used different column aliases, join orders and operand order, and some added extra columns. Every hit was a fixed-text schema lookup. ([first-real-runs](results/first-real-runs/))
 
@@ -26,11 +26,25 @@ Setup: Claude Haiku 5.5 agents, 4 at a time, on a small `shop` database (4 table
 - With no simulated delay, follower time dropped 32%. All of that saving came from fewer LLM turns.
 - When the leader is slow and followers start early (2 s delay, staggered), reuse falls to 0.33 per follower, because nothing is cached yet when they check.
 
+**3. On genuinely heavy queries, the cache itself cuts follower time in half.** This is TPC-H at scale factor 10 on a 4-vCPU cloud VM, where Q5 takes about 5.3 s and Q10 about 4.3 s. Same setup: 4 Haiku agents, sequential, 3 reps, no simulated delay ([results](results/tpch-sf10/)):
+
+| task | arm | correct | follower time (s) | follower LLM calls | follower SQL time (s) | DB time per run (s) |
+|---|---|---|---|---|---|---|
+| Q5 | no cache | 12/12 | 10.9 ± 0.2 | 3.7 | 5.1 | 20.5 |
+| Q5 | **aware** | 12/12 | **4.7 ± 0.1** | 3.0 | **0.0** | **5.1** |
+| Q10 | no cache | 12/12 | 9.1 ± 1.3 | 3.0 | 5.2 | 19.8 |
+| Q10 | **aware** | 12/12 | **4.4 ± 0.1** | 3.0 | **0.0** | **4.3** |
+
+- Followers finished **52–57% faster**, and database work fell **75–78%**, since only the first agent's query executed. Every follower reused it, and every answer was correct.
+- In Q10 both arms used exactly 3 LLM calls, so the **whole saving is the cache hit itself**, not fewer turns. That resolves the confound noted below for this task.
+- Without a cache, SQL was about half a follower's time here (5 of 11 s), against about 3.6% on BIRD (Aryan's measurement). Whether caching matters depends on how expensive the queries are.
+
 **How far to trust this:**
 - **Credible:** the behavior, meaning reuse counts, correctness and LLM-call counts.
 - **Real but narrow:** the 0 ms timing. It's one easy question, Haiku only, and 3 reps.
 - **Not credible as magnitudes:** the 2 s rows. The delay is simulated and also charges schema lookups, which are cheap on a real database.
-- **Open confound:** the saved turns may come from *seeing working SQL* rather than from the cached *result*. Measuring the cache's own value needs genuinely heavy queries. That's the next step.
+- **Confound (shop runs):** on the tiny DB, the saved turns may come from *seeing working SQL* rather than from the cached *result*. The TPC-H Q10 run separates the two: equal LLM calls, so the saving there is the cache hit.
+- **TPC-H runs:** sequential is the best case (the leader finishes before followers start). n = 3, Haiku only, two tasks. The aware leader can be slower: +2.5 s in Q10 from checking an empty cache.
 
 ## Quick start
 
@@ -106,7 +120,7 @@ It needs `ANTHROPIC_API_KEY` in the environment, or the alias `AGENTSQL_ANTHROPI
 
 ## Next
 
-1. **Clean heavy-query run (ready, runs in the cloud):** TPC-H at scale factor 10, Q5 and Q10, no cache vs. aware, 3 reps each. No simulated delay.
+1. **Overlapping agents on heavy queries:** staggered and parallel starts. Followers will often check before the leader's result is cached, so this is where waiting on an in-flight query (single-flight) should matter.
 2. **Scaling the aware catalog** (Shourya's ideas):
    - retrieve only the top-k relevant entries instead of listing everything;
    - store the question behind each cached query;
