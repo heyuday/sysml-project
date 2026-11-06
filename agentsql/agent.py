@@ -117,10 +117,12 @@ def format_catalog(entries) -> str:
 
 
 class Agent:
-    def __init__(self, agent_id: int, task: Task, question: str, expected: str,
+    def __init__(self, agent_id: int, task: Task, question: str, expected,
                  backend, cache: SqlCache, log: EventLog, max_steps: int = 20,
                  aware: bool = False):
-        self.id, self.task, self.question, self.expected = agent_id, task, question, expected
+        self.id, self.task, self.question = agent_id, task, question
+        # acceptable answers: any cell of the reference query's first row
+        self.expected = [expected] if isinstance(expected, str) else list(expected)
         self.backend, self.cache, self.log, self.max_steps = backend, cache, log, max_steps
         self.aware = aware
 
@@ -195,7 +197,7 @@ class Agent:
                 break
             conv.add_tool_results(results)
 
-        correct = answer is not None and self.expected.lower() in answer.lower()
+        correct = answer is not None and any(e.lower() in answer.lower() for e in self.expected)
         wall = time.perf_counter() - t0
         self.log.write(type="final", agent=self.id, task=self.task.id, answer=answer,
                        expected=self.expected, correct=correct, steps=step,

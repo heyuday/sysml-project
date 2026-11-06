@@ -24,19 +24,26 @@ import psycopg
 
 from agentsql.agent import Agent, EventLog
 from agentsql.analyze import load, report, summarize
-from agentsql.cache import DEFAULT_DSN, SqlCache
+from agentsql.cache import DSNS, SqlCache
 from agentsql.llm import make_backend
-from agentsql.tasks import SCENARIOS, assign
+from agentsql.tasks import DATASETS, SCENARIOS, assign
 
 
-def expected_answers(tasks) -> dict[str, str]:
-    """Run each reference query directly (outside the cache) to get the expected answer."""
-    with psycopg.connect(DEFAULT_DSN, autocommit=True) as conn:
-        return {t.id: str(conn.execute(t.reference_sql).fetchone()[0]) for t in tasks}
+def expected_answers(tasks, dsn) -> dict[str, list[str]]:
+    """Run each reference query directly (outside the cache). Any cell of its
+    first row counts as a correct answer (e.g. a customer's name or key)."""
+    with psycopg.connect(dsn, autocommit=True) as conn:
+        out = {}
+        for t in tasks:
+            row = conn.execute(t.reference_sql).fetchone()
+            out[t.id] = [str(v).strip() for v in row if v is not None]
+        return out
 
 
 def main(argv=None) -> str:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--dataset", choices=list(DATASETS), default="shop")
+    ap.add_argument("--task", default=None, help="question for same/paraphrase (default: dataset's first)")
     ap.add_argument("--agents", type=int, default=4)
     ap.add_argument("--scenario", choices=SCENARIOS, default="same")
     ap.add_argument("--schedule", choices=("sequential", "staggered", "parallel"), default="sequential")
@@ -49,27 +56,31 @@ def main(argv=None) -> str:
                     help="give agents a cached_queries tool and a hint to reuse cached SQL")
     ap.add_argument("--db-delay-ms", type=float, default=0.0,
                     help="simulated extra latency on every real DB execution (not on hits)")
+    ap.add_argument("--statement-timeout-s", type=float, default=120.0,
+                    help="Postgres statement_timeout for agent queries (0 = none)")
     ap.add_argument("--max-steps", type=int, default=20)
     ap.add_argument("--log", default=None)
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
 
-    plan = assign(args.scenario, args.agents)
-    expected = expected_answers({t for t, _ in plan})
+    dsn = DSNS[args.dataset]
+    plan = assign(args.scenario, args.agents, args.dataset, args.task)
+    expected = expected_answers({t for t, _ in plan}, dsn)
     backend = make_backend(args.backend, args.model, args.effort)
     model = getattr(backend, "model", None)
 
     os.makedirs("logs", exist_ok=True)
     path = args.log or datetime.now().strftime(
-        f"logs/%Y%m%d-%H%M%S-{args.scenario}-{args.schedule}-{args.backend}.jsonl")
+        f"logs/%Y%m%d-%H%M%S-{args.dataset}-{args.scenario}-{args.schedule}-{args.backend}.jsonl")
     log = EventLog(path)
-    log.write(type="run", scenario=args.scenario, schedule=args.schedule, gap=args.gap,
+    log.write(type="run", dataset=args.dataset, task=plan[0][0].id, scenario=args.scenario, schedule=args.schedule, gap=args.gap,
               n_agents=args.agents, cache=args.cache, backend=args.backend, model=model,
               effort=args.effort if args.backend == "anthropic" else None,
               aware=args.aware, db_delay_ms=args.db_delay_ms)
 
     # one cache shared by all agents
-    cache = SqlCache(mode=args.cache, read_only=True, db_delay_ms=args.db_delay_ms)
+    cache = SqlCache(dsn=dsn, mode=args.cache, read_only=True, db_delay_ms=args.db_delay_ms,
+                     statement_timeout_s=args.statement_timeout_s)
     agents = [Agent(i, t, q, expected[t.id], backend, cache, log, args.max_steps, args.aware)
               for i, (t, q) in enumerate(plan)]
 

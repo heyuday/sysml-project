@@ -39,7 +39,7 @@ You need Docker and [uv](https://docs.astral.sh/uv/).
 ```sh
 docker compose up -d --wait      # Postgres 16 on 127.0.0.1:55440, seeded from db/seed.sql
 uv sync
-uv run pytest -q                 # 35 tests, needs the database running
+uv run pytest -q                 # 37 tests (TPC-H ones skip until it's loaded); needs the DB running
 uv run python demo.py            # cache basics: 10 queries run twice, hit/miss and latency
 
 # agents (the mock backend needs no API key)
@@ -50,16 +50,42 @@ uv run python sweep.py --reps 3                                    # direct vs a
 uv run python -m agentsql.aggregate results/sweep-paraphrase-v2    # re-print a sweep's table
 ```
 
+**TPC-H (heavy queries).** [`scripts/load_tpch.py`](scripts/load_tpch.py) generates TPC-H with `tpchgen-cli` (installed from PyPI) and loads it into a `tpch` database. It works one table at a time to limit disk use, then times the task queries:
+
+```sh
+uv run python scripts/load_tpch.py --sf 1      # SF 1 ≈ 1 GB; SF 10 ≈ 15 GB in Postgres
+uv run python run_agents.py --dataset tpch --task q5_nation_revenue --scenario paraphrase --aware
+```
+
+TPC-H tasks: `q5_nation_revenue` (TPC-H Q5) and `q10_returned_customer` (Q10), each with 4 wordings. At SF 1 they reproduce the official TPC-H answers, INDONESIA and Customer#000057040. On an M2 MacBook at SF 1 the queries still take only 0.15–0.3 s, so the heavy run uses SF 10.
+
 Main `run_agents.py` options:
 
 | Flag | Values |
 |---|---|
+| `--dataset` | `shop` (tiny seed DB), `tpch` |
+| `--task` | question for `same`/`paraphrase`, e.g. `q5_nation_revenue` |
 | `--scenario` | `same`, `paraphrase` (same question, reworded per agent), `related` (different questions), `mixed` |
 | `--schedule` | `sequential`, `staggered --gap N`, `parallel` |
 | `--cache` | `exact`, `direct` (no cache) |
 | `--aware` | give agents the `cached_queries` tool and reuse hint |
 | `--db-delay-ms N` | simulated latency on real DB executions, never on hits |
+| `--statement-timeout-s N` | Postgres timeout for agent SQL (default 120) |
 | `--backend` | `anthropic` (default `claude-haiku-5-5`), `openai` (any OpenAI-compatible API: OpenAI, Gemini, vLLM), `mock` |
+
+## Running in the cloud (no Docker)
+
+[`scripts/cloud_run.sh`](scripts/cloud_run.sh) runs the TPC-H experiment on a fresh Ubuntu VM, such as a Claude Code cloud session. It runs in steps, so no single command runs too long:
+
+```sh
+bash scripts/cloud_run.sh setup                      # Postgres on :55440 + deps + tests (scripts/setup_cloud.sh)
+bash scripts/cloud_run.sh load                       # TPC-H SF 10 (override with SF=...)
+bash scripts/cloud_run.sh sweep q5_nation_revenue    # direct vs aware, sequential, 3 reps
+bash scripts/cloud_run.sh sweep q10_returned_customer
+bash scripts/cloud_run.sh summary
+```
+
+It needs `ANTHROPIC_API_KEY` in the environment. Results go to `results/tpch-sf10/`. Tested in an Ubuntu 24.04 container at SF 0.1 with the mock backend.
 
 ## Layout
 
@@ -73,13 +99,14 @@ Main `run_agents.py` options:
 | [`run_agents.py`](run_agents.py), [`sweep.py`](sweep.py), [`demo.py`](demo.py) | Entry points |
 | [`tests/`](tests/) | Cache correctness, concurrency, mock end-to-end agent runs |
 | [`db/seed.sql`](db/seed.sql), [`compose.yaml`](compose.yaml) | The small deterministic `shop` database |
+| [`scripts/`](scripts/) | TPC-H loader, Docker-free Postgres setup, cloud run steps |
 | [`results/`](results/) | Logs and tables from real-model runs (committed) |
 | [`NOTES.md`](NOTES.md) | Lab notebook, one section per iteration |
 | `logs/` | Scratch output from local runs (gitignored) |
 
 ## Next
 
-1. **Clean heavy-query run:** TPC-H at scale factor 1 in Postgres, 2 heavy questions, no cache vs. aware. No simulated delay.
+1. **Clean heavy-query run (ready, runs in the cloud):** TPC-H at scale factor 10, Q5 and Q10, no cache vs. aware, 3 reps each. No simulated delay.
 2. **Scaling the aware catalog** (Shourya's ideas):
    - retrieve only the top-k relevant entries instead of listing everything;
    - store the question behind each cached query;

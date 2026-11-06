@@ -26,6 +26,10 @@ import psycopg
 DEFAULT_DSN = os.environ.get(
     "AGENTSQL_DSN", "postgresql://bench:bench@127.0.0.1:55440/shop"
 )
+TPCH_DSN = os.environ.get(
+    "AGENTSQL_TPCH_DSN", "postgresql://bench:bench@127.0.0.1:55440/tpch"
+)
+DSNS = {"shop": DEFAULT_DSN, "tpch": TPCH_DSN}
 
 # Functions whose result can change between two executions of the same text.
 _VOLATILE = re.compile(
@@ -100,14 +104,19 @@ class SqlCache:
     key at the same time both execute it (no single-flight yet)."""
 
     def __init__(self, dsn: str = DEFAULT_DSN, mode: str = "exact",
-                 read_only: bool = False, db_delay_ms: float = 0.0):
+                 read_only: bool = False, db_delay_ms: float = 0.0,
+                 statement_timeout_s: float = 0.0):
         if mode not in ("direct", "exact"):
             raise ValueError(f"unknown mode {mode!r}")
         self.mode = mode
         self.dsn = dsn
         self.db_delay_ms = db_delay_ms  # simulated extra DB latency, applied to real executions only
-        self._conn_kwargs = (
-            {"options": "-c default_transaction_read_only=on"} if read_only else {})
+        opts = []
+        if read_only:
+            opts.append("-c default_transaction_read_only=on")
+        if statement_timeout_s:  # protects runs from runaway agent SQL
+            opts.append(f"-c statement_timeout={int(statement_timeout_s * 1000)}")
+        self._conn_kwargs = {"options": " ".join(opts)} if opts else {}
         self._local = threading.local()
         self._conns: list[psycopg.Connection] = []
         self._lock = threading.Lock()

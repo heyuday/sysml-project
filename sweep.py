@@ -2,6 +2,7 @@
 
     uv run python sweep.py --reps 3                       # default matrix (see below)
     uv run python sweep.py --backend mock --reps 1        # dry run, no API key
+    uv run python sweep.py --dataset tpch --task q5_nation_revenue --delays 0 --schedules sequential
     uv run python -m agentsql.aggregate logs/sweep-<ts>   # re-print a finished sweep
 
 Arms:
@@ -32,6 +33,8 @@ ARMS = {
 
 def main(argv=None) -> str:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--dataset", default="shop")
+    ap.add_argument("--task", default=None)
     ap.add_argument("--scenario", default="paraphrase")
     ap.add_argument("--agents", type=int, default=4)
     ap.add_argument("--reps", type=int, default=3)
@@ -59,13 +62,16 @@ def main(argv=None) -> str:
                 for arm in arms:
                     n += 1
                     name = f"{arm}-d{int(delay)}-{sched}-r{rep}"
-                    argv_run = ["--scenario", args.scenario, "--agents", str(args.agents),
+                    argv_run = ["--dataset", args.dataset, "--scenario", args.scenario,
+                                "--agents", str(args.agents),
                                 "--schedule", sched, "--gap", str(args.gap),
                                 "--db-delay-ms", str(delay), "--backend", args.backend,
                                 "--log", os.path.join(out, name + ".jsonl"), "--quiet",
                                 *ARMS[arm]]
                     if args.model:
                         argv_run += ["--model", args.model]
+                    if args.task:
+                        argv_run += ["--task", args.task]
                     print(f"[{n}/{total}] {name}", flush=True)
                     run_agents.main(argv_run)
 

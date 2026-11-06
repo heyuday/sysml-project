@@ -134,3 +134,19 @@ Followers = agents 1–3. Values are mean ± sd over 3 reps.
 ## Repo reorganized (2026-11-06)
 
 This project now lives at the repo root. MadBonzz's original files moved, unchanged, to `related-work/sysml-project/`. Real-model results are committed under `results/`. `logs/` is local scratch and gitignored. `compose.yaml` pins the Docker project name `agent-sql-bench`, so the existing container keeps being used.
+
+## TPC-H heavy-query setup, ready for the cloud (2026-11-06)
+
+**Why:** the `--db-delay-ms` stand-in distorts timings, as noted above. It also charges cheap schema lookups. Real heavy queries replace it.
+
+**Built:**
+- `scripts/load_tpch.py`: generates with `tpchgen-cli` (from PyPI; DuckDB's TPC-H extension needs a download host that isn't in the cloud's default allowlist), then loads into DB `tpch` one table at a time, generating, COPYing and deleting each CSV. Adds primary keys, runs ANALYZE, and times the task queries, checking that each answer is unique.
+- Tasks: `q5_nation_revenue` and `q10_returned_customer`, TPC-H Q5 and Q10 with standard parameters, narrowed to one-row answers, 4 wordings each. An answer is correct if it contains any cell of the reference row (name or key).
+- Agent connections get `statement_timeout` (default 120 s).
+- `scripts/setup_cloud.sh` sets up Postgres on :55440 without Docker. `scripts/cloud_run.sh` provides the `setup`, `load`, `sweep <task>` and `summary` steps.
+
+**Checks:**
+- SF 1 locally reproduces the official TPC-H answers (INDONESIA; Customer#000057040). But the queries take only 0.15–0.3 s on the M2 (parallel workers), which isn't heavy. Hence SF 10 for the real run.
+- The whole cloud flow passes in a fresh Ubuntu 24.04 container at SF 0.1 with the mock backend: setup, tests, load, missing-key refusal, mock sweep, idempotent re-setup.
+
+**Planned cloud run:** SF 10, sequential, 4 Haiku agents, `direct` vs `aware`, 3 reps per task. Results go to `results/tpch-sf10/`.
