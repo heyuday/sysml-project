@@ -8,6 +8,8 @@ CS 5470, Team 19.
 
 ## Main result: heavy queries (TPC-H, scale factor 10)
 
+### Agents one after another
+
 Setup:
 - **Data:** TPC-H at scale factor 10 in Postgres 16, on a 4-vCPU / 15 GB cloud VM. The two tasks are classic TPC-H queries, each asked in 4 different wordings:
   - **Q5:** top Asian nation by local-supplier revenue, a 6-table join taking about 5.3 s.
@@ -31,16 +33,27 @@ Setup:
   - n = 3, one model, two tasks.
   - The aware leader can be slightly slower (+2.5 s in Q10) because it checks an empty cache.
 
+### Agents running at the same time
+
+Same setup, but agents overlap: `parallel` (all start together) or `staggered` (3 s apart). The third arm, **`aware-live`**, also lists queries that are *still running*, and rerunning one verbatim waits for its result (single-flight). Mean follower time; "heavy runs" = analytical queries that actually executed ≥ 1 s per run; 3 reps; all 144 answers correct ([results](results/tpch-sf10/)):
+
+| task | schedule | no cache | aware | aware-live | heavy runs (no cache → aware-live) |
+|---|---|---|---|---|---|
+| Q10 | staggered | 9.1 s | 8.7 s | **4.1 s** | 4 → **1** |
+| Q5 | staggered | 13.4 s | 8.1 s | **7.5 s** | 4 → **2** |
+| Q10 | parallel | 18.1 s | 17.7 s | 16.7 s | 5.7 → 4 |
+| Q5 | parallel | 20.2 s | 19.9 s | 19.8 s | 4 → 4 |
+
+- **Showing running queries is what makes overlap work.** In staggered runs, followers saw the leader's query RUNNING and waited for it instead of recomputing. On Q10 that's −55% follower time and −78% DB time, matching the sequential result. Plain `aware` barely helped there, because the leader's result wasn't finished yet when followers looked.
+- **Simultaneous starts get no reuse in any arm.** Every agent checked the catalog once, about 1 s in. The first heavy query started at about 2.5–3.5 s, so there was nothing to see.
+- **Agents ignored the instruction to re-check before their expensive query.** Every agent checked exactly once. The fix is to enforce it in the system rather than in the prompt (next runs, item 1).
+- Overlap is costly without a cache: 4 simultaneous 5 s queries on 4 vCPUs took about 14 s each.
+
 **Why awareness is needed:** on a small database, four agents given the same question in different words wrote seven different SQL statements (different aliases, join order, extra columns). So a plain exact-text cache got **0 hits** on the analytical queries. Cache-aware agents instead rerun a cached query verbatim. This held in every run where a cached query existed, across 24 runs on the small database ([results/sweep-paraphrase-v2](results/sweep-paraphrase-v2/), [first runs](results/first-real-runs/)).
 
 ## Next runs
 
-1. **Agents running at the same time** (ready to run). When agents overlap, a follower often checks the cache before the leader's 5-second query has finished, then runs its own copy. A third arm, **`aware-live`**, tackles this:
-   - the catalog also shows queries that are *currently running*, marked RUNNING;
-   - rerunning one verbatim **waits for its result instead of recomputing it** (single-flight in the cache);
-   - agents are told to re-check the catalog right before an expensive query.
-
-   The run compares no cache, `aware` and `aware-live` under `parallel` starts (all at once) and `staggered` starts (3 s apart): Q5 and Q10, 3 reps each, 36 runs. The new metrics are mean time across all agents, the number of duplicate heavy executions, and waits on running queries.
+1. **Enforced re-check for simultaneous starts.** Agents didn't follow the prompt to re-check before their expensive query. Instead, when an aware agent's `run_sql` would execute a new query, the system first shows it any cached or RUNNING entries it hasn't seen yet. The agent then reruns one verbatim or confirms its own. This targets the `parallel` case, where the first heavy query starts about 0.5–1 s before the others.
 2. **A catalog that scales.** Listing every cached query costs more tokens as the cache grows. Instead, retrieve only the top-k entries relevant to the agent's question, and store the question behind each cached query. We'll measure tokens, reuse and accuracy as the catalog grows (10 → 100 → 1,000 entries).
 3. **Wrong-reuse test.** Give agents near-miss questions: same tables, different filter (e.g. "revenue by region" vs. "revenue by region for one category"). Do they rerun a cached query that looks similar but is wrong? The research suggests similar-but-wrong context is a real failure mode, so we'll measure the wrong-reuse rate directly.
 4. Later: invalidation when data changes (TTL vs. table versions), cache size limits and eviction, other models.

@@ -197,3 +197,34 @@ This project now lives at the repo root. MadBonzz's original files moved, unchan
 - `aware-live` bundles two changes, RUNNING visibility and the re-check hint, to avoid another run. We can't separate their individual effects. The logs record when each catalog check happened and what it showed (`n_running`), which partly separates them.
 - Single-flight is also active in the `aware` arm, but it only fires on identical SQL. Unaware or plain-aware agents rarely produce identical SQL, so the difference between arms comes from visibility.
 - Mock dry run (simulated 1.5 s delay, identical mock SQL): direct ran 4 heavy executions, aware 1. That only checks the plumbing.
+
+## TPC-H SF 10 concurrent agents, cloud (2026-11-06)
+
+36 runs: Q5 and Q10 × `parallel` (all start at once) and `staggered` (3 s gap) × `direct` / `aware` / `aware-live` × 3 reps. Haiku 5.5, 4 agents, no simulated delay. **All 144 answers correct.** Results are in `results/tpch-sf10/concurrent-*`.
+
+| task | schedule | arm | follower s | all-agent s | heavy runs/run | DB s/run | reused/follower | waits/follower |
+|---|---|---|---|---|---|---|---|---|
+| Q5 | parallel | direct | 20.2 | 19.7 | 4.0 | 57.2 | 0 | 0 |
+| Q5 | parallel | aware | 19.9 | 18.6 | 4.0 | 49.6 | 0 | 0 |
+| Q5 | parallel | aware-live | 19.8 | 19.6 | 4.0 | 57.4 | 0 | 0 |
+| Q5 | staggered | direct | 13.4 | 12.5 | 4.0 | 30.7 | 0 | 0 |
+| Q5 | staggered | aware | 8.1 | 8.2 | 2.3 | 12.7 | 0.56 | 0 |
+| Q5 | staggered | aware-live | **7.5** | 8.8 | **2.0** | 14.2 | 0.67 | 0.56 |
+| Q10 | parallel | direct | 18.1 | 18.3 | 5.7 | 57.2 | 0 | 0 |
+| Q10 | parallel | aware | 17.7 | 17.7 | 4.0 | 46.9 | 0 | 0 |
+| Q10 | parallel | aware-live | 16.7 | 16.6 | 4.0 | 48.7 | 0 | 0 |
+| Q10 | staggered | direct | 9.1 | 8.9 | 4.0 | 20.5 | 0 | 0 |
+| Q10 | staggered | aware | 8.7 | 9.3 | 3.0 | 16.8 | 0.33 | 0 |
+| Q10 | staggered | aware-live | **4.1** | **5.3** | **1.0** | **4.5** | 1.00 | 0.33 |
+
+**Findings:**
+1. **Staggered starts: showing running queries works.**
+   - Q10 aware-live: followers 9.1 → 4.1 s (−55%), heavy executions 4 → 1, DB time −78%. That matches the sequential result even though agents overlap. Plain `aware` barely helped there (0.33 reused per follower), because followers checked before the leader's query had *finished*.
+   - Q5: aware-live −44% and aware −40%. The two are similar because Q5's leader is slower, so its result was often already complete when followers checked.
+   - 6 of 12 aware-live catalog checks in staggered runs saw a RUNNING entry, and followers waited on it rather than recomputing.
+2. **Parallel starts: no reuse in any arm.** Every agent checked the catalog once, about 0.8–1.3 s after start. The first heavy query only started at about 2.5–3.5 s, so there was never anything to see.
+3. **The "re-check right before an expensive query" instruction was ignored.** Exactly 12 catalog checks per 12 agents in every arm and schedule: one each. The aware-live gains therefore come from RUNNING visibility plus single-flight waiting, not from re-checking. A prompt instruction alone doesn't make Haiku re-check.
+4. **Contention is real:** 4 simultaneous 5 s queries on 4 vCPUs push follower SQL time to about 14 s, nearly 3× the sequential time.
+5. **Cost:** aware arms use about 15–45% more input tokens.
+
+**Implication / next design:** enforce the re-check in the system instead of asking for it. When an aware agent's `run_sql` would execute a new query, first return any cached or RUNNING entries it hasn't seen yet. The agent then reruns one verbatim or confirms its own. This targets the parallel case: the first heavy query starts about 0.5–1 s before the others.
