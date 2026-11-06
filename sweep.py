@@ -9,6 +9,8 @@ Arms:
   direct - no cache (baseline)
   exact  - shared exact-text cache, agents unaware of it
   aware  - shared exact-text cache + cached_queries tool and reuse hint
+  aware-live - aware + catalog shows RUNNING queries (rerun verbatim -> wait on it,
+           via single-flight) + hint to re-check right before an expensive query
 
 Order: for each rep, for each (delay, schedule), run every arm back to back.
 Interleaving keeps API-latency drift from favouring one arm.
@@ -28,6 +30,7 @@ ARMS = {
     "direct": ["--cache", "direct"],
     "exact": ["--cache", "exact"],
     "aware": ["--cache", "exact", "--aware"],
+    "aware-live": ["--cache", "exact", "--live"],
 }
 
 

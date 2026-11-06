@@ -41,6 +41,13 @@ TOOLS = [
              {**_OBJ, "properties": {"answer": {"type": "string"}}, "required": ["answer"]}),
 ]
 
+LIVE_HINT = (
+    " The list also shows queries other analysts are running right now, marked "
+    "RUNNING: running one of those verbatim waits for its result instead of "
+    "recomputing it. Others may start a query while you explore, so call "
+    "cached_queries again right before you run an expensive query."
+)
+
 CACHED_QUERIES_TOOL = ToolSpec(
     "cached_queries",
     "List SQL queries whose results are already cached (most recent first), with "
@@ -103,36 +110,40 @@ class AgentResult:
 
 
 def format_catalog(entries) -> str:
-    """Numbered list of cached analytical queries. Schema lookups are left out:
-    the schema tools already hit the cache on their own."""
+    """Numbered list of cached (and, in live mode, running) analytical queries.
+    Schema lookups are left out: the schema tools already hit the cache."""
     rows = [e for e in entries if "information_schema" not in e.sql][:MAX_CATALOG]
     if not rows:
         return "(no cached queries yet)"
     now = time.time()
-    return "\n".join(
-        f"{i}. [{now - e.filled_at:.0f}s ago, {e.rowcount} rows, columns: "
-        f"{', '.join(e.columns)}]\n   {e.sql}"
-        for i, e in enumerate(rows, 1)
-    )
+
+    def head(e):
+        if e.running:
+            return (f"[RUNNING, started {now - e.filled_at:.0f}s ago by another analyst; "
+                    f"run it verbatim to wait for its result]")
+        return f"[{now - e.filled_at:.0f}s ago, {e.rowcount} rows, columns: {', '.join(e.columns)}]"
+
+    return "\n".join(f"{i}. {head(e)}\n   {e.sql}" for i, e in enumerate(rows, 1))
 
 
 class Agent:
     def __init__(self, agent_id: int, task: Task, question: str, expected,
                  backend, cache: SqlCache, log: EventLog, max_steps: int = 20,
-                 aware: bool = False):
+                 aware: bool = False, live: bool = False):
         self.id, self.task, self.question = agent_id, task, question
         # acceptable answers: any cell of the reference query's first row
         self.expected = [expected] if isinstance(expected, str) else list(expected)
         self.backend, self.cache, self.log, self.max_steps = backend, cache, log, max_steps
-        self.aware = aware
+        self.aware = aware or live
+        self.live = live  # catalog shows running queries + re-check hint
 
     # -- tools ------------------------------------------------------------
     def _tool(self, step: int, name: str, args: dict) -> tuple[str, bool]:
         if name == "cached_queries" and self.aware:
-            entries = self.cache.catalog()
+            entries = self.cache.catalog(include_running=self.live)
             text = format_catalog(entries)
             self.log.write(type="catalog", agent=self.id, task=self.task.id, step=step,
-                           n_entries=text.count("\n   "))
+                           n_entries=text.count("\n   "), n_running=text.count("[RUNNING"))
             return text, False
         if name == "list_tables":
             sql = LIST_TABLES_SQL
@@ -156,7 +167,8 @@ class Agent:
             self.log.write(**ev, error=msg, hit=False,
                            ms=round((self.log.now() - t_start) * 1000, 3))
             return f"SQL error: {msg}", True
-        self.log.write(**ev, hit=info.hit, cacheable=info.cacheable, reason=info.reason,
+        self.log.write(**ev, hit=info.hit, coalesced=info.coalesced,
+                       cacheable=info.cacheable, reason=info.reason,
                        ms=round(info.ms, 3), db_ms=round(info.db_ms, 3),
                        rows=result.rowcount)
         return format_result(result.columns, result.rows), False
@@ -165,7 +177,7 @@ class Agent:
     def run(self) -> AgentResult:
         t0 = time.perf_counter()
         self.log.write(type="start", agent=self.id, task=self.task.id, question=self.question)
-        system = SYSTEM + (AWARE_HINT if self.aware else "")
+        system = SYSTEM + (AWARE_HINT if self.aware else "") + (LIVE_HINT if self.live else "")
         tools = TOOLS + ([CACHED_QUERIES_TOOL] if self.aware else [])
         conv = self.backend.new_conversation(system, self.question, tools, task=self.task)
         answer, step = None, 0

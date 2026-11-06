@@ -178,4 +178,22 @@ This project now lives at the repo root. MadBonzz's original files moved, unchan
 
 **Next:**
 - Overlapping agents: staggered or parallel starts with heavy queries. Reuse will drop, so this is where single-flight (waiting on an in-flight query) matters.
-- Shourya's two items: a retrieval-based catalog and the near-miss wrong-reuse test.
+- A retrieval-based catalog (top-k relevant entries) and the near-miss wrong-reuse test.
+
+## Concurrent agents: design for the next cloud run (2026-11-06)
+
+**Problem:** when agents overlap, a follower checks the cache before the leader's 5 s query has finished, finds nothing, and runs its own copy. The 2 s-delay staggered runs on the shop DB showed reuse falling to 0.33 per follower.
+
+**Built:**
+- **Single-flight in `SqlCache`** (exact mode): an identical cacheable query that's already executing is waited on, not re-run. Errors pass to the waiters and nothing is cached. Tested: 4 threads give 1 execution and 3 waits, failures don't hang, and direct mode has no single-flight.
+- **`--live` (arm `aware-live`):** the catalog also lists queries that are RUNNING right now. Rerunning one verbatim waits for its result (via single-flight). The hint tells agents to re-check the catalog right before an expensive query, since the first check usually comes too early to help.
+- **New metrics:**
+  - `follower_waits`: waits on a running query;
+  - `agent_wall`: mean time across all agents, the fairer measure under parallel starts;
+  - `heavy_execs`: analytical queries that actually executed for ≥ 1 s.
+- `cloud_run.sh concurrent <task>`: `parallel` + `staggered` (3 s gap) × `direct` / `aware` / `aware-live` × 3 reps.
+
+**Design notes:**
+- `aware-live` bundles two changes, RUNNING visibility and the re-check hint, to avoid another run. We can't separate their individual effects. The logs record when each catalog check happened and what it showed (`n_running`), which partly separates them.
+- Single-flight is also active in the `aware` arm, but it only fires on identical SQL. Unaware or plain-aware agents rarely produce identical SQL, so the difference between arms comes from visibility.
+- Mock dry run (simulated 1.5 s delay, identical mock SQL): direct ran 4 heavy executions, aware 1. That only checks the plumbing.

@@ -178,16 +178,20 @@ class MockBackend:
     def new_conversation(self, system, user, tools, task: Task | None = None):
         if task is None:
             raise ValueError("mock backend needs the task")
-        return _MockConversation(self, task, aware=any(t.name == "cached_queries" for t in tools))
+        aware = any(t.name == "cached_queries" for t in tools)
+        live = aware and "RUNNING" in system  # live hint: re-check before the main query
+        return _MockConversation(self, task, aware=aware, live=live)
 
 
 class _MockConversation:
-    def __init__(self, backend: MockBackend, task: Task, aware: bool = False):
+    def __init__(self, backend: MockBackend, task: Task, aware: bool = False,
+                 live: bool = False):
         self.latency_s = backend.latency_s
         self.plan = (
             ([("cached_queries", {})] if aware else [])
             + [("list_tables", {})]
             + [("describe_table", {"table": t}) for t in task.tables]
+            + ([("cached_queries", {})] if live else [])
             + [("run_sql", {"sql": task.reference_sql})]
         )
         self.i = 0

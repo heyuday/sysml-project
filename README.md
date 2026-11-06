@@ -2,131 +2,112 @@
 
 **Can several LLM agents that query the same database share a SQL result cache, and does it help?**
 
-This is a small, honest benchmark: a handful of agents answer analyst questions against one PostgreSQL database through a shared result cache. Every LLM call and SQL call is logged. We build it in short build → test → look iterations, getting correctness first and measuring performance second. [NOTES.md](NOTES.md) is the lab notebook, recording what each iteration built, found and changed.
+Several agents answer analyst questions against one PostgreSQL database through a shared result cache. Every LLM call and SQL call is logged. We build it in short build → test → look iterations. [NOTES.md](NOTES.md) is the lab notebook.
 
 CS 5470, Team 19.
 
-## Findings so far
+## Main result: heavy queries (TPC-H, scale factor 10)
 
-Setup for findings 1–2: Claude Haiku 5.5 agents, 4 at a time, on a small `shop` database (4 tables, about 20k rows). Finding 3 uses TPC-H. Agent 0 runs first. Agents 1–3 ("followers") can reuse its work. Raw logs are in [`results/`](results/).
-
-**1. A plain exact-text cache gets no hits on real analytical SQL.** Four agents answering the same question, reworded, wrote seven different SQL statements. They used different column aliases, join orders and operand order, and some added extra columns. Every hit was a fixed-text schema lookup. ([first-real-runs](results/first-real-runs/))
-
-**2. Cache-aware agents reuse cached queries verbatim and stay correct.** With `--aware`, agents get a `cached_queries` tool, which lists cached SQL, its columns and row counts, plus a hint to rerun a fitting query exactly. Sweep of 24 runs, mean ± sd over 3 reps ([sweep-paraphrase-v2](results/sweep-paraphrase-v2/summary.csv)):
-
-| simulated DB delay | schedule | arm | correct | follower time (s) | follower LLM calls | reused queries per follower |
-|---|---|---|---|---|---|---|
-| 0 | sequential | no cache | 12/12 | 6.3 ± 0.4 | 4.9 | 0 |
-| 0 | sequential | **aware** | 12/12 | **4.3 ± 0.5** | **3.0** | 1.1 |
-| 0 | staggered | no cache | 12/12 | 6.2 ± 0.5 | 4.8 | 0 |
-| 0 | staggered | **aware** | 12/12 | **4.3 ± 0.8** | **3.0** | 1.0 |
-| 2 s | staggered | aware | 12/12 | 8.0 ± 0.2 | 3.9 | 0.33 |
-
-- Aware followers reused a cached query in every run where one existed. They took exactly 3 LLM calls each, against about 4.9 without the cache, and every answer was correct.
-- With no simulated delay, follower time dropped 32%. All of that saving came from fewer LLM turns.
-- When the leader is slow and followers start early (2 s delay, staggered), reuse falls to 0.33 per follower, because nothing is cached yet when they check.
-
-**3. On genuinely heavy queries, the cache itself cuts follower time in half.** This is TPC-H at scale factor 10 on a 4-vCPU cloud VM, where Q5 takes about 5.3 s and Q10 about 4.3 s. Same setup: 4 Haiku agents, sequential, 3 reps, no simulated delay ([results](results/tpch-sf10/)):
+Setup:
+- **Data:** TPC-H at scale factor 10 in Postgres 16, on a 4-vCPU / 15 GB cloud VM. The two tasks are classic TPC-H queries, each asked in 4 different wordings:
+  - **Q5:** top Asian nation by local-supplier revenue, a 6-table join taking about 5.3 s.
+  - **Q10:** the customer with the most revenue lost to returns, about 4.3 s.
+- **Agents:** 4 Claude Haiku 5.5 agents, one after another. Agent 0 (the "leader") runs first, and agents 1–3 ("followers") can reuse its work.
+- **Arms:** no cache vs. a shared cache with **cache-aware** agents. Aware agents get a `cached_queries` tool listing cached SQL with columns and row counts, and a hint to rerun a fitting query verbatim.
+- 3 reps per arm. No simulated latency. Raw logs are in [`results/tpch-sf10/`](results/tpch-sf10/).
 
 | task | arm | correct | follower time (s) | follower LLM calls | follower SQL time (s) | DB time per run (s) |
 |---|---|---|---|---|---|---|
 | Q5 | no cache | 12/12 | 10.9 ± 0.2 | 3.7 | 5.1 | 20.5 |
-| Q5 | **aware** | 12/12 | **4.7 ± 0.1** | 3.0 | **0.0** | **5.1** |
+| Q5 | **cache-aware** | 12/12 | **4.7 ± 0.1** | 3.0 | **0.0** | **5.1** |
 | Q10 | no cache | 12/12 | 9.1 ± 1.3 | 3.0 | 5.2 | 19.8 |
-| Q10 | **aware** | 12/12 | **4.4 ± 0.1** | 3.0 | **0.0** | **4.3** |
+| Q10 | **cache-aware** | 12/12 | **4.4 ± 0.1** | 3.0 | **0.0** | **4.3** |
 
-- Followers finished **52–57% faster**, and database work fell **75–78%**, since only the first agent's query executed. Every follower reused it, and every answer was correct.
-- In Q10 both arms used exactly 3 LLM calls, so the **whole saving is the cache hit itself**, not fewer turns. That resolves the confound noted below for this task.
-- Without a cache, SQL was about half a follower's time here (5 of 11 s), against about 3.6% on BIRD (Aryan's measurement). Whether caching matters depends on how expensive the queries are.
+- **Followers finish 52–57% faster, and database work drops 75–78%.** Only the leader's heavy query executes. Every follower reused it, and every answer was correct.
+- **The saving is the cache itself.** In Q10 both arms make exactly 3 LLM calls per follower, so the whole saving (about 4.7 s) is cached results replacing 4–5 s queries. In Q5, about 1 s comes from fewer turns and about 5 s from cache hits.
+- **Query cost decides whether this matters.** Without a cache, SQL is about half of a follower's time here. On small benchmark databases such as BIRD it's a few percent, and caching barely helps there.
+- **Limits:**
+  - Sequential is the best case for reuse: the leader always finishes first.
+  - n = 3, one model, two tasks.
+  - The aware leader can be slightly slower (+2.5 s in Q10) because it checks an empty cache.
 
-**How far to trust this:**
-- **Credible:** the behavior, meaning reuse counts, correctness and LLM-call counts.
-- **Real but narrow:** the 0 ms timing. It's one easy question, Haiku only, and 3 reps.
-- **Not credible as magnitudes:** the 2 s rows. The delay is simulated and also charges schema lookups, which are cheap on a real database.
-- **Confound (shop runs):** on the tiny DB, the saved turns may come from *seeing working SQL* rather than from the cached *result*. The TPC-H Q10 run separates the two: equal LLM calls, so the saving there is the cache hit.
-- **TPC-H runs:** sequential is the best case (the leader finishes before followers start). n = 3, Haiku only, two tasks. The aware leader can be slower: +2.5 s in Q10 from checking an empty cache.
+**Why awareness is needed:** on a small database, four agents given the same question in different words wrote seven different SQL statements (different aliases, join order, extra columns). So a plain exact-text cache got **0 hits** on the analytical queries. Cache-aware agents instead rerun a cached query verbatim. This held in every run where a cached query existed, across 24 runs on the small database ([results/sweep-paraphrase-v2](results/sweep-paraphrase-v2/), [first runs](results/first-real-runs/)).
+
+## Next runs
+
+1. **Agents running at the same time** (ready to run). When agents overlap, a follower often checks the cache before the leader's 5-second query has finished, then runs its own copy. A third arm, **`aware-live`**, tackles this:
+   - the catalog also shows queries that are *currently running*, marked RUNNING;
+   - rerunning one verbatim **waits for its result instead of recomputing it** (single-flight in the cache);
+   - agents are told to re-check the catalog right before an expensive query.
+
+   The run compares no cache, `aware` and `aware-live` under `parallel` starts (all at once) and `staggered` starts (3 s apart): Q5 and Q10, 3 reps each, 36 runs. The new metrics are mean time across all agents, the number of duplicate heavy executions, and waits on running queries.
+2. **A catalog that scales.** Listing every cached query costs more tokens as the cache grows. Instead, retrieve only the top-k entries relevant to the agent's question, and store the question behind each cached query. We'll measure tokens, reuse and accuracy as the catalog grows (10 → 100 → 1,000 entries).
+3. **Wrong-reuse test.** Give agents near-miss questions: same tables, different filter (e.g. "revenue by region" vs. "revenue by region for one category"). Do they rerun a cached query that looks similar but is wrong? The research suggests similar-but-wrong context is a real failure mode, so we'll measure the wrong-reuse rate directly.
+4. Later: invalidation when data changes (TTL vs. table versions), cache size limits and eviction, other models.
+
+## How it works
+
+- **Cache** ([`agentsql/cache.py`](agentsql/cache.py)):
+  - stores results of read-only `SELECT`s, keyed on the exact SQL text (writes, volatile functions and locks bypass it);
+  - is shared by all agents and thread-safe, with one Postgres connection per thread;
+  - **single-flight:** identical in-flight queries execute once, and the others wait;
+  - **catalog:** completed entries, plus running ones in live mode.
+- **Agents** ([`agentsql/agent.py`](agentsql/agent.py)): a minimal tool loop with `list_tables`, `describe_table`, `run_sql` and `final_answer`, plus `cached_queries` when aware. Every call goes through the cache. An answer is correct if it contains a cell of the reference query's first row.
+- **Backends** ([`agentsql/llm.py`](agentsql/llm.py)): Anthropic (default `claude-haiku-5-5`), any OpenAI-compatible API (OpenAI, Gemini, vLLM), and a scripted mock for tests.
 
 ## Quick start
 
 You need Docker and [uv](https://docs.astral.sh/uv/).
 
 ```sh
-docker compose up -d --wait      # Postgres 16 on 127.0.0.1:55440, seeded from db/seed.sql
+docker compose up -d --wait      # Postgres 16 on 127.0.0.1:55440 with the small `shop` DB
 uv sync
-uv run pytest -q                 # 37 tests (TPC-H ones skip until it's loaded); needs the DB running
-uv run python demo.py            # cache basics: 10 queries run twice, hit/miss and latency
+uv run pytest -q                 # 42 tests (TPC-H ones skip until it's loaded)
 
-# agents (the mock backend needs no API key)
-uv run python run_agents.py --backend mock --scenario paraphrase --aware
+uv run python scripts/load_tpch.py --sf 1                     # TPC-H into DB `tpch` (SF 10 ≈ 15 GB)
+uv run python run_agents.py --backend mock --dataset tpch --task q5_nation_revenue --scenario paraphrase --live
 echo 'ANTHROPIC_API_KEY=sk-ant-...' > .env && set -a && source .env && set +a   # .env is gitignored
-uv run python run_agents.py --scenario paraphrase --aware          # real run, Haiku 5.5 by default
-uv run python sweep.py --reps 3                                    # direct vs aware matrix
-uv run python -m agentsql.aggregate results/sweep-paraphrase-v2    # re-print a sweep's table
+uv run python sweep.py --dataset tpch --task q10_returned_customer --delays 0 --schedules sequential --arms direct,aware
+uv run python -m agentsql.aggregate results/tpch-sf10/q5_nation_revenue        # re-print a sweep's table
 ```
-
-**TPC-H (heavy queries).** [`scripts/load_tpch.py`](scripts/load_tpch.py) generates TPC-H with `tpchgen-cli` (installed from PyPI) and loads it into a `tpch` database. It works one table at a time to limit disk use, then times the task queries:
-
-```sh
-uv run python scripts/load_tpch.py --sf 1      # SF 1 ≈ 1 GB; SF 10 ≈ 15 GB in Postgres
-uv run python run_agents.py --dataset tpch --task q5_nation_revenue --scenario paraphrase --aware
-```
-
-TPC-H tasks: `q5_nation_revenue` (TPC-H Q5) and `q10_returned_customer` (Q10), each with 4 wordings. At SF 1 they reproduce the official TPC-H answers, INDONESIA and Customer#000057040. On an M2 MacBook at SF 1 the queries still take only 0.15–0.3 s, so the heavy run uses SF 10.
 
 Main `run_agents.py` options:
 
 | Flag | Values |
 |---|---|
-| `--dataset` | `shop` (tiny seed DB), `tpch` |
-| `--task` | question for `same`/`paraphrase`, e.g. `q5_nation_revenue` |
-| `--scenario` | `same`, `paraphrase` (same question, reworded per agent), `related` (different questions), `mixed` |
+| `--dataset` / `--task` | `shop` or `tpch`; question for `same`/`paraphrase`, e.g. `q5_nation_revenue`, `q10_returned_customer` |
+| `--scenario` | `same`, `paraphrase` (same question, reworded per agent), `related`, `mixed` |
 | `--schedule` | `sequential`, `staggered --gap N`, `parallel` |
-| `--cache` | `exact`, `direct` (no cache) |
-| `--aware` | give agents the `cached_queries` tool and reuse hint |
-| `--db-delay-ms N` | simulated latency on real DB executions, never on hits |
-| `--statement-timeout-s N` | Postgres timeout for agent SQL (default 120) |
-| `--backend` | `anthropic` (default `claude-haiku-5-5`), `openai` (any OpenAI-compatible API: OpenAI, Gemini, vLLM), `mock` |
+| `--cache` | `exact` or `direct` (no cache) |
+| `--aware` / `--live` | cache-aware agents; `--live` adds RUNNING entries, waiting and the re-check hint |
+| `--backend` / `--model` | `anthropic` (default), `openai`, `mock` |
+| `--statement-timeout-s`, `--db-delay-ms` | Postgres timeout for agent SQL (default 120 s); simulated DB latency (shop-DB experiments only) |
 
-## Running in the cloud (no Docker)
+### Running in the cloud (no Docker)
 
-[`scripts/cloud_run.sh`](scripts/cloud_run.sh) runs the TPC-H experiment on a fresh Ubuntu VM, such as a Claude Code cloud session. It runs in steps, so no single command runs too long:
+[`scripts/cloud_run.sh`](scripts/cloud_run.sh) runs the TPC-H experiments on a fresh Ubuntu VM, such as a Claude Code cloud session, in steps that each fit a command time limit:
 
 ```sh
-bash scripts/cloud_run.sh setup                      # Postgres on :55440 + deps + tests (scripts/setup_cloud.sh)
-bash scripts/cloud_run.sh load                       # TPC-H SF 10 (override with SF=...)
-bash scripts/cloud_run.sh sweep q5_nation_revenue    # direct vs aware, sequential, 3 reps
-bash scripts/cloud_run.sh sweep q10_returned_customer
+bash scripts/cloud_run.sh setup                        # Postgres on :55440 + deps + tests
+bash scripts/cloud_run.sh load                         # TPC-H SF 10 (~4 min on 4 vCPU)
+bash scripts/cloud_run.sh sweep q5_nation_revenue      # sequential: direct vs aware
+bash scripts/cloud_run.sh concurrent q5_nation_revenue # overlapping agents: direct vs aware vs aware-live
 bash scripts/cloud_run.sh summary
 ```
 
-It needs `ANTHROPIC_API_KEY` in the environment, or the alias `AGENTSQL_ANTHROPIC_API_KEY` if the host strips the former. Results go to `results/tpch-sf10/`. Tested in an Ubuntu 24.04 container at SF 0.1 with the mock backend.
+The key goes in the environment as `AGENTSQL_ANTHROPIC_API_KEY`. Claude Code cloud sessions reserve `ANTHROPIC_API_KEY` for their own login and don't pass it to commands.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| [`agentsql/cache.py`](agentsql/cache.py) | The shared SQL result cache: exact-text keys, conservative eligibility, thread-safe, catalog |
-| [`agentsql/agent.py`](agentsql/agent.py) | Minimal SQL agent loop and tools (`list_tables`, `describe_table`, `run_sql`, `final_answer`, `cached_queries`) |
-| [`agentsql/llm.py`](agentsql/llm.py) | LLM backends behind one interface: Anthropic, OpenAI-compatible, mock |
-| [`agentsql/tasks.py`](agentsql/tasks.py) | Questions (4 tasks × 4 wordings, unique answers) and scenarios |
-| [`agentsql/analyze.py`](agentsql/analyze.py), [`agentsql/aggregate.py`](agentsql/aggregate.py) | Per-run report; per-sweep table and CSVs |
-| [`run_agents.py`](run_agents.py), [`sweep.py`](sweep.py), [`demo.py`](demo.py) | Entry points |
-| [`tests/`](tests/) | Cache correctness, concurrency, mock end-to-end agent runs |
-| [`db/seed.sql`](db/seed.sql), [`compose.yaml`](compose.yaml) | The small deterministic `shop` database |
+| [`agentsql/`](agentsql/) | Cache, agent loop, LLM backends, tasks, per-run and per-sweep analysis |
+| [`run_agents.py`](run_agents.py), [`sweep.py`](sweep.py), [`demo.py`](demo.py) | Entry points: one run, a matrix of runs, and a cache demo |
 | [`scripts/`](scripts/) | TPC-H loader, Docker-free Postgres setup, cloud run steps |
-| [`results/`](results/) | Logs and tables from real-model runs (committed) |
-| [`NOTES.md`](NOTES.md) | Lab notebook, one section per iteration |
-| `logs/` | Scratch output from local runs (gitignored) |
-
-## Next
-
-1. **Overlapping agents on heavy queries:** staggered and parallel starts. Followers will often check before the leader's result is cached, so this is where waiting on an in-flight query (single-flight) should matter.
-2. **Scaling the aware catalog** (Shourya's ideas):
-   - retrieve only the top-k relevant entries instead of listing everything;
-   - store the question behind each cached query;
-   - measure token cost as the catalog grows.
-3. **Wrong-reuse test:** near-miss questions (same tables, different filter). Do agents reuse a similar but wrong cached query?
-4. Later: merging identical in-flight queries, invalidation when data changes, cache size limits and eviction.
+| [`tests/`](tests/) | Cache correctness, single-flight, concurrency, mock end-to-end runs |
+| [`results/`](results/) | Logs and tables from real-model runs |
+| [`db/seed.sql`](db/seed.sql), [`compose.yaml`](compose.yaml) | The small deterministic `shop` database |
+| [`NOTES.md`](NOTES.md) | Lab notebook |
 
 ## Related work
 
@@ -135,9 +116,11 @@ It needs `ANTHROPIC_API_KEY` in the environment, or the alias `AGENTSQL_ANTHROPI
   - [ToolCaching](https://arxiv.org/abs/2601.15335) (keep/evict policies for tool-call caches)
   - [semantic caching for multi-agent NL→SQL](https://arxiv.org/abs/2601.11687) (caches question → SQL translations)
 - **Motivation:** [Agent-first data systems](https://arxiv.org/abs/2509.00997) (agents' queries are highly redundant).
-- **Data:** [Text-to-Big SQL](https://arxiv.org/abs/2602.21480) (LLM agents on TPC-H, which our next step uses).
+- **Data:** [Text-to-Big SQL](https://arxiv.org/abs/2602.21480) (LLM agents on TPC-H).
+- **Retrieving a few relevant entries instead of listing them all:** [RAG-MCP](https://arxiv.org/abs/2505.03275) and [DAIL-SQL](https://arxiv.org/abs/2308.15363).
+- **Similar-but-wrong context:** [Shi et al. 2023](https://arxiv.org/abs/2302.00093) and [MeanCache](https://arxiv.org/abs/2403.02694).
 - **None of these tests agents that can see a shared result cache and choose to reuse it.**
 
 Teammates' related work:
-- **Aryan** ([dbkv](https://github.com/KilroyHere/dbkv)) found the database is about 3.6% of a BIRD agent's task time. Our results are consistent with that: on fast databases the gain is LLM turns, not database time.
-- [`related-work/sysml-project/`](related-work/sysml-project/) is MadBonzz's separate SQL-caching experiment, copied unchanged from [MadBonzz/sysml-project](https://github.com/MadBonzz/sysml-project). It shares no code with this project.
+- [dbkv](https://github.com/KilroyHere/dbkv) (GPU-serving side; measured the DB at about 3.6% of a BIRD agent's time).
+- [`related-work/sysml-project/`](related-work/sysml-project/) is a separate SQL-caching experiment, copied unchanged from [MadBonzz/sysml-project](https://github.com/MadBonzz/sysml-project).

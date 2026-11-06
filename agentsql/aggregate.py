@@ -24,7 +24,8 @@ def run_metrics(events: list[dict]) -> dict:
     finals = {e["agent"]: e for e in events if e["type"] == "final"}
     starts = {e["agent"]: e["t"] for e in events if e["type"] == "start"}
     per = defaultdict(lambda: dict(llm_s=0.0, llm_calls=0, sql_s=0.0, sql_calls=0,
-                                   run_sql_hits=0, in_tok=0, out_tok=0))
+                                   run_sql_hits=0, run_sql_waits=0, in_tok=0, out_tok=0))
+    heavy_execs = 0  # analytical queries that actually ran in Postgres for >= 1 s
     for e in events:
         if e["type"] == "llm":
             p = per[e["agent"]]
@@ -38,6 +39,11 @@ def run_metrics(events: list[dict]) -> dict:
             p["sql_calls"] += 1
             if e["tool"] == "run_sql" and e.get("hit"):
                 p["run_sql_hits"] += 1
+            if e["tool"] == "run_sql" and e.get("coalesced"):
+                p["run_sql_waits"] += 1
+            if (e["tool"] == "run_sql" and not e.get("hit") and not e.get("coalesced")
+                    and (e.get("db_ms") or 0) >= 1000):
+                heavy_execs += 1
 
     followers = [a for a in finals if a != 0]
 
@@ -49,7 +55,7 @@ def run_metrics(events: list[dict]) -> dict:
     db_total_s = sum((e.get("db_ms") or 0) for e in events if e["type"] == "tool") / 1000
     return dict(
         dataset=run.get("dataset", "shop"), task=run.get("task", ""),
-        arm=("aware" if run.get("aware") else run["cache"]),
+        arm=("aware-live" if run.get("live") else "aware" if run.get("aware") else run["cache"]),
         delay=run.get("db_delay_ms", 0), schedule=run["schedule"],
         leader_wall=finals[0]["wall_s"] if 0 in finals else None,
         follower_wall=sum(finals[a]["wall_s"] for a in followers) / max(len(followers), 1),
@@ -57,7 +63,10 @@ def run_metrics(events: list[dict]) -> dict:
         follower_llm_s=mean_of("llm_s", followers),
         follower_sql_s=mean_of("sql_s", followers),
         follower_sql_calls=mean_of("sql_calls", followers),
-        follower_reused=mean_of("run_sql_hits", followers),
+        follower_reused=mean_of("run_sql_hits", followers) + mean_of("run_sql_waits", followers),
+        follower_waits=mean_of("run_sql_waits", followers),
+        agent_wall=sum(f["wall_s"] for f in finals.values()) / len(finals),
+        heavy_execs=heavy_execs,
         makespan=end - min(starts.values()),
         db_total_s=db_total_s,
         in_tok=sum(p["in_tok"] for p in per.values()),
@@ -69,7 +78,8 @@ def run_metrics(events: list[dict]) -> dict:
 
 
 METRICS = ["follower_wall", "follower_llm_calls", "follower_llm_s", "follower_sql_s",
-           "follower_reused", "leader_wall", "makespan", "db_total_s", "in_tok"]
+           "follower_reused", "follower_waits", "agent_wall", "heavy_execs",
+           "leader_wall", "makespan", "db_total_s", "in_tok"]
 
 
 def aggregate(folder: str) -> list[dict]:
@@ -87,7 +97,7 @@ def aggregate(folder: str) -> list[dict]:
     groups = defaultdict(list)
     for r in runs:
         groups[(r["dataset"], r["task"], r["delay"], r["schedule"], r["arm"])].append(r)
-    order = {"direct": 0, "exact": 1, "aware": 2}
+    order = {"direct": 0, "exact": 1, "aware": 2, "aware-live": 3}
     rows = []
     for (dataset, task, delay, sched, arm), rs in sorted(
             groups.items(), key=lambda kv: (*kv[0][:4], order.get(kv[0][4], 9))):
@@ -111,20 +121,24 @@ def report(rows: list[dict]) -> str:
     def ms(r, k, fmt="{:.1f}"):
         return f"{fmt.format(r[k])}±{fmt.format(r[k + '_sd'])}"
 
-    head = (f"{'delay':>5} {'schedule':<10} {'arm':<6} {'n':>2} {'correct':>7}  "
+    head = (f"{'delay':>5} {'schedule':<10} {'arm':<10} {'n':>2} {'correct':>7}  "
             f"{'follower wall s':>15} {'LLM calls':>10} {'LLM s':>10} {'SQL s':>10} "
-            f"{'reused':>7} {'leader s':>10} {'makespan s':>11} {'DB s/run':>10} {'in tok':>13}")
-    out = ["Followers = agents 1..N-1 (mean per agent); values are mean±sd across reps.", head]
+            f"{'reused':>7} {'waits':>6} {'all-agent s':>12} {'heavy runs':>11} "
+            f"{'leader s':>10} {'makespan s':>11} {'DB s/run':>10} {'in tok':>13}")
+    out = ["Followers = agents 1..N-1 (mean per agent); 'reused' = cache hits + waits on a running "
+           "query; 'heavy runs' = analytical queries that executed >= 1 s; values are mean±sd across reps.",
+           head]
     last = None
     for r in rows:
         if (r["dataset"], r["task"]) != last:
             last = (r["dataset"], r["task"])
             out.append(f"-- dataset={r['dataset']} task={r['task']}")
         out.append(
-            f"{int(r['delay']):>5} {r['schedule']:<10} {r['arm']:<6} {r['n']:>2} "
+            f"{int(r['delay']):>5} {r['schedule']:<10} {r['arm']:<10} {r['n']:>2} "
             f"{r['correct']:>3}/{r['answers']:<3}  {ms(r, 'follower_wall'):>15} "
             f"{ms(r, 'follower_llm_calls'):>10} {ms(r, 'follower_llm_s'):>10} "
-            f"{ms(r, 'follower_sql_s'):>10} {r['follower_reused']:>7.2f} "
+            f"{ms(r, 'follower_sql_s'):>10} {r['follower_reused']:>7.2f} {r['follower_waits']:>6.2f} "
+            f"{ms(r, 'agent_wall'):>12} {ms(r, 'heavy_execs'):>11} "
             f"{ms(r, 'leader_wall'):>10} {ms(r, 'makespan'):>11} {ms(r, 'db_total_s'):>10} "
             f"{ms(r, 'in_tok', '{:.0f}'):>13}"
             + (f"  LLM errors {r['errors']}" if r["errors"] else ""))

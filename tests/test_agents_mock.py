@@ -41,7 +41,8 @@ def test_staggered_concurrent_run_is_consistent(tmp_path):
     s = _run(tmp_path, "--scenario", "mixed", "--schedule", "staggered", "--gap", "0.01")
     assert all(f["correct"] for f in s["finals"])
     stats = next(e for e in load(tmp_path / "run.jsonl") if e["type"] == "cache_stats")
-    assert stats["hits"] + stats["misses"] + stats["bypass"] == stats["calls"] == s["n_tool"]
+    outcomes = stats["hits"] + stats["misses"] + stats["bypass"] + stats["coalesced"]
+    assert outcomes == stats["calls"] == s["n_tool"]
 
 
 def test_agent_connection_is_read_only():

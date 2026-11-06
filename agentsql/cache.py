@@ -73,7 +73,8 @@ class CallInfo:
     reason: str
     hit: bool
     ms: float  # wall time of the run_sql call
-    db_ms: float  # time spent executing in Postgres (0 on a hit)
+    db_ms: float  # time spent executing in Postgres (0 on a hit or a coalesced wait)
+    coalesced: bool = False  # waited for an identical in-flight execution instead of running it
 
 
 @dataclass
@@ -82,6 +83,7 @@ class Stats:
     hits: int = 0
     misses: int = 0
     bypass: int = 0
+    coalesced: int = 0  # calls that waited on an identical in-flight query (single-flight)
     db_executions: int = 0
 
     def as_dict(self) -> dict:
@@ -93,15 +95,29 @@ class CatalogEntry:
     sql: str
     columns: tuple[str, ...]
     rowcount: int
-    filled_at: float  # time.time() when the result was stored
+    filled_at: float  # time.time() when stored, or when execution started if running
     hits: int
+    running: bool = False  # still executing in another caller; rerunning it verbatim waits for it
+
+
+class _Flight:
+    """One in-flight execution that identical concurrent callers wait on."""
+
+    def __init__(self):
+        self.event = threading.Event()
+        self.result: Result | None = None
+        self.error: BaseException | None = None
+        self.started = time.time()
 
 
 class SqlCache:
     """Shared by many threads. Each thread gets its own Postgres connection;
-    the lock guards only the in-memory store and counters, so DB executions
-    from different threads run concurrently. Two threads that miss on the same
-    key at the same time both execute it (no single-flight yet)."""
+    the lock guards only the in-memory state, so DB executions from different
+    threads run concurrently.
+
+    Single-flight (exact mode): if a cacheable query is already executing, an
+    identical call waits for that execution's result instead of running it
+    again. Errors are passed to the waiters and nothing is cached."""
 
     def __init__(self, dsn: str = DEFAULT_DSN, mode: str = "exact",
                  read_only: bool = False, db_delay_ms: float = 0.0,
@@ -122,6 +138,7 @@ class SqlCache:
         self._lock = threading.Lock()
         self._store: dict[str, Result] = {}
         self._meta: dict[str, list] = {}  # sql -> [filled_at, hits]
+        self._inflight: dict[str, _Flight] = {}
         self.stats = Stats()
         self.log: list[CallInfo] = []
         _ = self.conn  # connect eagerly so a bad DSN fails here
@@ -142,17 +159,39 @@ class SqlCache:
         cacheable, reason = is_cacheable(sql)
         use_cache = self.mode == "exact" and cacheable
 
+        cached, flight, owner = None, None, False
         with self._lock:
             self.stats.calls += 1
-            cached = self._store.get(sql) if use_cache else None
-            if cached is not None:
-                self.stats.hits += 1
-                self._meta[sql][1] += 1
+            if use_cache:
+                cached = self._store.get(sql)
+                if cached is not None:
+                    self.stats.hits += 1
+                    self._meta[sql][1] += 1
+                elif sql in self._inflight:
+                    flight = self._inflight[sql]
+                    self.stats.coalesced += 1
+                else:
+                    flight, owner = _Flight(), True
+                    self._inflight[sql] = flight
 
+        coalesced = False
         if cached is not None:
             result, hit, db_ms = cached, True, 0.0
+        elif flight is not None and not owner:
+            flight.event.wait()  # identical query already running: wait for it
+            if flight.error is not None:
+                raise flight.error
+            result, hit, db_ms, coalesced = flight.result, False, 0.0, True
         else:
-            result, db_ms = self._execute(sql)  # outside the lock
+            try:
+                result, db_ms = self._execute(sql)  # outside the lock
+            except BaseException as e:
+                if owner:
+                    with self._lock:
+                        self._inflight.pop(sql, None)
+                    flight.error = e
+                    flight.event.set()
+                raise
             hit = False
             with self._lock:
                 if use_cache:
@@ -160,20 +199,28 @@ class SqlCache:
                     if sql not in self._store:
                         self._store[sql] = result
                         self._meta[sql] = [time.time(), 0]
+                    self._inflight.pop(sql, None)
                 else:
                     self.stats.bypass += 1
+            if owner:
+                flight.result = result
+                flight.event.set()
 
         info = CallInfo(sql, cacheable, reason, hit,
-                        (time.perf_counter() - t0) * 1000, db_ms)
+                        (time.perf_counter() - t0) * 1000, db_ms, coalesced)
         with self._lock:
             self.log.append(info)
         return result, info
 
-    def catalog(self) -> list[CatalogEntry]:
-        """What the cache currently holds, most recently filled first."""
+    def catalog(self, include_running: bool = False) -> list[CatalogEntry]:
+        """What the cache holds, most recent first. With include_running, also
+        queries currently executing (rerunning one verbatim waits for it)."""
         with self._lock:
             entries = [CatalogEntry(sql, r.columns, r.rowcount, *self._meta[sql])
                        for sql, r in self._store.items()]
+            if include_running:
+                entries += [CatalogEntry(sql, (), -1, f.started, 0, running=True)
+                            for sql, f in self._inflight.items()]
         return sorted(entries, key=lambda e: e.filled_at, reverse=True)
 
     def clear(self) -> None:

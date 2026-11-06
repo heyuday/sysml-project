@@ -54,6 +54,8 @@ def main(argv=None) -> str:
     ap.add_argument("--effort", default="medium", help="anthropic effort: low|medium|high|xhigh|max")
     ap.add_argument("--aware", action="store_true",
                     help="give agents a cached_queries tool and a hint to reuse cached SQL")
+    ap.add_argument("--live", action="store_true",
+                    help="aware + catalog shows running queries (rerun verbatim to wait) + re-check hint")
     ap.add_argument("--db-delay-ms", type=float, default=0.0,
                     help="simulated extra latency on every real DB execution (not on hits)")
     ap.add_argument("--statement-timeout-s", type=float, default=120.0,
@@ -76,12 +78,13 @@ def main(argv=None) -> str:
     log.write(type="run", dataset=args.dataset, task=plan[0][0].id, scenario=args.scenario, schedule=args.schedule, gap=args.gap,
               n_agents=args.agents, cache=args.cache, backend=args.backend, model=model,
               effort=args.effort if args.backend == "anthropic" else None,
-              aware=args.aware, db_delay_ms=args.db_delay_ms)
+              aware=args.aware or args.live, live=args.live, db_delay_ms=args.db_delay_ms)
 
     # one cache shared by all agents
     cache = SqlCache(dsn=dsn, mode=args.cache, read_only=True, db_delay_ms=args.db_delay_ms,
                      statement_timeout_s=args.statement_timeout_s)
-    agents = [Agent(i, t, q, expected[t.id], backend, cache, log, args.max_steps, args.aware)
+    agents = [Agent(i, t, q, expected[t.id], backend, cache, log, args.max_steps,
+                    aware=args.aware, live=args.live)
               for i, (t, q) in enumerate(plan)]
 
     if args.schedule == "sequential":
