@@ -5,7 +5,8 @@
     conv.add_tool_results([(id, text, is_error), ...])
 
 Backends:
-  anthropic - Claude via the official SDK (ANTHROPIC_API_KEY). Default model:
+  anthropic - Claude via the official SDK (ANTHROPIC_API_KEY, or the alias
+              AGENTSQL_ANTHROPIC_API_KEY). Default model:
               claude-haiku-5-5 (cheapest current Claude).
   openai    - any OpenAI-compatible endpoint: OpenAI, vLLM, SGLang
               (OPENAI_API_KEY, OPENAI_BASE_URL).
@@ -55,9 +56,14 @@ class AnthropicBackend:
 
     def __init__(self, model: str = "claude-haiku-5-5", effort: str = "medium",
                  max_tokens: int = 16000):
+        import os
+
         import anthropic
 
-        self.client = anthropic.Anthropic()
+        # AGENTSQL_ANTHROPIC_API_KEY is an alias for environments that reserve or
+        # strip ANTHROPIC_API_KEY (e.g. hosted coding sessions using it themselves).
+        key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("AGENTSQL_ANTHROPIC_API_KEY")
+        self.client = anthropic.Anthropic(api_key=key) if key else anthropic.Anthropic()
         self.model, self.effort, self.max_tokens = model, effort, max_tokens
 
     def new_conversation(self, system, user, tools, task=None):

@@ -28,7 +28,10 @@ case "${1:-}" in
     ;;
   sweep)
     task=${2:?usage: cloud_run.sh sweep <task>}
-    : "${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in the cloud environment settings (Environment variables)}"
+    if [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -z "${AGENTSQL_ANTHROPIC_API_KEY:-}" ]; then
+      echo "no API key: set ANTHROPIC_API_KEY or AGENTSQL_ANTHROPIC_API_KEY (cloud: environment settings)" >&2
+      exit 1
+    fi
     uv run python sweep.py --dataset tpch --task "$task" --delays 0 --schedules sequential \
       --reps "$REPS" --out "$OUT/$task" 2>&1 | tee "$OUT/$task.out"
     ;;

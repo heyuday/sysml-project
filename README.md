@@ -85,7 +85,7 @@ bash scripts/cloud_run.sh sweep q10_returned_customer
 bash scripts/cloud_run.sh summary
 ```
 
-It needs `ANTHROPIC_API_KEY` in the environment. Results go to `results/tpch-sf10/`. Tested in an Ubuntu 24.04 container at SF 0.1 with the mock backend.
+It needs `ANTHROPIC_API_KEY` in the environment, or the alias `AGENTSQL_ANTHROPIC_API_KEY` if the host strips the former. Results go to `results/tpch-sf10/`. Tested in an Ubuntu 24.04 container at SF 0.1 with the mock backend.
 
 ## Layout
 
