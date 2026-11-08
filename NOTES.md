@@ -228,3 +228,31 @@ This project now lives at the repo root. MadBonzz's original files moved, unchan
 5. **Cost:** aware arms use about 15–45% more input tokens.
 
 **Implication / next design:** enforce the re-check in the system instead of asking for it. When an aware agent's `run_sql` would execute a new query, first return any cached or RUNNING entries it hasn't seen yet. The agent then reruns one verbatim or confirms its own. This targets the parallel case: the first heavy query starts about 0.5–1 s before the others.
+
+## More TPC-H tasks for a larger batch (2026-11-08)
+
+**Goal:** a bigger sample on the same architecture (sequential, parallel and staggered; direct, aware and aware-live). Nothing new in the design.
+
+**Added tasks:** Q2, Q3, Q9, Q11, Q15 and Q18. Each is the standard TPC-H query with standard parameters, narrowed to a one-row answer (a name or key), with 4 wordings each.
+- At SF 1 every answer matches the official TPC-H result: Q2 Supplier#000005359, Q3 order 2456423, Q15 Supplier#000008449, Q18 Customer#000128120 / 4722021.
+- Every answer is unique (the runner-up differs).
+- The answer check now ignores thousands separators, so an order key written as 2,456,423 still matches.
+
+**SF 1 timings on the M2,** with expected cloud SF 10 times from the 12–26× ratio seen for Q5 and Q10:
+
+| task | SF 1 | expected SF 10 |
+|---|---|---|
+| Q11 | 0.05 s | ~1 s |
+| Q2 | 0.11 s | ~2 s |
+| Q10 | 0.35 s | 4.3 s (measured) |
+| Q15 | 0.22 s | ~4 s |
+| Q5 | 0.2 s | 5.3 s (measured) |
+| Q3 | 0.35 s | ~6 s |
+| Q9 | 1.0 s | ~20 s |
+| Q18 | 2.2 s | ~25–55 s, excluded from overlapping runs because of the 120 s timeout |
+
+**Batch 2 plan** (new folder `results/tpch-sf10-b2/`, a fresh VM; Q5 and Q10 rerun as a reproducibility check against batch 1):
+- sequential, direct vs aware, 5 reps × 7 tasks = 70 runs;
+- concurrent, parallel + staggered × direct, aware and aware-live, 3 reps × 7 tasks = 126 runs.
+
+The 7 tasks span about 1 s to 20 s per query, so the batch also shows **how the cache's benefit scales with query cost**.

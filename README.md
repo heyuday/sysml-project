@@ -88,7 +88,7 @@ Main `run_agents.py` options:
 
 | Flag | Values |
 |---|---|
-| `--dataset` / `--task` | `shop` or `tpch`; question for `same`/`paraphrase`, e.g. `q5_nation_revenue`, `q10_returned_customer` |
+| `--dataset` / `--task` | `shop` or `tpch`; question for `same`/`paraphrase`. TPC-H tasks: `q2_min_cost_supplier`, `q3_shipping_priority`, `q5_nation_revenue`, `q9_green_profit`, `q10_returned_customer`, `q11_german_stock_part`, `q15_top_supplier`, `q18_large_order_customer` (each is the standard TPC-H query narrowed to a unique one-row answer; SF 1 answers match the official results) |
 | `--scenario` | `same`, `paraphrase` (same question, reworded per agent), `related`, `mixed` |
 | `--schedule` | `sequential`, `staggered --gap N`, `parallel` |
 | `--cache` | `exact` or `direct` (no cache) |

@@ -4,7 +4,9 @@
 #   bash scripts/cloud_run.sh setup              # Postgres + deps + tests        (~2 min)
 #   bash scripts/cloud_run.sh load               # TPC-H at $SF (default 10)      (~10 min)
 #   bash scripts/cloud_run.sh sweep <task>       # direct vs aware, $REPS reps    (~10-20 min)
-#       tasks: q5_nation_revenue, q10_returned_customer
+#       tasks (by expected cost at SF 10): q11_german_stock_part (~1 s), q2_min_cost_supplier,
+#       q10_returned_customer, q15_top_supplier, q5_nation_revenue, q3_shipping_priority,
+#       q9_green_profit (~20 s); q18_large_order_customer exists but is too slow for concurrent runs
 #   bash scripts/cloud_run.sh concurrent <task>  # agents overlap: parallel + staggered (3 s gap),
 #                                                #   direct vs aware vs aware-live, $REPS reps (~15 min)
 #   bash scripts/cloud_run.sh summary            # print every sweep table
@@ -15,7 +17,7 @@ cd "$(dirname "$0")/.."
 
 SF=${SF:-10}
 REPS=${REPS:-3}
-OUT=results/tpch-sf${SF%.*}
+OUT=${OUT:-results/tpch-sf${SF%.*}}   # override for a new batch, e.g. OUT=results/tpch-sf10-b2
 mkdir -p "$OUT"
 
 case "${1:-}" in
@@ -51,6 +53,6 @@ case "${1:-}" in
     for d in "$OUT"/*/; do echo "== $d"; uv run python -m agentsql.aggregate "$d"; echo; done
     ;;
   *)
-    sed -n '2,14p' "$0"; exit 1
+    sed -n '2,16p' "$0"; exit 1
     ;;
 esac

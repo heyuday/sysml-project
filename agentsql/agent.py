@@ -209,7 +209,8 @@ class Agent:
                 break
             conv.add_tool_results(results)
 
-        correct = answer is not None and any(e.lower() in answer.lower() for e in self.expected)
+        norm = (answer or "").lower().replace(",", "")
+        correct = answer is not None and any(e.lower().replace(",", "") in norm for e in self.expected)
         wall = time.perf_counter() - t0
         self.log.write(type="final", agent=self.id, task=self.task.id, answer=answer,
                        expected=self.expected, correct=correct, steps=step,

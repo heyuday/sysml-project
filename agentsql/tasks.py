@@ -119,6 +119,128 @@ TPCH_TASKS = {
         "ORDER BY sum(l_extendedprice * (1 - l_discount)) DESC LIMIT 1",
         ("customer", "orders", "lineitem"),
     ),
+    "q3_shipping_priority": Task(
+        "q3_shipping_priority",
+        (
+            "Among orders from customers in the BUILDING market segment that were placed before 1995-03-15 "
+            "and still had line items shipping after 1995-03-15, which order has the highest revenue from "
+            "those later-shipping items (extendedprice * (1 - discount))? Give the order key.",
+            "For BUILDING-segment customers, look at orders dated before March 15, 1995 whose line items "
+            "ship after that date. Summing l_extendedprice * (1 - l_discount) over those line items, which "
+            "order key comes out on top?",
+            "Which order (by order key) has the most unshipped revenue as of 1995-03-15? Only count orders "
+            "placed before that date by customers in market segment BUILDING, and only line items with a "
+            "ship date after it; revenue = extended price after discount.",
+            "Find the top order by potential revenue at 1995-03-15: BUILDING-segment customers, order date "
+            "before that day, line items with ship date after it, revenue = sum(l_extendedprice * (1 - l_discount)). "
+            "Answer with the order key.",
+        ),
+        "SELECT l_orderkey FROM customer, orders, lineitem "
+        "WHERE c_mktsegment = 'BUILDING' AND c_custkey = o_custkey AND l_orderkey = o_orderkey "
+        "AND o_orderdate < date '1995-03-15' AND l_shipdate > date '1995-03-15' "
+        "GROUP BY l_orderkey, o_orderdate, o_shippriority "
+        "ORDER BY sum(l_extendedprice * (1 - l_discount)) DESC, o_orderdate LIMIT 1",
+        ("customer", "orders", "lineitem"),
+    ),
+    "q9_green_profit": Task(
+        "q9_green_profit",
+        (
+            "For parts whose name contains 'green', which supplier nation made the most total profit in 1998? "
+            "Profit per line item is extendedprice * (1 - discount) minus supplycost * quantity, using the "
+            "partsupp supply cost for that part and supplier; the year is the order date's year.",
+            "Considering only parts with 'green' in their name and orders placed in 1998, which nation's "
+            "suppliers earned the largest profit, where profit = l_extendedprice * (1 - l_discount) - "
+            "ps_supplycost * l_quantity (partsupp matched on part and supplier)?",
+            "Which nation (of the supplier) had the highest 1998 profit on 'green' parts? Use order year 1998, "
+            "p_name containing 'green', and profit = discounted extended price minus supply cost times quantity.",
+            "Rank supplier nations by total 1998 profit from line items of parts named like '%green%'. "
+            "Profit = l_extendedprice * (1 - l_discount) - ps_supplycost * l_quantity. Which nation is first?",
+        ),
+        "SELECT n_name FROM part, supplier, lineitem, partsupp, orders, nation "
+        "WHERE s_suppkey = l_suppkey AND ps_suppkey = l_suppkey AND ps_partkey = l_partkey "
+        "AND p_partkey = l_partkey AND o_orderkey = l_orderkey AND s_nationkey = n_nationkey "
+        "AND p_name LIKE '%green%' AND o_orderdate >= date '1998-01-01' AND o_orderdate < date '1999-01-01' "
+        "GROUP BY n_name ORDER BY sum(l_extendedprice * (1 - l_discount) - ps_supplycost * l_quantity) DESC LIMIT 1",
+        ("part", "supplier", "lineitem", "partsupp", "orders", "nation"),
+    ),
+    "q11_german_stock_part": Task(
+        "q11_german_stock_part",
+        (
+            "Across suppliers located in GERMANY, which part has the largest total stock value, where stock "
+            "value is supplycost * availqty from partsupp? Give the part key.",
+            "Sum ps_supplycost * ps_availqty per part over partsupp rows from German suppliers. Which part key "
+            "has the highest total?",
+            "Which part (by part key) represents the most inventory value held by suppliers in GERMANY? "
+            "Inventory value = supply cost times available quantity.",
+            "For suppliers whose nation is GERMANY, compute each part's total value of available stock "
+            "(ps_supplycost * ps_availqty). Report the part key of the most valuable one.",
+        ),
+        "SELECT ps_partkey FROM partsupp, supplier, nation "
+        "WHERE ps_suppkey = s_suppkey AND s_nationkey = n_nationkey AND n_name = 'GERMANY' "
+        "GROUP BY ps_partkey ORDER BY sum(ps_supplycost * ps_availqty) DESC LIMIT 1",
+        ("partsupp", "supplier", "nation"),
+    ),
+    "q18_large_order_customer": Task(
+        "q18_large_order_customer",
+        (
+            "Among orders whose line items add up to a total quantity above 300, which order has the highest "
+            "total price (o_totalprice)? Give the name of the customer who placed it.",
+            "Consider only 'large' orders: total l_quantity across the order's line items greater than 300. "
+            "Which customer placed the large order with the biggest o_totalprice? Name the customer.",
+            "Find the most expensive order (by o_totalprice) among those with more than 300 units in total "
+            "(sum of l_quantity). Who is the customer?",
+            "Which customer owns the priciest order among orders whose summed line item quantity exceeds 300? "
+            "Answer with the customer name.",
+        ),
+        "SELECT c_name, o_orderkey FROM customer, orders, lineitem "
+        "WHERE o_orderkey IN (SELECT l_orderkey FROM lineitem GROUP BY l_orderkey HAVING sum(l_quantity) > 300) "
+        "AND c_custkey = o_custkey AND o_orderkey = l_orderkey "
+        "GROUP BY c_name, c_custkey, o_orderkey, o_orderdate, o_totalprice "
+        "ORDER BY o_totalprice DESC, o_orderdate LIMIT 1",
+        ("customer", "orders", "lineitem"),
+    ),
+    "q2_min_cost_supplier": Task(
+        "q2_min_cost_supplier",
+        (
+            "Look at parts of size 15 whose type ends in 'BRASS'. For each such part, find the suppliers in the "
+            "EUROPE region that offer it at the minimum supply cost available in EUROPE. Among all those "
+            "minimum-cost offers, which supplier has the highest account balance? Give the supplier name.",
+            "For size-15 parts with p_type like '%BRASS', consider only European suppliers (region EUROPE) whose "
+            "ps_supplycost equals the lowest European supply cost for that part. Which of those suppliers has the "
+            "largest s_acctbal? Name it.",
+            "Which European supplier, offering a size-15 BRASS part at that part's cheapest supply cost within the "
+            "EUROPE region, has the biggest account balance? Answer with the supplier's name.",
+            "Find the minimum-cost European supplier for each part of size 15 and type ending in BRASS (minimum "
+            "taken over suppliers in region EUROPE). Of these suppliers, which has the top account balance?",
+        ),
+        "SELECT s_name FROM part, supplier, partsupp, nation, region "
+        "WHERE p_partkey = ps_partkey AND s_suppkey = ps_suppkey AND p_size = 15 AND p_type LIKE '%BRASS' "
+        "AND s_nationkey = n_nationkey AND n_regionkey = r_regionkey AND r_name = 'EUROPE' "
+        "AND ps_supplycost = (SELECT min(ps_supplycost) FROM partsupp, supplier, nation, region "
+        "WHERE p_partkey = ps_partkey AND s_suppkey = ps_suppkey AND s_nationkey = n_nationkey "
+        "AND n_regionkey = r_regionkey AND r_name = 'EUROPE') "
+        "ORDER BY s_acctbal DESC, n_name, s_name, p_partkey LIMIT 1",
+        ("part", "supplier", "partsupp", "nation", "region"),
+    ),
+    "q15_top_supplier": Task(
+        "q15_top_supplier",
+        (
+            "Which supplier generated the most revenue from line items shipped in the first quarter of 1996 "
+            "(ship date from 1996-01-01 up to but not including 1996-04-01)? Revenue is extendedprice * "
+            "(1 - discount). Give the supplier's name.",
+            "Sum l_extendedprice * (1 - l_discount) per supplier over line items with l_shipdate in "
+            "[1996-01-01, 1996-04-01). Which supplier has the largest total? Name it.",
+            "Who was the top supplier by discounted revenue for items shipped during Q1 1996? Answer with the "
+            "supplier name.",
+            "Rank suppliers by total revenue (extended price after discount) on line items shipped between "
+            "January 1 and March 31, 1996. Which supplier is first?",
+        ),
+        "SELECT s_name, s_suppkey FROM supplier, (SELECT l_suppkey AS supplier_no, "
+        "sum(l_extendedprice * (1 - l_discount)) AS total_revenue FROM lineitem "
+        "WHERE l_shipdate >= date '1996-01-01' AND l_shipdate < date '1996-04-01' GROUP BY l_suppkey) r "
+        "WHERE s_suppkey = supplier_no ORDER BY total_revenue DESC LIMIT 1",
+        ("supplier", "lineitem"),
+    ),
 }
 
 DATASETS = {"shop": SHOP_TASKS, "tpch": TPCH_TASKS}
