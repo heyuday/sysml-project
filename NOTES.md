@@ -256,3 +256,26 @@ This project now lives at the repo root. MadBonzz's original files moved, unchan
 - concurrent, parallel + staggered × direct, aware and aware-live, 3 reps × 7 tasks = 126 runs.
 
 The 7 tasks span about 1 s to 20 s per query, so the batch also shows **how the cache's benefit scales with query cost**.
+
+## Batch 2 results (TPC-H SF 10, 7 tasks, cloud VM)
+
+**Correctness:** 196 runs, 784 answers, all correct. No step failed. The cloud session used `~/.anthropic_key` because the environment variable wasn't set.
+
+**Sequential:** on every task except Q2, all followers reused the leader's query. Follower time is about 3.5 s, three LLM calls, regardless of query cost.
+- Follower speedup grows with query cost: Q11 17%, Q15 47%, Q10/Q5/Q3 62–67%, Q9 86%.
+- DB work is down about 75% (Q9 66%, because its leader query alone is about 20 s of a 28 s total).
+- Q5 and Q10 reproduce batch 1 within about 1 s.
+
+**Q2 finding:** agents write Q2 as a CTE (`WITH ...`), and `is_cacheable` rejects those.
+- Bypassed queries: 46/57 sequential, 80/105 concurrent. Every one starts with `WITH`.
+- Reuse was 0.20 at best.
+- So this is a cost of our conservative eligibility rule, not of agent behaviour. Next: accept read-only CTEs.
+- The Q2 SQL errors (mostly "unterminated quoted identifier", 30 in all) didn't affect the final answers.
+
+**Concurrent, staggered:** aware-live cuts heavy executions from about 4 to about 1, and DB time by 75–87%, on Q10, Q15, Q5, Q3 and Q9.
+- Plain aware works only if the leader has finished by the time a follower looks.
+- That was partly true on Q5, Q10 and Q15; it gave almost nothing on Q3 and Q9.
+
+**Q2 outlier:** in the Q2 staggered aware-live run, rep 1 took 132 s because an uncached CTE query hit the 120 s statement timeout. The other reps took 16 s and 21 s.
+
+**Concurrent, parallel:** about 0 reuse in every arm on every task (Q3 0.11). This is the same as batch 1: everyone checks at about 1 s, before any heavy query exists. That makes the enforced re-check (or a short wait before running a new heavy query) the top next step.

@@ -8,55 +8,72 @@ CS 5470, Team 19.
 
 ## Main result: heavy queries (TPC-H, scale factor 10)
 
+Setup:
+- **Data:** TPC-H at scale factor 10 in Postgres 16, on a 4-vCPU / 15 GB cloud VM.
+- **Tasks:** 7 classic TPC-H queries, each narrowed to a one-row answer and asked in 4 different wordings. Single-query cost ranges from about 0.8 s (Q11) to about 20 s (Q9).
+- **Agents:** 4 Claude Haiku 5.5 agents. Agent 0 is the "leader"; agents 1–3 are "followers" that can reuse its work.
+- **Arms:** no cache, or a shared cache with **cache-aware** agents. Aware agents get a `cached_queries` tool that lists cached SQL with its columns and row counts, plus a hint to rerun a fitting query verbatim.
+- **Batch 2** ([`results/tpch-sf10-b2/`](results/tpch-sf10-b2/)): 5 reps sequential and 3 reps concurrent, per task and arm. **All 784 answers are correct.** Batch 1 ([`results/tpch-sf10/`](results/tpch-sf10/), Q5 and Q10 only) gave the same numbers.
+
 ### Agents one after another
 
-Setup:
-- **Data:** TPC-H at scale factor 10 in Postgres 16, on a 4-vCPU / 15 GB cloud VM. The two tasks are classic TPC-H queries, each asked in 4 different wordings:
-  - **Q5:** top Asian nation by local-supplier revenue, a 6-table join taking about 5.3 s.
-  - **Q10:** the customer with the most revenue lost to returns, about 4.3 s.
-- **Agents:** 4 Claude Haiku 5.5 agents, one after another. Agent 0 (the "leader") runs first, and agents 1–3 ("followers") can reuse its work.
-- **Arms:** no cache vs. a shared cache with **cache-aware** agents. Aware agents get a `cached_queries` tool listing cached SQL with columns and row counts, and a hint to rerun a fitting query verbatim.
-- 3 reps per arm. No simulated latency. Raw logs are in [`results/tpch-sf10/`](results/tpch-sf10/).
+Follower time is the mean per follower. DB time is the total database execution time per run.
 
-| task | arm | correct | follower time (s) | follower LLM calls | follower SQL time (s) | DB time per run (s) |
+| task | follower s, no cache | follower s, cache-aware | faster | reuse | DB s / run | less DB |
 |---|---|---|---|---|---|---|
-| Q5 | no cache | 12/12 | 10.9 ± 0.2 | 3.7 | 5.1 | 20.5 |
-| Q5 | **cache-aware** | 12/12 | **4.7 ± 0.1** | 3.0 | **0.0** | **5.1** |
-| Q10 | no cache | 12/12 | 9.1 ± 1.3 | 3.0 | 5.2 | 19.8 |
-| Q10 | **cache-aware** | 12/12 | **4.4 ± 0.1** | 3.0 | **0.0** | **4.3** |
+| Q11 (0.8 s query) | 4.4 | **3.6** | 17% | 1.00 | 3.0 → **0.8** | 74% |
+| Q2 | 8.6 | **8.3** | 3% | 0.20 | 15.4 → **13.4** | 13% |
+| Q10 | 9.7 | **3.7** | 62% | 1.00 | 23.6 → **5.3** | 78% |
+| Q15 | 7.5 | **3.9** | 47% | 1.00 | 14.6 → **3.7** | 75% |
+| Q5 | 10.6 | **3.9** | 63% | 1.00 | 23.6 → **6.1** | 74% |
+| Q3 | 10.1 | **3.3** | 67% | 1.00 | 24.4 → **6.1** | 75% |
+| Q9 (20 s query) | 26.5 | **3.7** | 86% | 1.00 | 82.4 → **27.8** | 66% |
 
-- **Followers finish 52–57% faster, and database work drops 75–78%.** Only the leader's heavy query executes. Every follower reused it, and every answer was correct.
-- **The saving is the cache itself.** In Q10 both arms make exactly 3 LLM calls per follower, so the whole saving (about 4.7 s) is cached results replacing 4–5 s queries. In Q5, about 1 s comes from fewer turns and about 5 s from cache hits.
-- **Query cost decides whether this matters.** Without a cache, SQL is about half of a follower's time here. On small benchmark databases such as BIRD it's a few percent, and caching barely helps there.
+- **Whenever a follower can see a cached result, it reuses it.** On 6 of 7 tasks every follower reused the leader's query. Follower time drops to about 3.5 s, the cost of three LLM calls, no matter how heavy the query is. DB work falls by about 75%.
+- **The saving grows with query cost:** 17% on a 0.8 s query, 86% on a 20 s query. On Q9 a whole 4-agent run went from 104 s to 45 s.
+- **Q2 is the exception, and the cause is our own cache rule.** Agents usually write Q2 with a CTE (`WITH ...`). Our cache conservatively refuses anything that isn't a plain `SELECT`, so 46 of 57 Q2 queries bypassed it. A follower can't reuse a result that was never stored. Accepting read-only CTEs is a cheap fix (next runs, item 2).
 - **Limits:**
-  - Sequential is the best case for reuse: the leader always finishes first.
-  - n = 3, one model, two tasks.
-  - The aware leader can be slightly slower (+2.5 s in Q10) because it checks an empty cache.
+  - Sequential is the best case for reuse, because the leader always finishes first.
+  - One model.
+  - The aware leader is sometimes slightly slower, because it checks an empty cache first.
 
 ### Agents running at the same time
 
-Same setup, but agents overlap: `parallel` (all start together) or `staggered` (3 s apart). The third arm, **`aware-live`**, also lists queries that are *still running*, and rerunning one verbatim waits for its result (single-flight). Mean follower time; "heavy runs" = analytical queries that actually executed ≥ 1 s per run; 3 reps; all 144 answers correct ([results](results/tpch-sf10/)):
+Same setup, but the agents overlap:
+- **`parallel`:** all agents start together.
+- **`staggered`:** agents start 3 s apart.
 
-| task | schedule | no cache | aware | aware-live | heavy runs (no cache → aware-live) |
-|---|---|---|---|---|---|
-| Q10 | staggered | 9.1 s | 8.7 s | **4.1 s** | 4 → **1** |
-| Q5 | staggered | 13.4 s | 8.1 s | **7.5 s** | 4 → **2** |
-| Q10 | parallel | 18.1 s | 17.7 s | 16.7 s | 5.7 → 4 |
-| Q5 | parallel | 20.2 s | 19.9 s | 19.8 s | 4 → 4 |
+The third arm, **`aware-live`**, also lists queries that are *still running*. Rerunning one of them verbatim waits for its result (single-flight) instead of executing again.
 
-- **Showing running queries is what makes overlap work.** In staggered runs, followers saw the leader's query RUNNING and waited for it instead of recomputing. On Q10 that's −55% follower time and −78% DB time, matching the sequential result. Plain `aware` barely helped there, because the leader's result wasn't finished yet when followers looked.
-- **Simultaneous starts get no reuse in any arm.** Every agent checked the catalog once, about 1 s in. The first heavy query started at about 2.5–3.5 s, so there was nothing to see.
-- **Agents ignored the instruction to re-check before their expensive query.** Every agent checked exactly once. The fix is to enforce it in the system rather than in the prompt (next runs, item 1).
-- Overlap is costly without a cache: 4 simultaneous 5 s queries on 4 vCPUs took about 14 s each.
+Columns: follower time is the mean in seconds. "Heavy runs" counts analytical queries per run that actually executed and took ≥ 1 s.
+
+| task | schedule | no cache | aware | aware-live | reuse (live) | heavy runs (no cache → live) | DB s / run (no cache → live) |
+|---|---|---|---|---|---|---|---|
+| Q10 | staggered | 11.1 | 8.5 | **4.4** | 1.00 | 4.3 → **1.0** | 27 → **5** |
+| Q15 | staggered | 7.6 | 4.8 | **3.4** | 1.00 | 4.0 → **1.0** | 17 → **3** |
+| Q5 | staggered | 17.5 | 10.5 | **6.5** | 0.89 | 4.0 → **1.3** | 44 → **10** |
+| Q3 | staggered | 16.9 | 16.6 | **4.9** | 1.00 | 4.0 → **1.0** | 45 → **6** |
+| Q9 | staggered | 44.5 | 43.8 | **19.1** | 0.67 | 4.3 → **2.0** | 148 → **37** |
+| Q11 | staggered | 4.4 | 4.0 | 3.4 | 1.00 | (all < 1 s) | 3 → 1 |
+| Q2 | staggered | 9.2 | 9.6 | 20.8* | 0.33 | 2.7 → 2.3 | 15 → 13 |
+| all 7 | parallel | | | about equal in every arm | ≈ 0 (Q3: 0.11) | no change | no change |
+
+\* One rep hit the 120 s statement timeout on an uncached CTE query. The other two reps took 16 s and 21 s.
+
+- **With staggered starts, showing running queries is what makes reuse work.** Followers see the leader's query RUNNING, rerun it verbatim and wait. The database runs the heavy query **once instead of about 4 times**, which saves 75–87% of DB time on Q10, Q15, Q5, Q3 and Q9.
+- **Plain `aware` helps only when the leader happens to finish before a follower looks.** It got some reuse on Q5, Q10 and Q15. On Q3 and Q9 it got almost none, because the leader's query was still running.
+- **Simultaneous starts get no reuse in any arm, on any task.** Every agent checked the catalog once, about 1 s in, before anyone's heavy query had started. Agents also ignored the prompt to re-check before an expensive query. The fix has to be enforced by the system (next runs, item 1).
+- Overlap is costly without a cache. On 4 vCPUs, 4 simultaneous copies of a heavy query each run 2–3.5× slower.
 
 **Why awareness is needed:** on a small database, four agents given the same question in different words wrote seven different SQL statements (different aliases, join order, extra columns). So a plain exact-text cache got **0 hits** on the analytical queries. Cache-aware agents instead rerun a cached query verbatim. This held in every run where a cached query existed, across 24 runs on the small database ([results/sweep-paraphrase-v2](results/sweep-paraphrase-v2/), [first runs](results/first-real-runs/)).
 
 ## Next runs
 
 1. **Enforced re-check for simultaneous starts.** Agents didn't follow the prompt to re-check before their expensive query. Instead, when an aware agent's `run_sql` would execute a new query, the system first shows it any cached or RUNNING entries it hasn't seen yet. The agent then reruns one verbatim or confirms its own. This targets the `parallel` case, where the first heavy query starts about 0.5–1 s before the others.
-2. **A catalog that scales.** Listing every cached query costs more tokens as the cache grows. Instead, retrieve only the top-k entries relevant to the agent's question, and store the question behind each cached query. We'll measure tokens, reuse and accuracy as the catalog grows (10 → 100 → 1,000 entries).
-3. **Wrong-reuse test.** Give agents near-miss questions: same tables, different filter (e.g. "revenue by region" vs. "revenue by region for one category"). Do they rerun a cached query that looks similar but is wrong? The research suggests similar-but-wrong context is a real failure mode, so we'll measure the wrong-reuse rate directly.
-4. Later: invalidation when data changes (TTL vs. table versions), cache size limits and eviction, other models.
+2. **Cache read-only CTEs.** Accept `WITH` queries whose bodies are plain SELECTs. This should recover Q2, where agents write CTEs and about 80% of their queries bypassed the cache.
+3. **A catalog that scales.** Listing every cached query costs more tokens as the cache grows. Instead, retrieve only the top-k entries relevant to the agent's question, and store the question behind each cached query. We'll measure tokens, reuse and accuracy as the catalog grows (10 → 100 → 1,000 entries).
+4. **Wrong-reuse test.** Give agents near-miss questions: same tables, different filter (e.g. "revenue by region" vs. "revenue by region for one category"). Do they rerun a cached query that looks similar but is wrong? The research suggests similar-but-wrong context is a real failure mode, so we'll measure the wrong-reuse rate directly.
+5. Later: invalidation when data changes (TTL vs. table versions), cache size limits and eviction, other models.
 
 ## How it works
 
@@ -75,7 +92,7 @@ You need Docker and [uv](https://docs.astral.sh/uv/).
 ```sh
 docker compose up -d --wait      # Postgres 16 on 127.0.0.1:55440 with the small `shop` DB
 uv sync
-uv run pytest -q                 # 42 tests (TPC-H ones skip until it's loaded)
+uv run pytest -q                 # 48 tests (TPC-H ones skip until it's loaded)
 
 uv run python scripts/load_tpch.py --sf 1                     # TPC-H into DB `tpch` (SF 10 ≈ 15 GB)
 uv run python run_agents.py --backend mock --dataset tpch --task q5_nation_revenue --scenario paraphrase --live
