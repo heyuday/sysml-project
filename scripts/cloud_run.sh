@@ -11,6 +11,7 @@
 #                                                #   direct vs aware vs aware-live, $REPS reps (~15 min)
 #   bash scripts/cloud_run.sh summary            # print every sweep table
 #
+# Env overrides: SF, REPS, OUT, MODEL, ARMS (comma-separated, replaces the step's default arms).
 # Results land in results/tpch-sf$SF/ (load timings, machine info, per-task sweep logs + CSVs).
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -18,6 +19,8 @@ cd "$(dirname "$0")/.."
 SF=${SF:-10}
 REPS=${REPS:-3}
 OUT=${OUT:-results/tpch-sf${SF%.*}}   # override for a new batch, e.g. OUT=results/tpch-sf10-b2
+MODEL=${MODEL:-}                       # e.g. MODEL=claude-opus-5-5 (default: the backend's, Haiku 5.5)
+MODEL_ARGS=(); [ -n "$MODEL" ] && MODEL_ARGS=(--model "$MODEL")
 mkdir -p "$OUT"
 
 case "${1:-}" in
@@ -37,7 +40,7 @@ case "${1:-}" in
       exit 1
     fi
     uv run python sweep.py --dataset tpch --task "$task" --delays 0 --schedules sequential \
-      --reps "$REPS" --out "$OUT/$task" 2>&1 | tee "$OUT/$task.out"
+      --arms "${ARMS:-direct,aware}" "${MODEL_ARGS[@]}" --reps "$REPS" --out "$OUT/$task" 2>&1 | tee "$OUT/$task.out"
     ;;
   concurrent)
     task=${2:?usage: cloud_run.sh concurrent <task>}
@@ -46,13 +49,13 @@ case "${1:-}" in
       exit 1
     fi
     uv run python sweep.py --dataset tpch --task "$task" --delays 0 \
-      --schedules parallel,staggered --gap 3 --arms direct,aware,aware-live \
-      --reps "$REPS" --out "$OUT/concurrent-$task" 2>&1 | tee "$OUT/concurrent-$task.out"
+      --schedules parallel,staggered --gap 3 --arms "${ARMS:-direct,aware,aware-live}" \
+      "${MODEL_ARGS[@]}" --reps "$REPS" --out "$OUT/concurrent-$task" 2>&1 | tee "$OUT/concurrent-$task.out"
     ;;
   summary)
     for d in "$OUT"/*/; do echo "== $d"; uv run python -m agentsql.aggregate "$d"; echo; done
     ;;
   *)
-    sed -n '2,16p' "$0"; exit 1
+    sed -n '2,17p' "$0"; exit 1
     ;;
 esac
